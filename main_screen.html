@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slay the Spore - Main Menu</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #221133;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Animated Background Gradient */
+        .bg-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 50%, #4a1936 0%, #221133 100%);
+        }
+
+        .spore-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255, 117, 140, 0.2) 2px, transparent 2px);
+            background-size: 60px 60px;
+            animation: moveBg 20s linear infinite;
+        }
+
+        @keyframes moveBg {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 600px 600px;
+            }
+        }
+
+        #main-menu,
+        #compendium-screen {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #compendium-screen {
+            display: none;
+        }
+
+        .panel {
+            background: rgba(20, 10, 30, 0.85);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            border: 2px solid #ff758c;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 60px;
+            color: #ff758c;
+            margin: 0 0 10px 0;
+            text-shadow: 0 2px 10px rgba(255, 117, 140, 0.5);
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #ffcc00;
+            margin: 0 0 40px 0;
+            font-weight: normal;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 300px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 117, 140, 0.6);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #5a5a7e 0%, #8282a5 100%);
+            box-shadow: 0 4px 15px rgba(90, 90, 126, 0.4);
+        }
+
+        button.secondary:hover {
+            box-shadow: 0 8px 25px rgba(90, 90, 126, 0.6);
+        }
+
+        /* Compendium UI */
+        #compendium-screen>.panel {
+            width: 80%;
+            max-width: 1000px;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+
+        #compendium-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            flex: 1;
+            perspective: 1000px;
+        }
+
+        #compendium-grid::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #compendium-grid::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        #compendium-grid::-webkit-scrollbar-thumb {
+            background: #ff758c;
+            border-radius: 5px;
+        }
+
+        /* Card Styles */
+        .card {
+            width: 180px;
+            height: 252px;
+            background: #2a2a3e;
+            /* 1.4x scale compared to index.html */
+            border: 3px solid #5a5a7e;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+            transition: transform 0.1s ease-out, box-shadow 0.2s, border-color 0.2s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            border-color: #fff;
+            z-index: 100;
+            box-shadow: 0 0 25px 8px rgba(255, 255, 255, 0.4), 0 5px 15px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px) scale(1.1);
+        }
+
+        /* Holographic Effect overlay */
+        .card .holo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 5;
+            --shine-x: 50%;
+            --shine-y: 50%;
+            --hex-shift-x: 0px;
+            --hex-shift-y: 0px;
+            background-image:
+                radial-gradient(circle at var(--shine-x) var(--shine-y), rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.08) 12%, rgba(255, 255, 255, 0) 28%),
+                linear-gradient(115deg, transparent 18%, rgba(255, 255, 255, 0.2) 24%, transparent 30%, transparent 44%, rgba(255, 100, 200, 0.12) 50%, transparent 56%, transparent 68%, rgba(100, 255, 255, 0.12) 74%, transparent 80%);
+            background-size: 145% 145%, 280% 280%;
+            background-position: center, var(--shine-x) var(--shine-y);
+            background-repeat: no-repeat, no-repeat;
+            background-blend-mode: screen, screen;
+            mix-blend-mode: screen;
+            opacity: 0;
+            filter: saturate(1.03) brightness(1.02);
+            transition: opacity 0.2s, filter 0.2s;
+        }
+
+        .card .holo::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background-image:
+                radial-gradient(circle at var(--shine-x) var(--shine-y), rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 24%, rgba(255, 255, 255, 0) 52%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 27 31.176' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='fillA' x1='1' y1='2' x2='17' y2='14' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%237cf7ff' stop-opacity='0.42'/%3E%3Cstop offset='0.52' stop-color='%23ffffff' stop-opacity='0.08'/%3E%3Cstop offset='1' stop-color='%23ffc2f2' stop-opacity='0.34'/%3E%3C/linearGradient%3E%3ClinearGradient id='fillB' x1='2' y1='17' x2='17' y2='30' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%239dfff5' stop-opacity='0.28'/%3E%3Cstop offset='0.5' stop-color='%23ffffff' stop-opacity='0.05'/%3E%3Cstop offset='1' stop-color='%23efd5ff' stop-opacity='0.25'/%3E%3C/linearGradient%3E%3ClinearGradient id='fillC' x1='15' y1='8' x2='31' y2='23' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23ffd9f7' stop-opacity='0.3'/%3E%3Cstop offset='0.45' stop-color='%23ffffff' stop-opacity='0.06'/%3E%3Cstop offset='1' stop-color='%2389fdf3' stop-opacity='0.32'/%3E%3C/linearGradient%3E%3CradialGradient id='glow' cx='0' cy='0' r='1' gradientUnits='userSpaceOnUse' gradientTransform='translate(13.5 15.588) rotate(90) scale(10.8 9.5)'%3E%3Cstop offset='0' stop-color='%23ffffff' stop-opacity='0.14'/%3E%3Cstop offset='0.62' stop-color='%23ffffff' stop-opacity='0.03'/%3E%3Cstop offset='1' stop-color='%23ffffff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M4.5 0H13.5L18 7.794L13.5 15.588H4.5L0 7.794Z' fill='url(%23fillA)'/%3E%3Cpath d='M4.5 15.588H13.5L18 23.382L13.5 31.176H4.5L0 23.382Z' fill='url(%23fillB)'/%3E%3Cpath d='M18 7.794H27L31.5 15.588L27 23.382H18L13.5 15.588Z' fill='url(%23fillC)'/%3E%3Cpath d='M4.5 0H13.5L18 7.794L13.5 15.588H4.5L0 7.794Z' fill='url(%23glow)'/%3E%3Cpath d='M18 7.794H27L31.5 15.588L27 23.382H18L13.5 15.588Z' fill='url(%23glow)' fill-opacity='0.78'/%3E%3C/svg%3E");
+            background-size: 100% 100%, 108px 124.7px;
+            background-position:
+                center,
+                var(--hex-shift-x) var(--hex-shift-y);
+            background-repeat: no-repeat, repeat;
+            mix-blend-mode: screen;
+            opacity: 0.58;
+            filter: saturate(1.25) brightness(1.1);
+        }
+
+        .card .holo::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background-image:
+                radial-gradient(circle at var(--shine-x) var(--shine-y), rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 20%, rgba(255, 255, 255, 0.02) 36%, rgba(255, 255, 255, 0) 52%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 27 31.176' fill='none'%3E%3Cg stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 0H13.5L18 7.794L13.5 15.588H4.5L0 7.794Z' stroke='%23ebfffd' stroke-width='0.48' stroke-opacity='0.24'/%3E%3Cpath d='M4.5 15.588H13.5L18 23.382L13.5 31.176H4.5L0 23.382Z' stroke='%23d7fff8' stroke-width='0.48' stroke-opacity='0.18'/%3E%3Cpath d='M18 7.794H27L31.5 15.588L27 23.382H18L13.5 15.588Z' stroke='%23f3f2ff' stroke-width='0.48' stroke-opacity='0.2'/%3E%3Cpath d='M18 -7.794H27L31.5 0L27 7.794H18L13.5 0Z' stroke='%23ebfffd' stroke-width='0.48' stroke-opacity='0.14'/%3E%3Cpath d='M18 23.382H27L31.5 31.176L27 38.97H18L13.5 31.176Z' stroke='%23dffaf7' stroke-width='0.48' stroke-opacity='0.12'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 100% 100%, 108px 124.7px;
+            background-position:
+                center,
+                var(--hex-shift-x) var(--hex-shift-y);
+            background-repeat: no-repeat, repeat;
+            mix-blend-mode: screen;
+            opacity: 0.44;
+            filter: saturate(0.92) brightness(1.1);
+        }
+
+        .card:hover .holo {
+            opacity: 1;
+            filter: saturate(1.1) brightness(1.05);
+        }
+
+        .card .cost {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            background: #55ccff;
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            border: 2px solid #fff;
+            z-index: 2;
+        }
+
+        .card .title {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            color: #fff;
+            z-index: 1;
+            text-shadow: 0 2px 4px #000;
+        }
+
+        .card .desc {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 1;
+            text-shadow: 0 2px 4px #000, 0 1px 2px #000;
+        }
+
+        .card.attack .title {
+            color: #ff758c;
+        }
+
+        .card.defend .title {
+            color: #55ccff;
+        }
+
+        .card.special .title {
+            color: #cc88ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="spore-particles"></div>
+
+    <!-- MAIN MENU -->
+    <div id="main-menu">
+        <div class="panel">
+            <h1>Slay the Spore</h1>
+            <h2>Evolve. Survive. Conquer.</h2>
+            <div class="menu-buttons">
+                <button onclick="window.location.href='index.html'">Play Game</button>
+                <button onclick="window.location.href='evolution_lab.html'">Evolution Lab</button>
+                <button class="secondary" onclick="openCompendium()">Compendium</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPENDIUM -->
+    <div id="compendium-screen">
+        <div class="panel">
+            <h1 style="font-size: 40px;">Card Compendium</h1>
+            <div id="compendium-grid"></div>
+            <div>
+                <button class="secondary" onclick="closeCompendium()"
+                    style="width: auto; padding: 10px 30px; font-size: 18px;">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="cards.js"></script>
+    <script>
+        // Use the shared CARDS array from cards.js
+        // (the compendium shows 1 copy of each unique card)
+
+        function openCompendium() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('compendium-screen').style.display = 'flex';
+            renderCompendium();
+        }
+
+        function closeCompendium() {
+            document.getElementById('main-menu').style.display = 'flex';
+            document.getElementById('compendium-screen').style.display = 'none';
+        }
+
+        function renderCompendium() {
+            const grid = document.getElementById('compendium-grid');
+            grid.innerHTML = '';
+
+            CARDS.forEach((card, index) => {
+                const cardClass = card.type === 'attack' ? 'attack' : card.type === 'defend' ? 'defend' : 'special';
+                const cardEl = document.createElement('div');
+                cardEl.className = `card ${cardClass}`;
+                cardEl.style.backgroundImage = `url('${card.img}')`;
+                cardEl.style.backgroundSize = 'cover';
+                cardEl.style.backgroundPosition = 'center';
+
+                cardEl.innerHTML = `
+                    <div class="holo" id="holo-${index}"></div>
+                    <div class="cost">${card.cost}</div>
+                    <div class="title">${card.name}</div>
+                    <div class="desc">${card.desc}</div>
+                `;
+
+                // Holographic tilt effect JS
+                cardEl.addEventListener('mousemove', (e) => {
+                    const rect = cardEl.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const mouseX = e.clientX - centerX;
+                    const mouseY = e.clientY - centerY;
+
+                    // Card tilt
+                    const rotateX = Math.max(-25, Math.min(25, (mouseY / 10) * -1));
+                    const rotateY = Math.max(-25, Math.min(25, (mouseX / 10)));
+                    cardEl.style.transform = `translateY(-20px) scale(1.1) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+                    // Holo position shift relative to mouse
+                    const holoEl = cardEl.querySelector('.holo');
+                    const shineX = 50 + (mouseX / rect.width) * 50;
+                    const shineY = 50 + (mouseY / rect.height) * 50;
+                    const hexShiftX = (mouseX / rect.width) * 6;
+                    const hexShiftY = (mouseY / rect.height) * 6;
+                    holoEl.style.setProperty('--shine-x', `${shineX}%`);
+                    holoEl.style.setProperty('--shine-y', `${shineY}%`);
+                    holoEl.style.setProperty('--hex-shift-x', `${hexShiftX}px`);
+                    holoEl.style.setProperty('--hex-shift-y', `${hexShiftY}px`);
+                });
+
+                cardEl.addEventListener('mouseleave', () => {
+                    cardEl.style.transform = '';
+                    const holoEl = cardEl.querySelector('.holo');
+                    holoEl.style.setProperty('--shine-x', '50%');
+                    holoEl.style.setProperty('--shine-y', '50%');
+                    holoEl.style.setProperty('--hex-shift-x', '0px');
+                    holoEl.style.setProperty('--hex-shift-y', '0px');
+                });
+
+                grid.appendChild(cardEl);
+            });
+        }
+    </script>
+</body>
+
+</html>

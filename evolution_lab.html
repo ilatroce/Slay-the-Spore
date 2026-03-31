@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slay the Spore - Evolution Lab</title>
+    <style>
+        :root { --bg1:#08111d; --bg2:#18344f; --panel:rgba(10,18,28,.8); --line:rgba(140,230,205,.25); --text:#eefbf7; --muted:#aacdc4; --accent:#69efb3; }
+        * { box-sizing: border-box; }
+        body { margin:0; overflow:hidden; font-family:"Trebuchet MS","Segoe UI",sans-serif; color:var(--text); background:radial-gradient(circle at top, rgba(98,233,186,.16), transparent 25%), linear-gradient(180deg,var(--bg1),var(--bg2) 52%, #102015); }
+        canvas { display:block; }
+        .ui { position:fixed; inset:0; display:grid; grid-template-columns:minmax(320px,420px) 1fr; pointer-events:none; }
+        .sidebar { padding:22px; display:flex; flex-direction:column; gap:14px; }
+        .panel { pointer-events:auto; background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:18px 20px; backdrop-filter:blur(10px); box-shadow:0 18px 50px rgba(0,0,0,.25); }
+        h1,h2,h3,p { margin:0; }
+        h1 { font-size:38px; margin-bottom:8px; }
+        p,.muted { color:var(--muted); line-height:1.45; }
+        .stats,.tiers,.aspects { display:grid; gap:10px; }
+        .row { display:flex; justify-content:space-between; gap:10px; }
+        .bar { height:12px; background:rgba(255,255,255,.09); border-radius:999px; overflow:hidden; }
+        .fill { height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#8fe7ff,#ffd26e); }
+        .actions { display:flex; flex-wrap:wrap; gap:10px; }
+        button,a { pointer-events:auto; border:none; border-radius:999px; padding:12px 18px; font:inherit; font-weight:bold; cursor:pointer; text-decoration:none; transition:.2s ease; display:inline-flex; align-items:center; justify-content:center; }
+        button:hover,a:hover { transform:translateY(-2px); }
+        button:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+        .primary { background:linear-gradient(135deg,#4edaa1,#7df1d5); color:#052617; }
+        .secondary { background:rgba(255,255,255,.08); color:var(--text); border:1px solid rgba(255,255,255,.08); }
+        .danger { background:linear-gradient(135deg,#ff8aa0,#ffb690); color:#321015; }
+        .chip { padding:11px 13px; border-radius:14px; background:rgba(255,255,255,.05); display:flex; justify-content:space-between; gap:12px; }
+        .overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(2,8,15,.64); backdrop-filter:blur(8px); pointer-events:auto; }
+        .overlay.visible { display:flex; }
+        .choice-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:16px; }
+        .choice { padding:16px; border-radius:18px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); }
+        .choice h3 { margin-bottom:8px; }
+        .choice button { width:100%; margin-top:14px; }
+        .note { position:fixed; right:22px; bottom:20px; max-width:360px; padding:12px 16px; border-radius:999px; background:rgba(8,14,24,.62); border:1px solid rgba(255,255,255,.08); color:#dceee7; }
+        @media (max-width:980px) { .ui { grid-template-columns:1fr; } .choice-grid { grid-template-columns:1fr; } .note { left:16px; right:16px; max-width:none; } }
+    </style>
+</head>
+<body>
+    <div class="ui">
+        <div class="sidebar">
+            <section class="panel">
+                <h1>Evolution Lab</h1>
+                <p>This mode starts from a random genome like the main game, then stacks milestone mutations on top of that creature every 5 evolutions.</p>
+            </section>
+            <section class="panel stats">
+                <div class="row"><span>Total Evolutions</span><strong id="evolution-count">0</strong></div>
+                <div class="row"><span>Creature Rank</span><strong id="rank-label">Protoform</strong></div>
+                <div class="row"><span>Next Milestone</span><strong id="next-milestone">5 evolutions</strong></div>
+                <div class="bar"><div class="fill" id="milestone-progress"></div></div>
+                <p id="status-copy">A fresh random organism is waiting to mutate.</p>
+            </section>
+            <section class="panel actions">
+                <button id="evolve-btn" class="primary">Trigger Evolution</button>
+                <button id="randomize-btn" class="secondary">New Random Creature</button>
+                <button id="reset-btn" class="danger">Reset Lab</button>
+                <a class="secondary" href="main_screen.html">Back to Menu</a>
+            </section>
+            <section class="panel tiers" id="milestone-list"></section>
+            <section class="panel aspects" id="aspect-list"></section>
+        </div>
+    </div>
+
+    <div class="overlay" id="choice-overlay">
+        <div class="panel" style="width:min(980px,100%);">
+            <h2 id="choice-title">Choose an evolving aspect</h2>
+            <p class="muted" id="choice-copy">This branch keeps evolving after you unlock it.</p>
+            <div class="choice-grid" id="choice-grid"></div>
+        </div>
+    </div>
+
+    <div class="note">Drag to orbit. Scroll to zoom. Right-drag to pan.</div>
+
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const STORAGE_KEY = 'sporeEvolutionLabState';
+        const genomeLength = 1000;
+        const milestones = [
+            { threshold: 5, key: 'tier1', title: 'Pick the locomotion branch', subtitle: 'Choose how the creature first specializes.', options: [{ id: 'legs', label: '2 Legs' }, { id: 'wings', label: 'Wings' }, { id: 'tentacles', label: 'Tentacles' }] },
+            { threshold: 10, key: 'tier2', title: 'Pick the predator branch', subtitle: 'Choose its hunting mutation.', options: [{ id: 'claws', label: 'Claws' }, { id: 'teeth', label: 'Teeth' }, { id: 'sonar', label: 'Sonar' }] },
+            { threshold: 15, key: 'tier3', title: 'Pick the final mutation branch', subtitle: 'Choose its mature specialization.', options: [{ id: 'hands', label: 'Hands' }, { id: 'paws', label: 'Paws' }, { id: 'fangs', label: 'Fangs' }] }
+        ];
+        const labels = { legs: '2 Legs', wings: 'Wings', tentacles: 'Tentacles', claws: 'Claws', teeth: 'Teeth', sonar: 'Sonar', hands: 'Hands', paws: 'Paws', fangs: 'Fangs' };
+
+        const randomGenome = () => Array.from({ length: genomeLength }, () => Math.random());
+        const defaultState = () => ({ evolutionCount: 0, choices: { tier1: null, tier2: null, tier3: null }, genome: randomGenome() });
+        const state = (() => { try { const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); return parsed && Array.isArray(parsed.genome) ? { evolutionCount: parsed.evolutionCount || 0, choices: { tier1: parsed?.choices?.tier1 || null, tier2: parsed?.choices?.tier2 || null, tier3: parsed?.choices?.tier3 || null }, genome: parsed.genome.slice(0, genomeLength) } : defaultState(); } catch { return defaultState(); } })();
+        const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const currentMilestone = () => milestones.find((m) => state.evolutionCount >= m.threshold && !state.choices[m.key]) || null;
+        const nextMilestone = () => milestones.find((m) => !state.choices[m.key]) || null;
+        const featureLevel = (id, unlock) => state.evolutionCount >= unlock && id ? Math.max(1, state.evolutionCount - unlock + 1) : 0;
+
+        function mutateGenome(strength = 1) {
+            const rate = THREE.MathUtils.clamp(0.12 + strength * 0.02, 0.12, 0.5);
+            const amount = 0.24 + strength * 0.02;
+            const donor = randomGenome();
+            state.genome = state.genome.map((gene, i) => {
+                let next = gene;
+                if (Math.random() < 0.2) next = donor[i];
+                if (Math.random() < rate) next = THREE.MathUtils.clamp(next + (Math.random() - 0.5) * amount * 2, 0, 1);
+                return next;
+            });
+        }
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0e1720, 0.035);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 200);
+        camera.position.set(8.5, 5.8, 12.5);
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.target.set(0, 2.4, 0);
+        controls.minDistance = 5;
+        controls.maxDistance = 22;
+        controls.maxPolarAngle = Math.PI * 0.48;
+        scene.add(new THREE.HemisphereLight(0xa4ffe5, 0x09100f, 1.65));
+        const keyLight = new THREE.DirectionalLight(0xe8fff8, 1.9); keyLight.position.set(7, 12, 8); keyLight.castShadow = true; scene.add(keyLight);
+        const rimLight = new THREE.PointLight(0x7af6ff, 12, 28, 2);
+        rimLight.position.set(-6, 4, -7);
+        scene.add(rimLight);
+        const floor = new THREE.Mesh(new THREE.CircleGeometry(24, 80), new THREE.MeshStandardMaterial({ color: 0x173228, roughness: 0.95 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+        const dais = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.8, 1.1, 8), new THREE.MeshStandardMaterial({ color: 0x243c49, roughness: 0.82, metalness: 0.14 })); dais.position.y = 0.55; dais.castShadow = true; scene.add(dais);
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(3.5, 0.14, 18, 72), new THREE.MeshStandardMaterial({ color: 0x82ffd5, emissive: 0x48e6ab, emissiveIntensity: 1.4 })); ring.rotation.x = Math.PI / 2; ring.position.y = 1.02; scene.add(ring);
+
+        let creature = null;
+        let growthPulse = 0;
+
+        function outline(mesh, color = 0x111722, scale = 1.05) {
+            const o = new THREE.Mesh(mesh.geometry, new THREE.MeshBasicMaterial({ color, side: THREE.BackSide }));
+            o.scale.multiplyScalar(scale);
+            mesh.add(o);
+        }
+
+        function createBone(start, end, radius, material, radialSegments = 12, capSegments = 8) {
+            const direction = new THREE.Vector3().subVectors(end, start);
+            const length = Math.max(0.001, direction.length());
+            const bone = new THREE.Mesh(new THREE.CapsuleGeometry(radius, length, capSegments, radialSegments), material);
+            bone.position.copy(start).addScaledVector(direction, 0.5);
+            bone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
+            bone.castShadow = true;
+            bone.receiveShadow = true;
+            return bone;
+        }
+
+        function createWingPanel(points, material) {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            points.forEach((point) => positions.push(point.x, point.y, point.z));
+            const indices = [];
+            for (let i = 1; i < points.length - 1; i++) indices.push(0, i, i + 1);
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+            const panel = new THREE.Mesh(geometry, material);
+            panel.castShadow = true;
+            panel.receiveShadow = true;
+            return panel;
+        }
+
+        function addDragonWingPair(host, animations, config) {
+            const membraneColor = config.membraneColor?.isColor ? config.membraneColor.clone() : new THREE.Color(config.membraneColor);
+            const boneColor = config.boneColor?.isColor ? config.boneColor.clone() : new THREE.Color(config.boneColor);
+            const membraneOpacity = config.membraneOpacity ?? 0.74;
+            const span = config.span ?? 2.8;
+            const height = config.height ?? span * 0.52;
+            const chord = config.chord ?? span * 0.38;
+            const sweep = config.sweep ?? 0.22;
+            const flare = config.flare ?? 0.18;
+            const attachX = config.attachX ?? 0.8;
+            const attachY = config.attachY ?? 1.2;
+            const attachZ = config.attachZ ?? -0.2;
+            const flapSpeed = config.flapSpeed ?? 2.2;
+            const flapAmplitude = config.flapAmplitude ?? 0.24;
+
+            const boneMat = new THREE.MeshStandardMaterial({ color: boneColor, roughness: 0.58, metalness: 0.08 });
+            const jointMat = new THREE.MeshStandardMaterial({ color: boneColor.clone().offsetHSL(0, 0, 0.05), roughness: 0.46, metalness: 0.12 });
+            const membraneMat = new THREE.MeshStandardMaterial({ color: membraneColor, emissive: membraneColor.clone().multiplyScalar(0.12), emissiveIntensity: 0.55, side: THREE.DoubleSide, transparent: true, opacity: membraneOpacity, roughness: 0.88, metalness: 0.03 });
+            const membraneShadowMat = new THREE.MeshStandardMaterial({ color: membraneColor.clone().offsetHSL(0, 0, -0.08), side: THREE.DoubleSide, transparent: true, opacity: Math.max(0.2, membraneOpacity * 0.45), roughness: 0.92, metalness: 0.02 });
+
+            [-1, 1].forEach((side) => {
+                const wing = new THREE.Group();
+                wing.position.set(side * attachX, attachY, attachZ);
+
+                const shoulderPoint = new THREE.Vector3(0, 0, 0);
+                const elbowPoint = new THREE.Vector3(side * span * 0.34, height * (0.3 + flare * 0.15), -span * (0.06 + sweep * 0.08));
+                const wristPoint = new THREE.Vector3(side * span * 0.72, height * 0.08, -span * (0.14 + sweep * 0.12));
+                const tipA = new THREE.Vector3(side * span * 1.04, -height * 0.02, -span * 0.2);
+                const tipB = new THREE.Vector3(side * span * 0.9, -height * 0.34 - chord * 0.1, -span * 0.08);
+                const tipC = new THREE.Vector3(side * span * 0.7, -height * 0.6 - chord * 0.18, span * 0.04);
+                const bodyTrail = new THREE.Vector3(side * span * 0.18, -height * 0.7 - chord * 0.08, span * 0.12);
+                const bodyRoot = new THREE.Vector3(side * span * 0.04, -height * 0.24, span * 0.1);
+
+                const membrane = createWingPanel([shoulderPoint, elbowPoint, wristPoint, tipA, tipB, tipC, bodyTrail, bodyRoot], membraneMat);
+                wing.add(membrane);
+                const innerMembrane = createWingPanel([
+                    shoulderPoint.clone().lerp(elbowPoint, 0.15),
+                    elbowPoint.clone().lerp(wristPoint, 0.12),
+                    wristPoint.clone().lerp(tipA, 0.18),
+                    tipA.clone().lerp(tipB, 0.18),
+                    tipB.clone().lerp(tipC, 0.18),
+                    tipC.clone().lerp(bodyTrail, 0.12),
+                    bodyTrail.clone().lerp(bodyRoot, 0.1),
+                    bodyRoot.clone().lerp(shoulderPoint, 0.2)
+                ], membraneShadowMat);
+                wing.add(innerMembrane);
+
+                const bones = [
+                    createBone(shoulderPoint, elbowPoint, 0.08 + span * 0.012, boneMat),
+                    createBone(elbowPoint, wristPoint, 0.06 + span * 0.01, boneMat),
+                    createBone(wristPoint, tipA, 0.038 + span * 0.008, boneMat),
+                    createBone(wristPoint, tipB, 0.032 + span * 0.006, boneMat),
+                    createBone(wristPoint, tipC, 0.028 + span * 0.005, boneMat),
+                    createBone(shoulderPoint, bodyTrail, 0.03 + span * 0.005, jointMat),
+                    createBone(elbowPoint, tipC, 0.022 + span * 0.004, jointMat)
+                ];
+                bones.forEach((bone) => { outline(bone, 0x17202a, 1.05); wing.add(bone); });
+
+                [shoulderPoint, elbowPoint, wristPoint].forEach((point, index) => {
+                    const joint = new THREE.Mesh(new THREE.SphereGeometry(0.1 + span * (index === 0 ? 0.014 : 0.01), 14, 14), jointMat);
+                    joint.position.copy(point);
+                    outline(joint, 0x17202a, 1.06);
+                    wing.add(joint);
+                });
+
+                const shoulderMuscle = new THREE.Mesh(new THREE.SphereGeometry(0.18 + span * 0.018, 16, 16), jointMat);
+                shoulderMuscle.scale.set(1.4, 0.95, 1.2);
+                shoulderMuscle.position.set(side * 0.04, -0.02, 0.02);
+                outline(shoulderMuscle, 0x17202a, 1.05);
+                wing.add(shoulderMuscle);
+
+                const claw = new THREE.Mesh(new THREE.ConeGeometry(0.04 + span * 0.008, 0.24 + span * 0.05, 8), jointMat);
+                claw.position.copy(tipA);
+                claw.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tipA.clone().sub(wristPoint).normalize());
+                wing.add(claw);
+
+                host.add(wing);
+
+                const restSpread = side * (0.92 + flare * 0.28);
+                const restYaw = side * (-0.24 - sweep * 0.32);
+                const restPitch = -0.18 - chord * 0.04;
+                const baseY = attachY;
+                const baseZ = attachZ;
+                const phase = side > 0 ? 0 : Math.PI;
+                animations.push((t) => {
+                    const flap = Math.sin(t * flapSpeed + phase);
+                    const tuck = Math.max(0, -flap);
+                    wing.rotation.z = restSpread + flap * side * flapAmplitude;
+                    wing.rotation.y = restYaw - side * (tuck * 0.3 + 0.04 * Math.cos(t * flapSpeed + phase));
+                    wing.rotation.x = restPitch + Math.max(0, flap) * 0.22 - tuck * 0.1;
+                    wing.position.y = baseY + Math.sin(t * flapSpeed + phase) * 0.05;
+                    wing.position.z = baseZ + tuck * 0.08;
+                });
+            });
+        }
+
+        function buildBaseCreature(genome, generation) {
+            let index = 0;
+            const g = () => genome[index++ % genomeLength];
+            const root = new THREE.Group();
+            root.userData.animations = [];
+            const animationRoot = new THREE.Group();
+            root.add(animationRoot);
+
+            const hue = g();
+            const lightnessSeed = g();
+            const accentShift = g();
+            const sizeX = g();
+            const sizeY = g();
+            const sizeZ = g();
+            const bodyColor = new THREE.Color().setHSL(hue, Math.min(1, 0.6 + generation * 0.06), Math.max(0.12, 0.68 - generation * 0.03 * lightnessSeed));
+            const accentColor = new THREE.Color().setHSL((hue + 0.5 * accentShift) % 1, 1, 0.52);
+            let rx = 0.8 + sizeX * 0.4, ry = 0.8 + sizeY * 0.4, rz = 0.8 + sizeZ * 0.4;
+            if (generation > 3) {
+                rx += (g() - 0.5) * 1.6;
+                ry += (g() - 0.2) * 2.6;
+                rz += (g() - 0.5) * 1.6;
+            }
+
+            const shapeType = g();
+            let bodyGeo = shapeType < 0.18 ? new THREE.SphereGeometry(1, 32, 32) : shapeType < 0.36 ? new THREE.BoxGeometry(1.5, 1.5, 1.5, 12, 12, 12) : shapeType < 0.56 ? new THREE.ConeGeometry(1, 1.8, 32) : shapeType < 0.78 ? new THREE.CylinderGeometry(0.8, 1, 1.5, 32) : new THREE.IcosahedronGeometry(1.2, 2);
+            bodyGeo.scale(rx, ry, rz);
+            const roughnessSeed = g();
+            const metalnessSeed = g();
+            const bodyMat = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.2 + roughnessSeed * 0.6, metalness: metalnessSeed * 0.45 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = ry;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            outline(body);
+            animationRoot.add(body);
+
+            const face = new THREE.Group();
+            const faceHeight = g();
+            face.position.set(0, ry + faceHeight * 0.4 - 0.2, rz * 0.9);
+            animationRoot.add(face);
+            const head = new THREE.Group();
+            head.position.z = 0.06;
+            face.add(head);
+            const headMat = new THREE.MeshStandardMaterial({ color: bodyColor.clone().offsetHSL(0, 0, 0.04), roughness: 0.24 + roughnessSeed * 0.48, metalness: metalnessSeed * 0.18 });
+            const softMat = new THREE.MeshStandardMaterial({ color: 0x7a1d33, roughness: 0.82, metalness: 0.04 });
+            const skull = new THREE.Mesh(new THREE.SphereGeometry(0.34, 20, 20), headMat);
+            skull.scale.set(1.45 + g() * 0.38, 1.16 + g() * 0.28, 1.04 + g() * 0.2);
+            skull.position.set(0, 0.03, -0.06);
+            outline(skull, 0x17202a, 1.08);
+            head.add(skull);
+            const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+            const eyeSize = 0.14 + g() * 0.18;
+            const eyeSpacing = 0.18 + g() * 0.4;
+            const eyeLayout = g();
+            const eyeOffsets = eyeLayout < 0.18
+                ? [{ x: 0, y: 0.04, scale: 1.35 }]
+                : eyeLayout < 0.72
+                    ? [{ x: -eyeSpacing, y: 0, scale: 1 }, { x: eyeSpacing, y: 0, scale: 1 }]
+                    : eyeLayout < 0.9
+                        ? [{ x: 0, y: 0.24, scale: 0.8 }, { x: -eyeSpacing * 0.82, y: -0.08, scale: 0.8 }, { x: eyeSpacing * 0.82, y: -0.08, scale: 0.8 }]
+                        : [{ x: -eyeSpacing * 0.64, y: 0.16, scale: 0.72 }, { x: eyeSpacing * 0.64, y: 0.16, scale: 0.72 }, { x: -eyeSpacing * 0.84, y: -0.16, scale: 0.72 }, { x: eyeSpacing * 0.84, y: -0.16, scale: 0.72 }];
+            const eyeMeshes = [];
+            const eyeLift = 0.07;
+            const eyeDepth = 0.18;
+            eyeOffsets.forEach(({ x, y, scale }) => {
+                const size = eyeSize * scale;
+                const eye = new THREE.Mesh(new THREE.SphereGeometry(size, 16, 16), eyeWhite);
+                eye.position.set(x, y + eyeLift, eyeDepth);
+                outline(eye, 0x17202a, 1.08);
+                head.add(eye);
+                const pupil = new THREE.Mesh(new THREE.SphereGeometry(size * 0.52, 16, 16), pupilMat);
+                pupil.position.set(x, y + eyeLift, eyeDepth + size * 0.55);
+                head.add(pupil);
+                eyeMeshes.push(eye);
+            });
+            const brow = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), headMat);
+            brow.scale.set(1.18 + eyeSpacing * 1.25, 0.34, 0.5);
+            brow.position.set(0, 0.22, 0.02);
+            outline(brow, 0x17202a, 1.08);
+            head.add(brow);
+            const hornSeed = g();
+            if (hornSeed > 0.44 || generation > 6) {
+                const hornMat = new THREE.MeshStandardMaterial({ color: accentColor.clone().lerp(bodyColor, 0.48), roughness: 0.42, metalness: 0.12 });
+                [-1, 1].forEach((side) => {
+                    const horn = new THREE.Mesh(new THREE.ConeGeometry(0.06 + g() * 0.03, 0.42 + g() * 0.28 + generation * 0.02, 9), hornMat);
+                    horn.position.set(side * (0.2 + eyeSpacing * 0.32), 0.28 + g() * 0.05, -0.04);
+                    horn.rotation.z = side * (0.34 + g() * 0.18);
+                    horn.rotation.x = -0.6 - g() * 0.4;
+                    outline(horn, 0x17202a, 1.05);
+                    head.add(horn);
+                });
+            }
+
+            const mouthChance = g();
+            const jawWidth = 1.2 + g() * 0.5;
+            const jawHeight = 0.8 + g() * 0.22;
+            const jawLength = 1.22 + g() * 0.46;
+            const jawPivot = new THREE.Group();
+            jawPivot.position.set(0, -0.2, 0.1);
+            head.add(jawPivot);
+            const upperJaw = new THREE.Mesh(new THREE.SphereGeometry(0.18, 18, 18), headMat);
+            upperJaw.scale.set(jawWidth, jawHeight, jawLength);
+            upperJaw.position.set(0, 0.05, 0.18);
+            outline(upperJaw, 0x17202a, 1.08);
+            jawPivot.add(upperJaw);
+            const noseBridge = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), headMat);
+            noseBridge.scale.set(jawWidth * 0.55, jawHeight * 0.34, jawLength * 0.58);
+            noseBridge.position.set(0, 0.12, 0.34);
+            outline(noseBridge, 0x17202a, 1.06);
+            jawPivot.add(noseBridge);
+            const lowerJaw = new THREE.Group();
+            lowerJaw.position.set(0, -0.04, 0.02);
+            jawPivot.add(lowerJaw);
+            const lowerJawMesh = new THREE.Mesh(new THREE.SphereGeometry(0.17, 18, 18), headMat);
+            lowerJawMesh.scale.set(jawWidth * 0.92, jawHeight * 0.54, jawLength * 1.05);
+            lowerJawMesh.position.set(0, -0.06, 0.2);
+            outline(lowerJawMesh, 0x17202a, 1.08);
+            lowerJaw.add(lowerJawMesh);
+            const mouthInterior = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 16), softMat);
+            mouthInterior.scale.set(jawWidth * 0.72, jawHeight * 0.28, jawLength * 0.9);
+            mouthInterior.position.set(0, -0.02, 0.18);
+            jawPivot.add(mouthInterior);
+            const lip = new THREE.Mesh(new THREE.SphereGeometry(0.08, 14, 14), new THREE.MeshBasicMaterial({ color: 0xff6e92 }));
+            lip.scale.set(1.15 + g() * 0.72, 0.22 + g() * 0.14, 0.42 + g() * 0.16);
+            lip.position.set(0, 0, 0.5);
+            jawPivot.add(lip);
+            if (mouthChance > 0.28) {
+                const tongue = new THREE.Mesh(new THREE.SphereGeometry(0.08, 14, 14), new THREE.MeshBasicMaterial({ color: 0xff7aa8 }));
+                tongue.scale.set(1.08 + g() * 0.35, 0.18 + g() * 0.06, 0.56);
+                tongue.position.set(0, -0.02, 0.24);
+                lowerJaw.add(tongue);
+            }
+            [-1, 1].forEach((side) => {
+                const nostril = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 10), new THREE.MeshBasicMaterial({ color: 0x17202a }));
+                nostril.scale.set(1, 0.6, 1.4);
+                nostril.position.set(side * 0.08, 0.02, 0.54);
+                jawPivot.add(nostril);
+            });
+            const upperTeethAnchor = new THREE.Group();
+            upperTeethAnchor.position.set(0, -0.04, 0.16);
+            jawPivot.add(upperTeethAnchor);
+            const lowerTeethAnchor = new THREE.Group();
+            lowerTeethAnchor.position.set(0, -0.01, 0.17);
+            lowerJaw.add(lowerTeethAnchor);
+            const sonarAnchor = new THREE.Group();
+            sonarAnchor.position.set(0, 0.03, 0.44);
+            head.add(sonarAnchor);
+            const jawMotion = { rest: 0.08 + mouthChance * 0.12, amp: 0.015 + mouthChance * 0.03, speed: 1.4 + mouthChance * 0.8 };
+            lowerJaw.rotation.x = jawMotion.rest;
+            root.userData.animations.push((t) => {
+                lowerJaw.rotation.x = jawMotion.rest + Math.sin(t * jawMotion.speed) * jawMotion.amp;
+            });
+
+            const neckStart = new THREE.Vector3(0, ry * 0.84, rz * 0.26);
+            const neckEnd = new THREE.Vector3(0, face.position.y - ry * 0.18, face.position.z * 0.72);
+            const neck = createBone(neckStart, neckEnd, 0.13 + g() * 0.05, headMat);
+            outline(neck, 0x17202a, 1.05);
+            animationRoot.add(neck);
+            const throat = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), headMat);
+            throat.scale.set(0.95, 0.7, 1.25);
+            throat.position.copy(neckStart).lerp(neckEnd, 0.58);
+            throat.position.y -= 0.04;
+            outline(throat, 0x17202a, 1.05);
+            animationRoot.add(throat);
+
+            const appendageBias = g();
+            const appendageMat = new THREE.MeshStandardMaterial({ color: appendageBias > 0.5 ? bodyColor : accentColor, roughness: 0.45, metalness: 0.15 });
+            const limbPairs = generation < 3 ? (g() > 0.5 ? 1 : 2) : Math.floor(g() * 3) + Math.floor(generation / 2);
+            for (let l = 0; l < limbPairs; l++) {
+                const limbGeo = new THREE.CapsuleGeometry(0.15 + g() * 0.12, 0.55 + g() * 0.6, 12, 16);
+                const angle = g() * Math.PI;
+                const zPos = Math.cos(angle) * rz * 0.8;
+                const xPos = Math.sin(angle) * rx * 0.9;
+                const yPos = (g() * 0.8 + 0.1) * ry * 2;
+                const left = new THREE.Mesh(limbGeo, appendageMat);
+                const right = new THREE.Mesh(limbGeo, appendageMat);
+                left.position.set(-xPos, yPos, zPos);
+                right.position.set(xPos, yPos, zPos);
+                left.rotation.z = Math.PI / 4 + g();
+                right.rotation.z = -left.rotation.z;
+                outline(left); outline(right);
+                animationRoot.add(left, right);
+            }
+
+            if (g() > 0.5 || generation > 2) {
+                let parent = animationRoot;
+                for (let i = 0; i < 3 + Math.floor(g() * generation); i++) {
+                    const tailNode = new THREE.Group();
+                    tailNode.position.set(0, i === 0 ? ry * 0.6 : 0, i === 0 ? -rz * 0.95 : -(0.34 + i * 0.04));
+                    const seg = new THREE.Mesh(new THREE.SphereGeometry(0.3 * Math.pow(0.88, i), 16, 16), appendageMat);
+                    seg.position.z = -0.2;
+                    outline(seg);
+                    tailNode.add(seg);
+                    parent.add(tailNode);
+                    const off = i * 0.3;
+                    root.userData.animations.push((t) => { tailNode.rotation.y = Math.sin(t * 2.1 - off) * 0.24; });
+                    parent = tailNode;
+                }
+            }
+
+            const ridgeSeed = g();
+            if (ridgeSeed > 0.38 || generation > 4) {
+                const ridgeMat = new THREE.MeshStandardMaterial({ color: accentColor.clone().lerp(bodyColor, 0.22), roughness: 0.34, metalness: 0.12 });
+                const ridgeCount = 3 + Math.floor(g() * 3) + Math.floor(generation / 6);
+                for (let i = 0; i < ridgeCount; i++) {
+                    const t = ridgeCount === 1 ? 0.5 : i / (ridgeCount - 1);
+                    const ridge = new THREE.Mesh(new THREE.ConeGeometry((0.07 + (1 - t) * 0.07) * (1 + g() * 0.28), 0.45 + (1 - t) * 0.65 + generation * 0.02, 7), ridgeMat);
+                    ridge.position.set(0, ry * (1.08 - t * 0.28), THREE.MathUtils.lerp(rz * 0.26, -rz * 1.04, t));
+                    ridge.rotation.x = -0.32 - t * 0.15;
+                    outline(ridge, 0x17202a, 1.05);
+                    animationRoot.add(ridge);
+                }
+            }
+
+            const breathSpeed = 2 + g() * 2;
+            const bobSpeed = 1.7 + g();
+            const bobHeight = 0.1 + g() * 0.18;
+            root.userData.animations.push((t) => {
+                animationRoot.scale.y = 1 + Math.sin(t * breathSpeed) * 0.05;
+                animationRoot.position.y = Math.abs(Math.sin(t * bobSpeed)) * bobHeight;
+                const blink = Math.sin(t * 3.2) > 0.985 ? 0.1 : 1;
+                eyeMeshes.forEach((eye) => { eye.scale.y = blink; });
+            });
+            root.userData.lab = { animationRoot, face, head, jawPivot, lowerJaw, upperTeethAnchor, lowerTeethAnchor, mouthInterior, sonarAnchor, jawMotion, rx, ry, rz, bodyColor, accentColor };
+            return root;
+        }
+
+        function addMutationParts(root) {
+            const lab = root.userData.lab;
+            const host = lab.animationRoot;
+            const face = lab.face;
+            const accent = new THREE.MeshStandardMaterial({ color: lab.accentColor, roughness: 0.38, metalness: 0.2 });
+            const dark = new THREE.MeshStandardMaterial({ color: 0x141824, roughness: 0.7 });
+            const ivory = new THREE.MeshStandardMaterial({ color: 0xf4f5ef, roughness: 0.2 });
+            const legLevel = featureLevel(state.choices.tier1 === 'legs' ? 'legs' : null, 5);
+            const wingLevel = featureLevel(state.choices.tier1 === 'wings' ? 'wings' : null, 5);
+            const tentacleLevel = featureLevel(state.choices.tier1 === 'tentacles' ? 'tentacles' : null, 5);
+            const clawLevel = featureLevel(state.choices.tier2 === 'claws' ? 'claws' : null, 10);
+            const teethLevel = featureLevel(state.choices.tier2 === 'teeth' ? 'teeth' : null, 10);
+            const sonarLevel = featureLevel(state.choices.tier2 === 'sonar' ? 'sonar' : null, 10);
+            const handsLevel = featureLevel(state.choices.tier3 === 'hands' ? 'hands' : null, 15);
+            const pawsLevel = featureLevel(state.choices.tier3 === 'paws' ? 'paws' : null, 15);
+            const fangsLevel = featureLevel(state.choices.tier3 === 'fangs' ? 'fangs' : null, 15);
+            const addToothArc = (anchor, count, spread, zFront, size, flip = false, yOffset = 0) => {
+                for (let i = 0; i < count; i++) {
+                    const t = count === 1 ? 0.5 : i / (count - 1);
+                    const x = THREE.MathUtils.lerp(-spread, spread, t);
+                    const curve = 1 - Math.abs(t * 2 - 1);
+                    const tooth = new THREE.Mesh(new THREE.ConeGeometry(size * (0.92 + curve * 0.16), size * 3.3, 7), ivory);
+                    tooth.position.set(x, yOffset, zFront - Math.abs(x) * 0.28);
+                    tooth.rotation.x = flip ? Math.PI : 0;
+                    anchor.add(tooth);
+                }
+            };
+
+            if (lab.jawMotion) {
+                lab.jawMotion.rest += Math.min(0.08, teethLevel * 0.008) + Math.min(0.1, fangsLevel * 0.01);
+                lab.jawMotion.amp += (teethLevel ? 0.015 : 0) + (fangsLevel ? 0.02 : 0);
+            }
+
+            if (legLevel) [-1,1].forEach((s)=>{ const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.2 + legLevel * 0.016, 1.1 + legLevel * 0.14, 10, 16), accent); leg.position.set(s * lab.rx * 0.42, lab.ry * 0.06, -lab.rz * 0.08); leg.rotation.z = s * 0.12; outline(leg); host.add(leg); });
+            if (wingLevel) addDragonWingPair(host, root.userData.animations, { attachX: lab.rx * 0.56, attachY: lab.ry * (1.18 + Math.min(0.38, wingLevel * 0.03)), attachZ: -lab.rz * (0.16 + Math.min(0.18, wingLevel * 0.01)), span: 2.7 + wingLevel * 0.28, height: 1.45 + wingLevel * 0.07, chord: 1.08 + wingLevel * 0.05, sweep: 0.26 + Math.min(0.2, wingLevel * 0.012), flare: 0.28 + Math.min(0.16, wingLevel * 0.01), membraneColor: lab.accentColor.clone().lerp(lab.bodyColor, 0.24), boneColor: lab.bodyColor.clone().offsetHSL(0, 0, -0.18), membraneOpacity: 0.72, flapSpeed: Math.max(1.35, 2.2 - wingLevel * 0.03), flapAmplitude: 0.26 + Math.min(0.1, wingLevel * 0.004) });
+            if (tentacleLevel) [-1,1].forEach((s)=>{ const tentacle = new THREE.Mesh(new THREE.CapsuleGeometry(0.14 + tentacleLevel * 0.01, 1.6 + tentacleLevel * 0.2, 8, 12), accent); tentacle.position.set(s * lab.rx * 0.9, lab.ry * 0.38, -lab.rz * 0.14); tentacle.rotation.z = s * 0.34; outline(tentacle); host.add(tentacle); root.userData.animations.push((t)=>{ tentacle.rotation.y = Math.sin(t * 2.2) * 0.3; }); });
+            if (clawLevel) [-1,1].forEach((s)=>{ const claw = new THREE.Mesh(new THREE.ConeGeometry(0.08 + clawLevel * 0.006, 0.52 + clawLevel * 0.05, 7), dark); claw.position.set(s * lab.rx * 1.02, lab.ry * 0.7, lab.rz * 0.72); claw.rotation.x = Math.PI / 2; claw.rotation.z = s * 0.14; host.add(claw); });
+            if (teethLevel) {
+                addToothArc(lab.upperTeethAnchor || face, 6 + Math.min(6, teethLevel), 0.22 + teethLevel * 0.01, 0.3, 0.035 + teethLevel * 0.003, true, -0.01);
+                addToothArc(lab.lowerTeethAnchor || face, 5 + Math.min(5, teethLevel), 0.18 + teethLevel * 0.008, 0.24, 0.03 + teethLevel * 0.002, false, 0.02);
+            }
+            if (sonarLevel) {
+                const sonarRoot = new THREE.Group();
+                const emitterMat = new THREE.MeshStandardMaterial({ color: lab.accentColor, emissive: lab.accentColor, emissiveIntensity: 1.2, roughness: 0.28, metalness: 0.24 });
+                const beamMat = new THREE.MeshBasicMaterial({ color: lab.accentColor, transparent: true, opacity: 0.24 });
+                const bridge = new THREE.Mesh(new THREE.CapsuleGeometry(0.03 + sonarLevel * 0.002, 0.74 + sonarLevel * 0.06, 8, 14), emitterMat);
+                bridge.rotation.z = Math.PI / 2;
+                outline(bridge, 0x17202a, 1.06);
+                sonarRoot.add(bridge);
+                [-1,1].forEach((s)=> {
+                    const emitter = new THREE.Mesh(new THREE.CylinderGeometry(0.07 + sonarLevel * 0.004, 0.09 + sonarLevel * 0.004, 0.24 + sonarLevel * 0.015, 14), emitterMat);
+                    emitter.rotation.z = Math.PI / 2;
+                    emitter.position.set(s * (0.44 + sonarLevel * 0.03), 0, 0.03);
+                    outline(emitter, 0x17202a, 1.05);
+                    sonarRoot.add(emitter);
+                });
+                const pulses = Array.from({ length: 3 }, (_, i) => {
+                    const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.24 + i * 0.12, 0.012 + sonarLevel * 0.001, 6, 42, Math.PI * 1.22), beamMat.clone());
+                    pulse.rotation.x = Math.PI / 2;
+                    pulse.position.set(0, 0, 0.14 + i * 0.16);
+                    sonarRoot.add(pulse);
+                    return pulse;
+                });
+                (lab.sonarAnchor || face).add(sonarRoot);
+                root.userData.animations.push((t)=>{
+                    sonarRoot.position.y = Math.sin(t * 3.2) * 0.02;
+                    pulses.forEach((pulse, i) => {
+                        const cycle = (t * 0.75 + i * 0.28) % 1;
+                        const spread = 0.92 + cycle * (0.9 + sonarLevel * 0.04);
+                        pulse.scale.set(spread, 1, spread);
+                        pulse.position.z = 0.12 + cycle * (0.62 + sonarLevel * 0.05);
+                        pulse.material.opacity = 0.28 * (1 - cycle);
+                    });
+                });
+            }
+            if (handsLevel) [-1,1].forEach((s)=>{ const hand = new THREE.Mesh(new THREE.SphereGeometry(0.22 + handsLevel * 0.018, 14, 12), accent); hand.scale.set(1.35,0.78,1.25); hand.position.set(s * lab.rx * 1.02, lab.ry * 0.7, lab.rz * 0.68); outline(hand); host.add(hand); });
+            if (pawsLevel) [-1,1].forEach((s)=>{ const paw = new THREE.Mesh(new THREE.SphereGeometry(0.28 + pawsLevel * 0.02, 16, 14), accent); paw.scale.set(2.1,0.86,1.7); paw.position.set(s * lab.rx * 1.0, lab.ry * 0.66, lab.rz * 0.72); outline(paw); host.add(paw); });
+            if (fangsLevel) [-1,1].forEach((s)=>{ const fang = new THREE.Mesh(new THREE.ConeGeometry(0.07 + fangsLevel * 0.005, 0.7 + fangsLevel * 0.08, 8), ivory); fang.position.set(s * (0.12 + Math.min(0.08, fangsLevel * 0.008)), -0.02, 0.3); fang.rotation.x = Math.PI; (lab.upperTeethAnchor || face).add(fang); });
+        }
+
+        function rebuildCreature() {
+            if (creature) scene.remove(creature);
+            const generation = Math.max(1, state.evolutionCount + 1);
+            creature = buildBaseCreature(state.genome, generation);
+            addMutationParts(creature);
+            creature.userData.baseScale = 1 + generation * 0.05;
+            creature.scale.setScalar(creature.userData.baseScale);
+            creature.position.y = 1.1;
+            scene.add(creature);
+        }
+
+        function updateHud() {
+            document.getElementById('evolution-count').textContent = state.evolutionCount;
+            document.getElementById('rank-label').textContent = state.evolutionCount >= 15 ? 'Apex Chimera' : state.evolutionCount >= 10 ? 'Predator Morph' : state.evolutionCount >= 5 ? 'Adaptive Hunter' : state.evolutionCount ? 'Emergent Form' : 'Protoform';
+            document.getElementById('status-copy').textContent = Object.values(state.choices).filter(Boolean).length ? `Active mutation lines: ${Object.values(state.choices).filter(Boolean).map((id) => labels[id]).join(', ')}.` : 'A fresh random organism is waiting to mutate.';
+            const next = nextMilestone();
+            document.getElementById('next-milestone').textContent = next ? `${next.threshold} evolutions` : 'All branches chosen';
+            document.getElementById('milestone-progress').style.width = next ? `${Math.max(0, Math.min(100, state.evolutionCount / next.threshold * 100))}%` : '100%';
+            document.getElementById('evolve-btn').disabled = !!currentMilestone();
+            const tierList = document.getElementById('milestone-list');
+            tierList.innerHTML = '';
+            milestones.forEach((m, i) => { const div = document.createElement('div'); div.className = 'chip'; div.innerHTML = `<span>Tier ${i + 1} - ${m.threshold} Evolutions</span><span>${state.choices[m.key] ? labels[state.choices[m.key]] : state.evolutionCount >= m.threshold ? 'Choice pending' : `${m.threshold - state.evolutionCount} left`}</span>`; tierList.appendChild(div); });
+            const aspectList = document.getElementById('aspect-list');
+            aspectList.innerHTML = '';
+            const chosen = Object.values(state.choices).filter(Boolean);
+            if (!chosen.length) { const div = document.createElement('div'); div.className = 'chip'; div.innerHTML = '<span>No specialization chosen yet</span><span>Base anatomy only</span>'; aspectList.appendChild(div); }
+            chosen.forEach((id) => { const div = document.createElement('div'); div.className = 'chip'; div.innerHTML = `<span>${labels[id]}</span><span>Active</span>`; aspectList.appendChild(div); });
+        }
+
+        function showChoice(milestone) {
+            const overlay = document.getElementById('choice-overlay');
+            const grid = document.getElementById('choice-grid');
+            document.getElementById('choice-title').textContent = milestone.title;
+            document.getElementById('choice-copy').textContent = milestone.subtitle;
+            grid.innerHTML = '';
+            milestone.options.forEach((option) => {
+                const card = document.createElement('div');
+                card.className = 'choice';
+                card.innerHTML = `<h3>${option.label}</h3><p class="muted">This body part keeps improving after every later evolution.</p>`;
+                const button = document.createElement('button');
+                button.className = 'primary';
+                button.textContent = 'Choose';
+                button.onclick = () => { state.choices[milestone.key] = option.id; save(); overlay.classList.remove('visible'); rebuildCreature(); updateHud(); };
+                card.appendChild(button);
+                grid.appendChild(card);
+            });
+            overlay.classList.add('visible');
+        }
+
+        function maybePromptChoice() { const m = currentMilestone(); const overlay = document.getElementById('choice-overlay'); if (m) showChoice(m); else overlay.classList.remove('visible'); }
+        function evolve() { if (currentMilestone()) return; state.evolutionCount += 1; mutateGenome(1 + state.evolutionCount * 0.03); save(); growthPulse = 1; rebuildCreature(); updateHud(); maybePromptChoice(); }
+
+        document.getElementById('evolve-btn').onclick = evolve;
+        document.getElementById('randomize-btn').onclick = () => { state.genome = randomGenome(); save(); rebuildCreature(); updateHud(); };
+        document.getElementById('reset-btn').onclick = () => { Object.assign(state, defaultState()); save(); rebuildCreature(); updateHud(); maybePromptChoice(); };
+
+        rebuildCreature();
+        updateHud();
+        maybePromptChoice();
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+            ring.rotation.z += 0.004;
+            if (creature) {
+                (creature.userData.animations || []).forEach((fn) => fn(t));
+                growthPulse = growthPulse > 0.001 ? growthPulse * 0.9 : 0;
+                const baseScale = creature.userData.baseScale || 1;
+                const scale = baseScale * (1 + state.evolutionCount * 0.012 + growthPulse * 0.12);
+                creature.scale.setScalar(scale);
+            }
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
