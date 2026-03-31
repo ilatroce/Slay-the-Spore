@@ -94,6 +94,293 @@
         
         #end-turn-btn { position: absolute; bottom: 80px; right: 5%; background: #444; border: 2px solid #aaa;}
         #end-turn-btn:hover { background: #666; }
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(159, 230, 255, 0.38), rgba(255, 150, 228, 0.28));
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            color: #ecfaff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            box-shadow: 0 14px 34px rgba(79, 123, 255, 0.22);
+        }
+        #llm-mode-panel {
+            margin: 0 0 20px;
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background:
+                linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
+                radial-gradient(circle at top left, rgba(138, 236, 255, 0.18), transparent 44%),
+                rgba(22, 14, 34, 0.68);
+            backdrop-filter: blur(18px) saturate(150%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 18px 40px rgba(8, 8, 30, 0.22);
+            text-align: left;
+        }
+        .llm-panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .llm-panel-kicker,
+        .chat-kicker {
+            color: #b8eeff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .llm-panel-title {
+            color: #fff4fb;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+        .llm-field-label {
+            display: block;
+            color: #ffdbe3;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        #llm-chat-input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(20, 17, 38, 0.56);
+            color: #fff8fc;
+            border-radius: 16px;
+            outline: none;
+        }
+        .llm-personality-copy {
+            color: #ffdbe3;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 10px;
+            min-height: 22px;
+        }
+        .llm-random-copy {
+            color: rgba(230, 247, 255, 0.74);
+            font-size: 12px;
+            line-height: 1.45;
+            margin: 0;
+        }
+        .llm-status-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            max-width: 220px;
+            min-height: 34px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #f4fbff;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.3;
+            text-align: center;
+        }
+        .llm-status-chip.compact {
+            min-height: 32px;
+            max-width: 180px;
+            font-size: 11px;
+        }
+        .llm-status-chip.info {
+            box-shadow: 0 0 0 1px rgba(144, 240, 255, 0.12);
+        }
+        .llm-status-chip.success {
+            background: rgba(94, 255, 186, 0.14);
+            border-color: rgba(94, 255, 186, 0.26);
+            color: #d9ffe8;
+        }
+        .llm-status-chip.warning {
+            background: rgba(255, 202, 110, 0.16);
+            border-color: rgba(255, 202, 110, 0.25);
+            color: #fff1c6;
+        }
+        .llm-status-chip.error {
+            background: rgba(255, 120, 148, 0.16);
+            border-color: rgba(255, 120, 148, 0.24);
+            color: #ffe1e7;
+        }
+        #llm-chat-shell {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            bottom: 18px;
+            width: 350px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 28px;
+            pointer-events: auto;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background:
+                linear-gradient(150deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05)),
+                radial-gradient(circle at top right, rgba(255, 153, 213, 0.22), transparent 38%),
+                radial-gradient(circle at bottom left, rgba(106, 233, 255, 0.18), transparent 38%),
+                rgba(17, 16, 34, 0.5);
+            backdrop-filter: blur(24px) saturate(170%);
+            box-shadow: 0 26px 60px rgba(7, 8, 24, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+        #llm-chat-glow {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 18% 18%, rgba(165, 255, 255, 0.18), transparent 30%),
+                radial-gradient(circle at 82% 16%, rgba(255, 179, 225, 0.18), transparent 28%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 38%);
+            mix-blend-mode: screen;
+        }
+        #llm-chat-header,
+        #llm-chat-log,
+        #llm-chat-form {
+            position: relative;
+            z-index: 1;
+        }
+        #llm-chat-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 20px 20px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        #llm-chat-header h3 {
+            margin: 0 0 6px;
+        }
+        #llm-chat-subtitle {
+            margin: 0;
+            color: rgba(255, 242, 250, 0.78);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        #llm-chat-log {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        #llm-chat-log::-webkit-scrollbar {
+            width: 8px;
+        }
+        #llm-chat-log::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+        }
+        .chat-message {
+            max-width: 88%;
+            padding: 12px 14px;
+            border-radius: 18px;
+            line-height: 1.45;
+            font-size: 14px;
+            color: #fff5fb;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        }
+        .chat-message.enemy {
+            align-self: flex-start;
+            background: linear-gradient(140deg, rgba(255, 192, 224, 0.2), rgba(255, 255, 255, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+        .chat-message.player {
+            align-self: flex-end;
+            background: linear-gradient(140deg, rgba(129, 239, 255, 0.2), rgba(255, 255, 255, 0.06));
+            border: 1px solid rgba(146, 233, 255, 0.18);
+        }
+        .chat-message.system {
+            align-self: stretch;
+            max-width: 100%;
+            background: rgba(10, 11, 24, 0.24);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            color: #dbefff;
+            font-size: 12px;
+        }
+        .chat-author {
+            display: block;
+            margin-bottom: 4px;
+            color: rgba(220, 248, 255, 0.72);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        #llm-chat-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 16px 18px 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        #llm-chat-input {
+            padding: 12px 14px;
+            font-size: 14px;
+        }
+        #llm-chat-send {
+            flex: 0 0 auto;
+            padding: 12px 18px;
+            font-size: 15px;
+            margin: 0;
+        }
+        body.llm-mode {
+            background:
+                radial-gradient(circle at 15% 15%, rgba(138, 234, 255, 0.16), transparent 34%),
+                radial-gradient(circle at 85% 12%, rgba(255, 150, 215, 0.16), transparent 36%),
+                #f8eaf5;
+        }
+        body.llm-mode #combat-screen {
+            padding-right: 392px;
+        }
+        body.llm-mode #combat-hud,
+        body.llm-mode #hand {
+            width: calc(100% - 430px);
+            max-width: none;
+        }
+        body.llm-mode #end-turn-btn {
+            right: 400px;
+        }
+        body.llm-mode #llm-chat-shell {
+            display: flex;
+        }
+        body.llm-mode #fight-button {
+            min-width: 290px;
+        }
+        @media (max-width: 1360px) {
+            body.llm-mode #combat-screen {
+                padding: 20px 0 350px;
+            }
+            body.llm-mode #combat-hud,
+            body.llm-mode #hand {
+                width: 92%;
+            }
+            body.llm-mode #llm-chat-shell {
+                top: auto;
+                left: 18px;
+                right: 18px;
+                bottom: 18px;
+                width: auto;
+                height: 300px;
+            }
+            body.llm-mode #end-turn-btn {
+                right: 18px;
+                bottom: 328px;
+            }
+        }
 
         .btn-small {
             pointer-events: auto; background: #eee; color: #555; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 14px; margin-top: 10px;
@@ -346,8 +633,9 @@
         <!-- START SCREEN -->
         <div id="start-screen" class="screen">
             <div class="panel" id="start-panel">
-                <h1>Slay the Spore</h1>
-                <h2>Choose your starting creature!</h2>
+                <div id="mode-badge" class="mode-badge" style="display: none;">Fight LLMs</div>
+                <h1 id="start-title">Slay the Spore</h1>
+                <h2 id="start-subtitle">Choose your starting creature!</h2>
                 <button id="reroll-btn" class="btn-small">🎲 Reroll Starters</button>
             </div>
             <div class="starter-buttons">
@@ -364,9 +652,21 @@
                 <h3 id="menu-stats">Max HP: 50 | Base Damage: 5</h3>
                 <div id="menu-mutations" class="mutation-strip"></div>
                 <p id="menu-mutation-copy" class="mutation-copy">First mutation choice unlocks after 5 evolutions.</p>
-                <p style="color: #aaa; margin-bottom: 20px;">Your creature hungers for battle and evolution.</p>
+                <p id="menu-flavor-copy" style="color: #aaa; margin-bottom: 20px;">Your creature hungers for battle and evolution.</p>
                 <div id="menu-deck">Deck: 8 cards | Attack x4 | Defend x4</div>
-                <button onclick="startCombat()">Fight Next Monster</button>
+                <div id="llm-mode-panel" style="display: none;">
+                    <div class="llm-panel-header">
+                        <div>
+                            <div class="llm-panel-kicker">Local Rival Mind</div>
+                            <div class="llm-panel-title">Each new creature rolls a personality from the rival pool.</div>
+                        </div>
+                        <div id="llm-status-chip" class="llm-status-chip">Preparing local model...</div>
+                    </div>
+                    <div class="llm-field-label">Enemy Personality</div>
+                    <p id="llm-personality-copy" class="llm-personality-copy"></p>
+                    <p id="llm-random-copy" class="llm-random-copy"></p>
+                </div>
+                <button id="fight-button" onclick="startCombat()">Fight Next Monster</button>
             </div>
         </div>
 
@@ -392,13 +692,29 @@
             
             <div id="hand"></div>
             <button id="end-turn-btn" onclick="endTurn()">End Turn</button>
+            <aside id="llm-chat-shell" style="display: none;">
+                <div id="llm-chat-glow"></div>
+                <div id="llm-chat-header">
+                    <div>
+                        <div class="chat-kicker">Liquid Glass Link</div>
+                        <h3 id="llm-chat-title">Fight LLMs</h3>
+                        <p id="llm-chat-subtitle">A local rival mind will taunt and telegraph its plans here.</p>
+                    </div>
+                    <div id="llm-chat-model-status" class="llm-status-chip compact">Preparing local model...</div>
+                </div>
+                <div id="llm-chat-log"></div>
+                <form id="llm-chat-form">
+                    <input id="llm-chat-input" type="text" maxlength="180" placeholder="Say something to your rival..." />
+                    <button id="llm-chat-send" type="submit">Send</button>
+                </form>
+            </aside>
         </div>
 
         <!-- VICTORY SCREEN -->
         <div id="victory-screen" class="screen" style="display: none;">
             <div class="panel reward-panel">
                 <h1 style="color: #4CAF50;">VICTORY!</h1>
-                <p>Your creature consumed the fallen monster.</p>
+                <p id="victory-copy">Your creature consumed the fallen monster.</p>
                 <div id="reward-card-container"></div>
                 <p id="reward-note" class="reward-note">Hover cards to inspect them, click 1 to select it, or skip the reward.</p>
                 <div class="reward-actions">
@@ -420,7 +736,7 @@
         <div id="defeat-screen" class="screen" style="display: none;">
             <div class="panel">
                 <h1 style="color: #FF3333;">DEFEAT</h1>
-                <p>Your timeline ends here.</p>
+                <p id="defeat-copy">Your timeline ends here.</p>
                 <button onclick="location.reload()" style="background: #333;">Restart Game</button>
             </div>
         </div>
@@ -439,6 +755,7 @@
     <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as webllm from 'https://esm.run/@mlc-ai/web-llm';
 
 const GRASS_BASE = new THREE.Color('#5acb45');
 const GRASS_TIP = new THREE.Color('#ddff9f');
@@ -508,6 +825,159 @@ const MUTATION_DATA = {
         description: 'Your attacks deal +5 extra damage and each attack has a 5% chance to make the enemy skip its turn.'
     }
 };
+const pageParams = new URLSearchParams(window.location.search);
+const isLlmMode = pageParams.get('mode') === 'llm';
+const hasLocalLlmSupport = typeof navigator !== 'undefined' && !!navigator.gpu;
+const DEFAULT_LLM_PERSONALITY_ID = 'friendly';
+const LLM_MODEL_PATTERNS = [
+    /Qwen2\.5-1\.5B-Instruct/i,
+    /Qwen2\.5-0\.5B-Instruct/i,
+    /Qwen2-1\.5B-Instruct/i,
+    /Qwen2-0\.5B-Instruct/i,
+    /SmolLM2-1\.7B-Instruct/i
+];
+const LLM_ACTION_LIBRARY = {
+    jab: {
+        label: 'Quick Jab',
+        summary: 'A reliable strike.',
+        promptHint: 'Quick Jab: hit the player for base damage plus any stored charge.',
+        build: ({ baseDamage, storedCharge }) => ({
+            id: 'jab',
+            label: 'Quick Jab',
+            damage: baseDamage + storedCharge,
+            blockGain: 0,
+            chargeGain: 0,
+            consumesCharge: true,
+            skip: false,
+            intentText: `Intent: Quick Jab for ${baseDamage + storedCharge}!`
+        })
+    },
+    all_in: {
+        label: 'Overclocked Strike',
+        summary: 'High damage, no defense.',
+        promptHint: 'Overclocked Strike: hit the player for base damage +4 plus any stored charge.',
+        build: ({ baseDamage, storedCharge }) => ({
+            id: 'all_in',
+            label: 'Overclocked Strike',
+            damage: baseDamage + 4 + storedCharge,
+            blockGain: 0,
+            chargeGain: 0,
+            consumesCharge: true,
+            skip: false,
+            intentText: `Intent: Overclocked Strike for ${baseDamage + 4 + storedCharge}!`
+        })
+    },
+    guard: {
+        label: 'Guard Stance',
+        summary: 'Block up, then poke.',
+        promptHint: 'Guard Stance: gain block and still poke for a lighter attack.',
+        build: ({ baseDamage, generation, storedCharge }) => {
+            const blockGain = 6 + generation * 2;
+            const damage = Math.max(0, baseDamage - 3 + storedCharge);
+            return {
+                id: 'guard',
+                label: 'Guard Stance',
+                damage,
+                blockGain,
+                chargeGain: 0,
+                consumesCharge: true,
+                skip: false,
+                intentText: `Intent: Guard Stance (+${blockGain} Block, ${damage} damage)`
+            };
+        }
+    },
+    scheme: {
+        label: 'Scheming Circuit',
+        summary: 'Store power for later.',
+        promptHint: 'Scheming Circuit: gain a little block now and store bonus damage for the next attack.',
+        build: ({ generation }) => {
+            const blockGain = 4 + generation;
+            const chargeGain = 3 + Math.floor(generation / 2);
+            return {
+                id: 'scheme',
+                label: 'Scheming Circuit',
+                damage: 0,
+                blockGain,
+                chargeGain,
+                consumesCharge: false,
+                skip: false,
+                intentText: `Intent: Scheming Circuit (+${blockGain} Block, stores +${chargeGain} damage)`
+            };
+        }
+    },
+    skip: {
+        label: 'Skip Turn',
+        summary: 'Does nothing this turn.',
+        promptHint: 'Skip Turn: do not attack this turn.',
+        build: () => ({
+            id: 'skip',
+            label: 'Skip Turn',
+            damage: 0,
+            blockGain: 0,
+            chargeGain: 0,
+            consumesCharge: false,
+            skip: true,
+            intentText: 'Intent: Skip turn'
+        })
+    }
+};
+const LLM_PERSONALITIES = {
+    friendly: {
+        name: 'Friendly',
+        summary: 'Funny, lighthearted, and oddly happy to be here.',
+        turnTemperature: 0.82,
+        chatTemperature: 0.9,
+        fallbackActions: ['guard', 'jab', 'scheme', 'skip', 'all_in'],
+        openingLine: 'Aww, look at us. Two little organisms making memories in a battle pit.',
+        systemPrompt: 'Your personality is Friendly. You enjoy the fight, stay funny and lighthearted, and sound like you are genuinely having fun. Tease playfully, never mean-spirited.'
+    },
+    pest: {
+        name: 'Pest',
+        summary: 'Tedious, rude, and constantly trying to get under your skin.',
+        turnTemperature: 0.76,
+        chatTemperature: 0.82,
+        fallbackActions: ['all_in', 'jab', 'scheme', 'guard', 'skip'],
+        openingLine: 'Oh good, another hero. I was worried I might have to insult the furniture instead.',
+        systemPrompt: 'Your personality is Pest. You are tedious, rude, and annoying on purpose. Keep it PG-13: no slurs, no hate speech, no sexual content, no threats. Be bratty and petty instead.'
+    },
+    mathematician: {
+        name: 'Mathmatician',
+        summary: 'A nerdy analyst who talks in equations, odds, and game theory.',
+        turnTemperature: 0.65,
+        chatTemperature: 0.74,
+        fallbackActions: ['scheme', 'guard', 'jab', 'all_in', 'skip'],
+        openingLine: 'Excellent. A fresh data set. Let us see whether your line of play converges or catastrophically diverges.',
+        systemPrompt: 'Your personality is Mathmatician. Speak like an excited math and science nerd. Reference probabilities, expected value, systems, and stats in a playful way.'
+    },
+    knowitall: {
+        name: 'The Knowitall',
+        summary: 'Keeps blurting out fun facts that connect to the battle.',
+        turnTemperature: 0.78,
+        chatTemperature: 0.86,
+        fallbackActions: ['scheme', 'jab', 'guard', 'all_in', 'skip'],
+        openingLine: 'Fun fact: your impending defeat and my lecture series are happening at the same time.',
+        systemPrompt: 'Your personality is The Knowitall. You keep spamming quick fun facts related to what just happened in battle. Sound delighted with your own trivia.'
+    },
+    goodone: {
+        name: 'The Good One',
+        summary: 'Too honest for his own good and often tells you exactly what he is doing.',
+        turnTemperature: 0.7,
+        chatTemperature: 0.78,
+        fallbackActions: ['guard', 'skip', 'jab', 'scheme', 'all_in'],
+        openingLine: 'I should warn you: I am morally incapable of bluffing. You deserve a fair fight.',
+        systemPrompt: 'Your personality is The Good One. You are generous and transparent. You often tell the player your card, your plan, and sometimes skip your turn on purpose to be nice.'
+    },
+    twoface: {
+        name: 'Twoface',
+        summary: 'Starts warm, then gets pricklier as pressure rises.',
+        turnTemperature: 0.83,
+        chatTemperature: 0.88,
+        fallbackActions: ['jab', 'guard', 'all_in', 'scheme', 'skip'],
+        openingLine: 'Hi there, little spore. Let us keep this civil. I am sure that will last forever.',
+        systemPrompt: 'Your personality is Twoface. Start kind and polite. As the battle drags on or you take damage, become noticeably pricklier, sharper, and more impatient.'
+    }
+};
+const LLM_PERSONALITY_IDS = Object.keys(LLM_PERSONALITIES);
 
 function hashNoise(n) {
     n = (n ^ 61) ^ (n >>> 16);
@@ -2675,6 +3145,14 @@ function maybePromptMutationChoice() {
 }
 
 function determineEnemyIntent() {
+    applyPlayerForcedEnemySkip();
+
+    enemyIntentDmg = enemyWillSkipTurn
+        ? 0
+        : calcEnemyBaseDmg(enemyGeneration) + Math.floor(Math.random() * 3);
+}
+
+function applyPlayerForcedEnemySkip() {
     enemyWillSkipTurn = false;
     enemySkipReason = '';
 
@@ -2688,9 +3166,361 @@ function determineEnemyIntent() {
         markEnemySkip('Swamper');
     }
 
-    enemyIntentDmg = enemyWillSkipTurn
-        ? 0
-        : calcEnemyBaseDmg(enemyGeneration) + Math.floor(Math.random() * 3);
+    return enemyWillSkipTurn;
+}
+
+function normalizeActionId(value) {
+    const key = String(value || '').toLowerCase().replace(/[^a-z]/g, '');
+    const aliases = {
+        jab: 'jab',
+        quickjab: 'jab',
+        strike: 'all_in',
+        allin: 'all_in',
+        overclocked: 'all_in',
+        overclockedstrike: 'all_in',
+        guard: 'guard',
+        guardstance: 'guard',
+        scheme: 'scheme',
+        schemingcircuit: 'scheme',
+        skip: 'skip',
+        skipturn: 'skip'
+    };
+    return aliases[key] || '';
+}
+
+function summarizeHandForLlm() {
+    if (!handPile.length) return 'No cards in hand.';
+    return handPile.map((card) => `${card.name}(${card.cost})`).join(', ');
+}
+
+function buildLlmIntent(actionId) {
+    const chosenId = LLM_ACTION_LIBRARY[actionId] ? actionId : 'jab';
+    const build = LLM_ACTION_LIBRARY[chosenId].build;
+    return build({
+        baseDamage: calcEnemyBaseDmg(enemyGeneration),
+        generation: enemyGeneration,
+        storedCharge: llmStoredCharge
+    });
+}
+
+function pickFallbackActionId(personality = getActiveLlmPersonality()) {
+    if (enemyWillSkipTurn) return 'skip';
+    if (personality === LLM_PERSONALITIES.goodone && Math.random() < 0.18) return 'skip';
+    if (!llmStoredCharge && llmTurnIndex > 0 && llmTurnIndex % 3 === 0) return 'scheme';
+    if (enemyHP < enemyMaxHP * 0.38) return 'guard';
+    if (playerHP < playerMaxHP * 0.33) return 'all_in';
+    return personality.fallbackActions.find((id) => LLM_ACTION_LIBRARY[id]) || 'jab';
+}
+
+function buildLlmTurnMessages(personality) {
+    const prickliness = personality === LLM_PERSONALITIES.twoface
+        ? Math.min(10, Math.round(llmTurnIndex + ((enemyMaxHP - enemyHP) / Math.max(1, enemyMaxHP)) * 10))
+        : 0;
+    const recentEvents = llmRecentEvents.length
+        ? llmRecentEvents.map((entry) => `- ${entry}`).join('\n')
+        : '- The duel just started.';
+    const actionHints = Object.values(LLM_ACTION_LIBRARY)
+        .map((action) => `- ${action.promptHint}`)
+        .join('\n');
+
+    return [
+        {
+            role: 'system',
+            content: [
+                buildLlmRoleplayPrompt(personality),
+                'You are planning exactly one legal combat move for this turn in a browser card battler.',
+                'Stay in character, but never invent extra rules, cards, damage types, or actions.',
+                'The "line" and "reveal" fields are spoken dialogue said out loud to the player.',
+                'Do not describe what you would say. Say it.',
+                'Reply with valid JSON only.',
+                'Use this schema:',
+                '{"action":"jab|all_in|guard|scheme|skip","line":"one short in-character sentence","reveal":"optional extra hint or confession"}',
+                'Keep the line under 24 words.',
+                'If you provide reveal, keep it under 18 words.'
+            ].join(' ')
+        },
+        {
+            role: 'user',
+            content: [
+                `Personality: ${personality.name}`,
+                `Turn: ${llmTurnIndex}`,
+                `Enemy HP: ${enemyHP}/${enemyMaxHP}`,
+                `Enemy Block: ${enemyBlock}`,
+                `Stored charge: ${llmStoredCharge}`,
+                `Player HP: ${playerHP}/${playerMaxHP}`,
+                `Player Block: ${playerBlock}`,
+                `Player dodge: ${getDodgePercent()}%`,
+                `Player energy: ${playerEnergy}`,
+                `Player hand: ${summarizeHandForLlm()}`,
+                personality === LLM_PERSONALITIES.twoface ? `Prickliness level from 0-10: ${prickliness}` : '',
+                'Recent battle events:',
+                recentEvents,
+                'Allowed actions:',
+                actionHints
+            ].filter(Boolean).join('\n')
+        }
+    ];
+}
+
+function normalizeLlmIntentDecision(decision) {
+    const personality = getActiveLlmPersonality();
+    const fallbackId = pickFallbackActionId(personality);
+    const fallbackIntent = buildLlmIntent(fallbackId);
+    const parsedActionId = normalizeActionId(decision?.action);
+    const actionId = parsedActionId || fallbackId;
+    const intent = buildLlmIntent(actionId);
+
+    const cleanedLine = String(decision?.line || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+    const cleanedReveal = String(decision?.reveal || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+    const defaultLine = {
+        friendly: `I picked ${intent.label}. Let us make this a charming little disaster.`,
+        pest: `I am using ${intent.label}. Try to keep up.`,
+        mathematician: `${intent.label} is the locally optimal line. I checked.`,
+        knowitall: `Fun fact: ${intent.label} is happening because I said so.`,
+        goodone: `I am honestly going with ${intent.label}. Sorry for ruining the surprise.`,
+        twoface: llmTurnIndex < 3 ? `I will use ${intent.label}. No hard feelings.` : `${intent.label}. You are starting to annoy me, frankly.`
+    };
+    const line = cleanedLine || defaultLine[Object.keys(LLM_PERSONALITIES).find((key) => LLM_PERSONALITIES[key] === personality)] || fallbackIntent.label;
+
+    let reveal = cleanedReveal;
+    if (!reveal && personality === LLM_PERSONALITIES.goodone) {
+        reveal = `I am showing my plan: ${intent.label}.`;
+    }
+
+    return {
+        intent,
+        line,
+        reveal
+    };
+}
+
+async function planLlmEnemyIntent() {
+    llmTurnIndex += 1;
+    playerTurnLocked = true;
+    llmBusy = true;
+    llmCurrentIntent = {
+        id: 'pending',
+        label: 'Thinking',
+        damage: 0,
+        blockGain: 0,
+        chargeGain: 0,
+        consumesCharge: false,
+        skip: false,
+        intentText: 'Intent: Rival model is thinking...'
+    };
+    enemyIntentDmg = 0;
+    updateCombatInteractionState();
+    updateCombatUI();
+
+    if (applyPlayerForcedEnemySkip()) {
+        llmCurrentIntent = buildLlmIntent('skip');
+        llmCurrentIntent.intentText = `Intent: Skip turn (${enemySkipReason})`;
+        appendLlmChatMessage('enemy', `${enemySkipReason} got me. I am losing a turn.`, { author: getActiveLlmPersonality().name });
+        playerTurnLocked = false;
+        llmBusy = false;
+        renderHand();
+        updateCombatInteractionState();
+        updateCombatUI();
+        return;
+    }
+
+    const personality = getActiveLlmPersonality();
+    const fallback = normalizeLlmIntentDecision({ action: pickFallbackActionId(personality) });
+
+    try {
+        const engine = await prepareLlmEngine();
+        const response = await enqueueLlmTask(() => engine.chat.completions.create({
+            messages: buildLlmTurnMessages(personality),
+            temperature: personality.turnTemperature,
+            top_p: 0.92,
+            max_tokens: 120
+        }));
+        const parsed = extractJsonObject(getCompletionText(response));
+        const decision = normalizeLlmIntentDecision(parsed);
+        llmCurrentIntent = decision.intent;
+        enemyIntentDmg = decision.intent.damage;
+
+        const speech = decision.reveal ? `${decision.line} ${decision.reveal}` : decision.line;
+        appendLlmChatMessage('enemy', speech, { author: personality.name });
+    } catch (error) {
+        llmCurrentIntent = fallback.intent;
+        enemyIntentDmg = fallback.intent.damage;
+        appendLlmChatMessage('system', 'The local rival glitched for a second and falls back to instinct.');
+        appendLlmChatMessage('enemy', fallback.line, { author: personality.name });
+    } finally {
+        if (gameState === 'FIGHT') {
+            pushLlmEvent(`${personality.name} prepares ${llmCurrentIntent.label}.`);
+            playerTurnLocked = false;
+            llmBusy = false;
+            renderHand();
+            updateCombatInteractionState();
+            updateCombatUI();
+        }
+    }
+}
+
+function executeLlmEnemyIntent() {
+    const intent = llmCurrentIntent || buildLlmIntent(pickFallbackActionId());
+    let summary = `${getActiveLlmPersonality().name} used ${intent.label}`;
+
+    if (enemyWillSkipTurn || intent.skip) {
+        showFloatingText('enemy', `${enemySkipReason || 'Skip'}!`, '#8ff0ff');
+        summary += enemySkipReason ? ` and lost the turn to ${enemySkipReason}` : ' and skipped the turn';
+        pushLlmEvent(summary);
+        updateCombatUI();
+        return;
+    }
+
+    if (intent.blockGain > 0) {
+        enemyBlock += intent.blockGain;
+        showFloatingText('enemy', `+${intent.blockGain} Block`, '#55ccff');
+        summary += `, gaining ${intent.blockGain} Block`;
+    }
+
+    if (intent.chargeGain > 0) {
+        llmStoredCharge += intent.chargeGain;
+        showFloatingText('enemy', `+${intent.chargeGain} Charge`, '#ffcc00');
+        summary += ` and storing +${intent.chargeGain} damage`;
+    }
+
+    if (intent.damage > 0) {
+        enemyCreature.userData.animationRoot.position.x -= 1;
+        setTimeout(() => enemyCreature.userData.animationRoot.position.x += 1, 100);
+        dealDamage('player', intent.damage, { isEnemyAttack: true });
+        summary += ` for ${intent.damage} damage`;
+    } else {
+        updateCombatUI();
+    }
+
+    if (intent.consumesCharge && intent.damage > 0) {
+        llmStoredCharge = 0;
+    }
+
+    pushLlmEvent(summary);
+}
+
+async function handleLlmChatSubmit(event) {
+    event.preventDefault();
+    if (!isLlmMode || gameState !== 'FIGHT' || llmBusy) return;
+
+    const input = document.getElementById('llm-chat-input');
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    appendLlmChatMessage('player', text);
+    llmBusy = true;
+    updateCombatInteractionState();
+
+    try {
+        const engine = await prepareLlmEngine();
+        const personality = getActiveLlmPersonality();
+        const recentChat = llmChatMessages
+            .slice(-6)
+            .map((entry) => `${entry.author}: ${entry.text}`)
+            .join('\n');
+        const response = await enqueueLlmTask(() => engine.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: [
+                        buildLlmRoleplayPrompt(personality),
+                        'Reply to the player in character.',
+                        'Speak like a person in the arena, not like a virtual assistant.',
+                        'This is flavor chat only. Do not change your already chosen move or invent new gameplay rules.',
+                        'Keep the response to one or two short sentences.'
+                    ].join(' ')
+                },
+                {
+                    role: 'user',
+                    content: [
+                        `Current planned action: ${llmCurrentIntent ? llmCurrentIntent.label : 'None yet'}`,
+                        `Battle status: enemy ${enemyHP}/${enemyMaxHP} HP, player ${playerHP}/${playerMaxHP} HP.`,
+                        'Recent chat:',
+                        recentChat,
+                        `Player says: ${text}`
+                    ].join('\n')
+                }
+            ],
+            temperature: personality.chatTemperature,
+            top_p: 0.94,
+            max_tokens: 90
+        }));
+        const reply = getCompletionText(response) || 'I had a comeback lined up, but my buffers ate it.';
+        appendLlmChatMessage('enemy', reply, { author: personality.name });
+    } catch (error) {
+        appendLlmChatMessage('system', 'The local rival missed that line. Try again in a moment.');
+    } finally {
+        llmBusy = false;
+        updateCombatInteractionState();
+    }
+}
+
+function updateLlmPersonalityUI() {
+    if (!isLlmMode) return;
+    const personality = getActiveLlmPersonality();
+    const copy = document.getElementById('llm-personality-copy');
+    const randomCopy = document.getElementById('llm-random-copy');
+    const title = document.getElementById('llm-chat-title');
+    const subtitle = document.getElementById('llm-chat-subtitle');
+    const fightButton = document.getElementById('fight-button');
+    const isCombatLive = gameState === 'FIGHT';
+
+    if (copy) {
+        copy.textContent = isCombatLive
+            ? `${personality.name}: ${personality.summary}`
+            : 'Every new enemy creature rolls one personality from the agreed pool before the fight starts.';
+    }
+    if (randomCopy) {
+        randomCopy.textContent = isCombatLive
+            ? `Current rival: ${personality.name}. The next creature will reroll.`
+            : 'Pool: Friendly, Pest, Mathmatician, The Knowitall, The Good One, and Twoface.';
+    }
+    if (title) {
+        title.textContent = isCombatLive ? `${personality.name} Link` : 'Rival Link';
+    }
+    if (subtitle) {
+        subtitle.textContent = isCombatLive
+            ? `${personality.summary} You can taunt back in the chat box.`
+            : 'Each creature rolls a personality when the duel begins. You can taunt back in the chat box.';
+    }
+    if (fightButton) {
+        fightButton.textContent = isCombatLive ? `Fight ${personality.name}` : 'Roll Rival and Fight';
+    }
+}
+
+function initLlmModeUI() {
+    if (!isLlmMode || llmUiReady) return;
+    llmUiReady = true;
+
+    document.body.classList.add('llm-mode');
+    document.title = 'Slay the Spore - Fight LLMs';
+
+    const badge = document.getElementById('mode-badge');
+    const panel = document.getElementById('llm-mode-panel');
+    const shell = document.getElementById('llm-chat-shell');
+    const form = document.getElementById('llm-chat-form');
+
+    if (badge) badge.style.display = 'inline-flex';
+    if (panel) panel.style.display = 'block';
+    if (shell) shell.style.display = 'flex';
+
+    document.getElementById('start-title').textContent = 'Fight LLMs';
+    document.getElementById('start-subtitle').textContent = 'Choose your starting creature for the arena.';
+    document.getElementById('menu-flavor-copy').textContent = 'Your creature is entering a liquid-glass arena to duel a local rival mind.';
+    document.getElementById('victory-copy').textContent = 'Your creature compressed the rival mind and harvested new tactics.';
+    document.getElementById('defeat-copy').textContent = 'The rival model outwitted your timeline this round.';
+
+    form.addEventListener('submit', handleLlmChatSubmit);
+    updateLlmPersonalityUI();
+    setLlmStatus(llmStatusText, llmStatusTone);
+
+    if (hasLocalLlmSupport) {
+        prepareLlmEngine().catch(() => undefined);
+    } else {
+        setLlmStatus('Fight LLMs needs a recent Chrome or Edge build with WebGPU enabled.', 'error');
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2714,6 +3544,8 @@ function initStarters() {
     activeCreatures.forEach(c => scene.remove(c));
     activeCreatures = [];
     starters = [];
+    playerTurnLocked = false;
+    llmBusy = false;
     mutationState = defaultMutationState();
     hideMutationChoice();
     
@@ -2753,6 +3585,8 @@ document.getElementById('reroll-btn').addEventListener('click', initStarters);
 
 function goToMenu(isEvolving = false) {
     gameState = 'MENU';
+    playerTurnLocked = false;
+    llmBusy = false;
     
     // Clear scene
     activeCreatures.forEach(c => scene.remove(c));
@@ -2818,6 +3652,13 @@ function goToMenu(isEvolving = false) {
     updateMenuStats();
     updateMutationUI();
     updateMenuDeckUI();
+    if (isLlmMode) {
+        updateLlmPersonalityUI();
+        const fightButton = document.getElementById('fight-button');
+        if (fightButton) {
+            fightButton.disabled = !hasLocalLlmSupport;
+        }
+    }
     maybePromptMutationChoice();
 }
 
@@ -2879,6 +3720,23 @@ let selectedVictoryRewardIndex = -1;
 let drawPile = [];
 let handPile = [];
 let discardPile = [];
+let playerTurnLocked = false;
+let activeLlmPersonalityId = DEFAULT_LLM_PERSONALITY_ID;
+let lastLlmPersonalityId = '';
+let llmEngine = null;
+let llmEnginePromise = null;
+let llmEngineMode = '';
+let llmWorker = null;
+let llmStatusText = hasLocalLlmSupport ? 'Waiting for a fight to warm up the local model.' : 'WebGPU is unavailable in this browser.';
+let llmStatusTone = hasLocalLlmSupport ? 'info' : 'error';
+let llmQueue = Promise.resolve();
+let llmUiReady = false;
+let llmTurnIndex = 0;
+let llmStoredCharge = 0;
+let llmCurrentIntent = null;
+let llmRecentEvents = [];
+let llmChatMessages = [];
+let llmBusy = false;
 
 // Hover interaction handled partially via CSS and partially on element events
 
@@ -2888,6 +3746,285 @@ function calcPlayerBaseBlock() { return 4 + playerGeneration * 2; }
 
 function calcEnemyMaxHP(gen) { return 30 + gen * 12; }
 function calcEnemyBaseDmg(gen) { return 4 + gen * 3; }
+
+function getActiveLlmPersonality() {
+    return LLM_PERSONALITIES[activeLlmPersonalityId] || LLM_PERSONALITIES[DEFAULT_LLM_PERSONALITY_ID];
+}
+
+function rollLlmPersonalityId() {
+    const pool = LLM_PERSONALITY_IDS.filter((id) => id !== lastLlmPersonalityId);
+    const candidates = pool.length ? pool : LLM_PERSONALITY_IDS;
+    const chosenId = candidates[Math.floor(Math.random() * candidates.length)] || DEFAULT_LLM_PERSONALITY_ID;
+    activeLlmPersonalityId = chosenId;
+    lastLlmPersonalityId = chosenId;
+    return chosenId;
+}
+
+function buildLlmRoleplayPrompt(personality) {
+    return [
+        'You are not an assistant, helper, chatbot, or narrator.',
+        'You are the rival creature currently fighting the player in Slay the Spore.',
+        'Speak as if you are a real person in this battle, directly to the player, in first person.',
+        'Never mention being an AI, LLM, model, assistant, system prompt, browser feature, or software.',
+        'Never say you are here to help, never ask how you can assist, and never step out of character.',
+        'All speech should feel like live dialogue spoken by the rival in the arena.',
+        personality.systemPrompt
+    ].join(' ');
+}
+
+function setLlmStatus(text, tone = 'info') {
+    llmStatusText = text;
+    llmStatusTone = tone;
+
+    ['llm-status-chip', 'llm-chat-model-status'].forEach((id) => {
+        const node = document.getElementById(id);
+        if (!node) return;
+        node.textContent = text;
+        node.className = `llm-status-chip${node.classList.contains('compact') ? ' compact' : ''} ${tone}`;
+    });
+}
+
+function pushLlmEvent(summary) {
+    if (!summary) return;
+    llmRecentEvents.push(summary);
+    if (llmRecentEvents.length > 8) {
+        llmRecentEvents.shift();
+    }
+}
+
+function renderLlmChatLog() {
+    const log = document.getElementById('llm-chat-log');
+    if (!log) return;
+
+    log.innerHTML = '';
+    llmChatMessages.forEach((entry) => {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-message ${entry.role}`;
+        if (entry.role !== 'system') {
+            const author = document.createElement('span');
+            author.className = 'chat-author';
+            author.textContent = entry.author;
+            bubble.appendChild(author);
+        }
+
+        const body = document.createElement('div');
+        body.textContent = entry.text;
+        bubble.appendChild(body);
+        log.appendChild(bubble);
+    });
+
+    log.scrollTop = log.scrollHeight;
+}
+
+function appendLlmChatMessage(role, text, options = {}) {
+    const cleanText = String(text || '').trim();
+    if (!cleanText) return;
+
+    let author = options.author || 'System';
+    if (role === 'enemy') {
+        author = options.author || getActiveLlmPersonality().name;
+    } else if (role === 'player') {
+        author = options.author || 'You';
+    }
+
+    llmChatMessages.push({ role, text: cleanText, author });
+    if (llmChatMessages.length > 18) {
+        llmChatMessages = llmChatMessages.slice(-18);
+    }
+    renderLlmChatLog();
+}
+
+function resetLlmBattleState() {
+    llmTurnIndex = 0;
+    llmStoredCharge = 0;
+    llmCurrentIntent = null;
+    llmRecentEvents = [];
+    llmChatMessages = [];
+    renderLlmChatLog();
+
+    const personality = getActiveLlmPersonality();
+    appendLlmChatMessage('system', `Personality rolled: ${personality.name}.`);
+    appendLlmChatMessage('system', 'Local rival link established. The enemy is powered entirely in your browser.');
+    appendLlmChatMessage('enemy', personality.openingLine, { author: personality.name });
+}
+
+function updateCombatInteractionState() {
+    const sendBtn = document.getElementById('llm-chat-send');
+    const sendInput = document.getElementById('llm-chat-input');
+    const endTurnBtn = document.getElementById('end-turn-btn');
+    const canInteract = gameState === 'FIGHT' && !playerTurnLocked;
+
+    if (endTurnBtn) {
+        endTurnBtn.disabled = !canInteract;
+    }
+    if (sendBtn) {
+        sendBtn.disabled = !isLlmMode || gameState !== 'FIGHT' || llmBusy || !hasLocalLlmSupport;
+    }
+    if (sendInput) {
+        sendInput.disabled = !isLlmMode || gameState !== 'FIGHT' || llmBusy || !hasLocalLlmSupport;
+    }
+}
+
+function getPreferredModelPatterns() {
+    const memory = Number(navigator.deviceMemory || 0);
+    if (memory >= 8) {
+        return LLM_MODEL_PATTERNS;
+    }
+
+    return [
+        LLM_MODEL_PATTERNS[1],
+        LLM_MODEL_PATTERNS[0],
+        LLM_MODEL_PATTERNS[3],
+        LLM_MODEL_PATTERNS[2],
+        LLM_MODEL_PATTERNS[4]
+    ];
+}
+
+function getCandidateModelIds() {
+    const modelList = Array.isArray(webllm.prebuiltAppConfig?.model_list)
+        ? webllm.prebuiltAppConfig.model_list
+        : [];
+    const availableIds = modelList
+        .map((record) => record?.model_id || record?.model || record?.modelId || '')
+        .filter(Boolean);
+    const ordered = [];
+
+    getPreferredModelPatterns().forEach((pattern) => {
+        const match = availableIds.find((id) => pattern.test(id));
+        if (match && !ordered.includes(match)) {
+            ordered.push(match);
+        }
+    });
+
+    [
+        'HF://mlc-ai/Qwen2.5-1.5B-Instruct-q4f32_1-MLC',
+        'HF://mlc-ai/Qwen2.5-0.5B-Instruct-q4f32_1-MLC'
+    ].forEach((id) => {
+        if (!ordered.includes(id)) {
+            ordered.push(id);
+        }
+    });
+
+    return ordered;
+}
+
+function describeLlmProgress(progress) {
+    const baseText = progress?.text || progress?.status || 'Loading local model...';
+    const fraction = Number(progress?.progress);
+    if (Number.isFinite(fraction) && fraction > 0 && fraction <= 1) {
+        return `${baseText} ${Math.round(fraction * 100)}%`;
+    }
+    return baseText;
+}
+
+async function createWorkerLlmEngine(modelId) {
+    const worker = new Worker('./fight_llms_worker.js', { type: 'module' });
+    try {
+        const engine = await webllm.CreateWebWorkerMLCEngine(worker, modelId, {
+            initProgressCallback: (progress) => {
+                setLlmStatus(describeLlmProgress(progress), 'info');
+            }
+        });
+        llmWorker = worker;
+        llmEngineMode = 'worker';
+        return engine;
+    } catch (error) {
+        worker.terminate();
+        throw error;
+    }
+}
+
+async function createMainThreadLlmEngine(modelId) {
+    const engine = await webllm.CreateMLCEngine(modelId, {
+        initProgressCallback: (progress) => {
+            setLlmStatus(describeLlmProgress(progress), 'info');
+        }
+    });
+    llmEngineMode = 'main-thread';
+    return engine;
+}
+
+async function prepareLlmEngine() {
+    if (!isLlmMode) return null;
+    if (!hasLocalLlmSupport) {
+        throw new Error('WebGPU is unavailable in this browser.');
+    }
+    if (llmEngine) {
+        return llmEngine;
+    }
+    if (llmEnginePromise) {
+        return llmEnginePromise;
+    }
+
+    llmEnginePromise = (async () => {
+        const candidates = getCandidateModelIds();
+        let lastError = null;
+
+        for (const modelId of candidates) {
+            try {
+                setLlmStatus(`Loading ${modelId.split('/').pop()}...`, 'info');
+                try {
+                    llmEngine = await createWorkerLlmEngine(modelId);
+                } catch (workerError) {
+                    lastError = workerError;
+                    llmEngine = await createMainThreadLlmEngine(modelId);
+                }
+
+                setLlmStatus(`Ready: ${modelId.split('/').pop()} (${llmEngineMode})`, 'success');
+                return llmEngine;
+            } catch (error) {
+                lastError = error;
+                if (llmWorker) {
+                    llmWorker.terminate();
+                    llmWorker = null;
+                }
+                llmEngine = null;
+            }
+        }
+
+        throw lastError || new Error('No WebLLM model could be loaded.');
+    })();
+
+    try {
+        return await llmEnginePromise;
+    } finally {
+        if (!llmEngine) {
+            llmEnginePromise = null;
+            setLlmStatus('Could not load a local model in this browser.', 'error');
+        }
+    }
+}
+
+function enqueueLlmTask(taskFactory) {
+    const run = llmQueue.then(taskFactory, taskFactory);
+    llmQueue = run.catch(() => undefined);
+    return run;
+}
+
+function getCompletionText(response) {
+    const content = response?.choices?.[0]?.message?.content;
+    if (typeof content === 'string') {
+        return content.trim();
+    }
+    if (Array.isArray(content)) {
+        return content.map((item) => item?.text || '').join('').trim();
+    }
+    return '';
+}
+
+function extractJsonObject(text) {
+    const raw = String(text || '').trim();
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start === -1 || end === -1 || end <= start) {
+        return null;
+    }
+    try {
+        return JSON.parse(raw.slice(start, end + 1));
+    } catch (error) {
+        return null;
+    }
+}
 
 function updateMenuDeckUI() {
     const deckEl = document.getElementById('menu-deck');
@@ -3034,12 +4171,19 @@ window.skipVictoryReward = function() {
 }
 
 window.startCombat = function() {
+    if (isLlmMode && !hasLocalLlmSupport) {
+        setLlmStatus('Fight LLMs needs WebGPU. Open this in a recent Chrome or Edge build.', 'error');
+        return;
+    }
     if (currentMutationMilestone()) {
         maybePromptMutationChoice();
         return;
     }
 
     gameState = 'FIGHT';
+    if (isLlmMode) {
+        rollLlmPersonalityId();
+    }
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('combat-screen').style.display = 'flex';
     hideMutationChoice();
@@ -3078,9 +4222,17 @@ window.startCombat = function() {
     enemyHP = enemyMaxHP;
     enemyBlock = 0;
     enemyIntentDmg = 0;
+    llmStoredCharge = 0;
+    llmCurrentIntent = null;
+    playerTurnLocked = false;
     
     document.getElementById('player-gen-text').innerText = `(Gen ${playerGeneration})`;
-    document.getElementById('enemy-name').innerText = `Wild Creature (Gen ${enemyGeneration})`;
+    document.getElementById('enemy-name').innerText = isLlmMode
+        ? `${getActiveLlmPersonality().name} (Gen ${enemyGeneration})`
+        : `Wild Creature (Gen ${enemyGeneration})`;
+    if (isLlmMode) {
+        updateLlmPersonalityUI();
+    }
     
     // Combat status (strength, statuses)
     combatStatus = createCombatStatus();
@@ -3092,6 +4244,10 @@ window.startCombat = function() {
     shuffle(drawPile);
     discardPile = [];
     handPile = [];
+
+    if (isLlmMode) {
+        resetLlmBattleState();
+    }
     
     updateCombatUI();
     startTurn();
@@ -3105,6 +4261,7 @@ function shuffle(array) {
 }
 
 function startTurn() {
+    playerTurnLocked = !!isLlmMode;
     playerEnergy = 3 + getCombatStatusNumber('energyBonus');
     playerBlock = 0; // reset block start of turn
 
@@ -3120,12 +4277,15 @@ function startTurn() {
     if (playerHP <= 0) { loseCombat(); return; }
     if (enemyHP <= 0) { winCombat(); return; }
     
-    // Enemy decides intent
-    determineEnemyIntent();
-    
     // Draw cards, including mutation bonuses
     drawCards(getCardsPerTurn());
-    updateCombatUI();
+    if (isLlmMode) {
+        updateCombatInteractionState();
+        planLlmEnemyIntent();
+    } else {
+        determineEnemyIntent();
+        updateCombatUI();
+    }
 }
 
 function drawCards(num) {
@@ -3148,14 +4308,14 @@ function renderHand() {
     
     handPile.forEach((card, index) => {
         const cardClass = card.type === 'attack' ? 'attack' : card.type === 'defend' ? 'defend' : 'special';
-        const canAfford = playerEnergy >= card.cost;
+        const canAfford = playerEnergy >= card.cost && !playerTurnLocked;
         
         const cardEl = document.createElement('div');
         cardEl.className = `card ${cardClass}`;
         cardEl.style.backgroundImage = `url('${card.img}')`;
         cardEl.style.backgroundSize = 'cover';
         cardEl.style.backgroundPosition = 'center';
-        if (!canAfford) cardEl.style.opacity = '0.5';
+        if (!canAfford) cardEl.style.opacity = playerTurnLocked ? '0.35' : '0.5';
         
         cardEl.innerHTML = `
             <div class="cost">${card.cost}</div>
@@ -3266,8 +4426,15 @@ function makeCombatCtx() {
 }
 
 function playCard(index) {
+    if (playerTurnLocked) return;
     const card = handPile[index];
     if (playerEnergy >= card.cost) {
+        const beforeState = {
+            playerHP,
+            enemyHP,
+            playerBlock,
+            enemyBlock
+        };
         playerEnergy -= card.cost;
         const ctx = makeCombatCtx();
 
@@ -3293,6 +4460,7 @@ function playCard(index) {
         
         discardPile.push(card);
         handPile.splice(index, 1);
+        pushLlmEvent(`${card.name} resolved for ${Math.max(0, beforeState.enemyHP - enemyHP)} damage, ${Math.max(0, beforeState.playerHP - playerHP)} self damage, and ${Math.max(0, playerBlock - beforeState.playerBlock)} block swing.`);
         renderHand();
         updateCombatUI();
         
@@ -3305,31 +4473,55 @@ function playCard(index) {
 }
 
 window.endTurn = function() {
+    if (playerTurnLocked) return;
     // Apply end-of-turn status resets (e.g. No Pain No Gain expires)
     applyTurnEndEffects(makeCombatCtx());
 
     if (enemyHP > 0) {
-        if (enemyWillSkipTurn) {
-            showFloatingText('enemy', `${enemySkipReason || 'Enemy'} Skip!`, '#8ff0ff');
-        } else {
+        if (isLlmMode) {
             const mutationStats = getMutationCombatStats();
-
-            if (mutationStats.clawsCounter && playerBlock > 0) {
+            if (!enemyWillSkipTurn && llmCurrentIntent && !llmCurrentIntent.skip && llmCurrentIntent.damage > 0 && mutationStats.clawsCounter && playerBlock > 0) {
                 const counterDamage = playerBlock;
                 dealDamage('enemy', counterDamage);
                 showFloatingText('enemy', 'Claws!', '#ffb347');
+                pushLlmEvent(`Claws countered for ${counterDamage} damage.`);
                 if (enemyHP <= 0) {
                     winCombat();
                     return;
                 }
             }
-
-            enemyCreature.userData.animationRoot.position.x -= 1;
-            setTimeout(() => enemyCreature.userData.animationRoot.position.x += 1, 100);
-            dealDamage('player', enemyIntentDmg, { isEnemyAttack: true });
+            executeLlmEnemyIntent();
+            if (enemyHP <= 0) {
+                winCombat();
+                return;
+            }
             if (playerHP <= 0) {
                 loseCombat();
                 return;
+            }
+        } else {
+            if (enemyWillSkipTurn) {
+                showFloatingText('enemy', `${enemySkipReason || 'Enemy'} Skip!`, '#8ff0ff');
+            } else {
+                const mutationStats = getMutationCombatStats();
+
+                if (mutationStats.clawsCounter && playerBlock > 0) {
+                    const counterDamage = playerBlock;
+                    dealDamage('enemy', counterDamage);
+                    showFloatingText('enemy', 'Claws!', '#ffb347');
+                    if (enemyHP <= 0) {
+                        winCombat();
+                        return;
+                    }
+                }
+
+                enemyCreature.userData.animationRoot.position.x -= 1;
+                setTimeout(() => enemyCreature.userData.animationRoot.position.x += 1, 100);
+                dealDamage('player', enemyIntentDmg, { isEnemyAttack: true });
+                if (playerHP <= 0) {
+                    loseCombat();
+                    return;
+                }
             }
         }
     }
@@ -3337,6 +4529,7 @@ window.endTurn = function() {
     enemyWillSkipTurn = false;
     enemySkipReason = '';
     combatStatus.nextEnemyTurnDodgeChance = 0;
+    llmCurrentIntent = null;
     discardPile.push(...handPile);
     handPile = [];
     startTurn();
@@ -3456,10 +4649,17 @@ function updateCombatUI() {
     
     document.getElementById('enemy-hp-fill').style.width = `${(enemyHP/enemyMaxHP)*100}%`;
     document.getElementById('enemy-stats').innerHTML = `HP: ${enemyHP}/${enemyMaxHP} | <span class="block-text">Block: ${enemyBlock}</span>`;
-    document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
-        ? `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`
-        : `Intent: Attack for <span id="enemy-dmg">${enemyIntentDmg}</span>!`;
+    if (isLlmMode) {
+        document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
+            ? `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`
+            : (llmCurrentIntent?.intentText || 'Intent: Rival model is thinking...');
+    } else {
+        document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
+            ? `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`
+            : `Intent: Attack for <span id="enemy-dmg">${enemyIntentDmg}</span>!`;
+    }
     updateMutationUI();
+    updateCombatInteractionState();
 }
 
 function winCombat() {
@@ -3468,9 +4668,12 @@ function winCombat() {
     document.getElementById('victory-screen').style.display = 'flex';
     enemyCombatCircle.visible = false;
     hideMutationChoice();
+    playerTurnLocked = false;
+    llmBusy = false;
     pendingVictoryRewards = rollVictoryRewards(3);
     selectedVictoryRewardIndex = -1;
     renderVictoryReward();
+    updateCombatInteractionState();
     
     let drop = setInterval(() => {
         if(enemyCreature) {
@@ -3492,6 +4695,9 @@ function loseCombat() {
     playerCombatCircle.visible = false;
     enemyCombatCircle.visible = false;
     hideMutationChoice();
+    playerTurnLocked = false;
+    llmBusy = false;
+    updateCombatInteractionState();
 }
 
 window.triggerEvolution = function() {
@@ -3544,6 +4750,7 @@ window.addEventListener('resize', () => {
 });
 
 // Start the game!
+initLlmModeUI();
 initStarters();
 animate();
 
