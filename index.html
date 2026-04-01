@@ -864,11 +864,14 @@
                 margin-top: 0;
                 flex-direction: column;
                 gap: 12px;
+                flex: 0 0 auto;
             }
             .entity-stats {
                 width: 100%;
                 max-width: none;
                 padding: 14px;
+                flex: 0 0 auto;
+                min-height: 0;
             }
             .intent {
                 font-size: 16px;
@@ -876,7 +879,7 @@
             #hand-wrap {
                 width: calc(100% + var(--safe-left) + var(--safe-right));
                 max-width: none;
-                margin: 0 calc(-1 * var(--safe-right)) 0 calc(-1 * var(--safe-left));
+                margin: auto calc(-1 * var(--safe-right)) 0 calc(-1 * var(--safe-left));
                 padding: 18px var(--safe-right) 12px var(--safe-left);
                 scroll-padding-inline: var(--safe-left);
             }
@@ -1119,6 +1122,9 @@
                 padding: 10px 10px 12px;
                 border-radius: 10px;
                 gap: 6px;
+            }
+            #combat-hud {
+                gap: 8px;
             }
             .entity-stats h3 {
                 margin-bottom: 8px;
