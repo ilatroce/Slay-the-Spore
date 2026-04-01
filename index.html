@@ -1113,61 +1113,73 @@
             #combat-screen {
                 gap: 8px;
                 padding:
-                    calc(var(--safe-top) + 8px)
+                    calc(var(--safe-top) + 6px)
                     12px
-                    calc(var(--safe-bottom) + var(--combat-button-height) + 74px + var(--combat-chat-offset))
+                    calc(var(--safe-bottom) + var(--combat-button-height) + 64px + var(--combat-chat-offset))
                     12px;
             }
             .entity-stats {
-                padding: 10px 10px 12px;
+                padding: 8px 8px 10px;
                 border-radius: 10px;
-                gap: 6px;
+                gap: 4px;
             }
             #combat-hud {
-                gap: 8px;
+                gap: 6px;
             }
             .entity-stats h3 {
-                margin-bottom: 8px;
-                font-size: 15px;
+                margin-bottom: 6px;
+                font-size: 13px;
             }
             .hp-bar {
-                height: 14px;
+                height: 12px;
+            }
+            .energy-readout {
+                margin-top: 2px !important;
+                font-size: 12px;
             }
             #player-stats,
             #enemy-stats,
             #player-buffs,
             .hud-mutation-copy {
-                font-size: 11px;
-                line-height: 1.3;
+                font-size: 10px;
+                line-height: 1.22;
+            }
+            #player-buffs,
+            .hud-mutation-copy {
+                min-height: 0;
             }
             .intent {
-                margin-top: 2px;
-                padding: 4px 6px;
-                font-size: 13px;
+                margin-top: 1px;
+                padding: 3px 5px;
+                font-size: 12px;
             }
             .mutation-strip.compact {
-                min-height: 36px;
-                gap: 6px;
+                min-height: 26px;
+                gap: 4px;
+                margin: 4px 0 0;
             }
             .mutation-badge,
             .mutation-strip.compact .mutation-badge {
-                width: 36px;
-                height: 36px;
-                padding: 4px;
-                border-radius: 10px;
+                width: 28px;
+                height: 28px;
+                padding: 3px;
+                border-radius: 8px;
+            }
+            .mutation-empty {
+                font-size: 10px;
             }
             #hand-wrap {
-                padding-top: 12px;
-                padding-bottom: 8px;
+                padding-top: 8px;
+                padding-bottom: 6px;
             }
             #hand {
-                min-height: 136px;
-                gap: 8px;
+                min-height: 122px;
+                gap: 6px;
             }
             .card {
-                width: 92px;
-                height: 128px;
-                padding: 6px;
+                width: 82px;
+                height: 114px;
+                padding: 5px;
                 border-width: 2px;
                 border-radius: 8px;
             }
@@ -1177,27 +1189,27 @@
             .card .cost {
                 top: -6px;
                 left: -6px;
-                width: 22px;
-                height: 22px;
-                border-radius: 11px;
-                font-size: 11px;
+                width: 20px;
+                height: 20px;
+                border-radius: 10px;
+                font-size: 10px;
                 border-width: 1px;
             }
             .card .title {
-                font-size: 10px;
-                line-height: 1.15;
-                padding-bottom: 3px;
-                margin-bottom: 3px;
+                font-size: 9px;
+                line-height: 1.08;
+                padding-bottom: 2px;
+                margin-bottom: 2px;
             }
             .card .desc {
-                font-size: 9.5px;
-                line-height: 1.2;
+                font-size: 8.5px;
+                line-height: 1.1;
             }
             #end-turn-btn {
                 left: 12px;
                 right: 12px;
-                font-size: 15px;
-                padding: 12px 14px;
+                font-size: 14px;
+                padding: 10px 12px;
                 border-radius: 20px;
             }
             body.llm-mode #llm-chat-shell {
@@ -1210,26 +1222,26 @@
                 padding: 12px 0 10px;
             }
             #reward-card-container .card.reward-card {
-                flex-basis: 122px;
-                width: 122px;
-                height: 172px;
+                flex-basis: 110px;
+                width: 110px;
+                height: 154px;
             }
             #reward-card-container .card.reward-card .cost {
-                width: 24px;
-                height: 24px;
-                border-radius: 12px;
+                width: 20px;
+                height: 20px;
+                border-radius: 10px;
                 top: -7px;
                 left: -7px;
-                font-size: 11px;
+                font-size: 10px;
             }
             #reward-card-container .card.reward-card .title {
-                font-size: 11px;
-                padding-bottom: 3px;
-                margin-bottom: 3px;
+                font-size: 9px;
+                padding-bottom: 2px;
+                margin-bottom: 2px;
             }
             #reward-card-container .card.reward-card .desc {
-                font-size: 10px;
-                line-height: 1.2;
+                font-size: 8.5px;
+                line-height: 1.1;
             }
             .reward-actions {
                 gap: 8px;
@@ -1262,19 +1274,19 @@
                 font-size: 12px;
             }
             .card {
-                width: 84px;
-                height: 118px;
+                width: 76px;
+                height: 106px;
             }
             .card .desc {
-                font-size: 9px;
+                font-size: 8px;
             }
             #reward-card-container .card.reward-card {
-                flex-basis: 112px;
-                width: 112px;
-                height: 158px;
+                flex-basis: 102px;
+                width: 102px;
+                height: 144px;
             }
             #end-turn-btn {
-                font-size: 14px;
+                font-size: 13px;
             }
         }
         @media (hover: none), (pointer: coarse) {
@@ -1356,7 +1368,7 @@
                     <h3>Your Creature <span id="player-gen-text"></span></h3>
                     <div class="hp-bar"><div class="hp-fill" id="player-hp-fill"></div></div>
                     <div id="player-stats">HP: 50/50 | <span class="block-text">Block: 0</span></div>
-                    <div style="color: #55ccff; font-weight: bold; margin-top: 5px;">Energy: <span id="player-energy">3</span>/3</div>
+                    <div class="energy-readout" style="color: #55ccff; font-weight: bold; margin-top: 5px;">Energy: <span id="player-energy">3</span>/3</div>
                     <div id="player-buffs" style="color: #ffcc00; font-size: 13px; margin-top: 3px; min-height: 18px;"></div>
                     <div id="player-mutations" class="mutation-strip compact"></div>
                     <div id="player-mutation-copy" class="hud-mutation-copy"></div>
