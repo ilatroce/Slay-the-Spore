@@ -1111,47 +1111,80 @@
                 width: 100%;
             }
             #combat-screen {
-                gap: 8px;
+                gap: 0;
                 padding:
                     calc(var(--safe-top) + 6px)
                     12px
                     calc(var(--safe-bottom) + var(--combat-button-height) + 64px + var(--combat-chat-offset))
                     12px;
             }
-            .entity-stats {
-                padding: 8px 8px 10px;
-                border-radius: 10px;
-                gap: 4px;
-            }
             #combat-hud {
-                gap: 6px;
+                position: absolute;
+                top: calc(var(--safe-top) + 6px);
+                left: 10px;
+                right: 10px;
+                width: auto;
+                z-index: 20;
+                pointer-events: none;
+                gap: 0;
+            }
+            .entity-stats {
+                position: absolute;
+                top: 0;
+                width: min(43vw, 168px);
+                max-width: min(43vw, 168px);
+                padding: 6px 7px 7px;
+                border-radius: 10px;
+                gap: 3px;
+                background: rgba(10, 8, 18, 0.64);
+                border-color: rgba(255, 117, 140, 0.68);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 22px rgba(0,0,0,0.22);
+                pointer-events: none;
+            }
+            .player-hud {
+                left: 0;
+            }
+            .enemy-hud {
+                right: 0;
             }
             .entity-stats h3 {
-                margin-bottom: 6px;
-                font-size: 13px;
+                margin-bottom: 4px;
+                font-size: 10px;
+                line-height: 1.1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .hp-bar {
-                height: 12px;
+                height: 8px;
+                border-radius: 999px;
             }
             .energy-readout {
                 margin-top: 2px !important;
-                font-size: 12px;
+                font-size: 10px;
             }
             #player-stats,
             #enemy-stats,
             #player-buffs,
             .hud-mutation-copy {
-                font-size: 10px;
-                line-height: 1.22;
+                font-size: 9px;
+                line-height: 1.12;
             }
             #player-buffs,
             .hud-mutation-copy {
                 min-height: 0;
             }
+            #player-buffs,
+            #player-mutations,
+            #player-mutation-copy {
+                display: none;
+            }
             .intent {
                 margin-top: 1px;
-                padding: 3px 5px;
-                font-size: 12px;
+                padding: 2px 4px;
+                font-size: 9px;
+                border-radius: 7px;
             }
             .mutation-strip.compact {
                 min-height: 26px;
@@ -1169,7 +1202,7 @@
                 font-size: 10px;
             }
             #hand-wrap {
-                padding-top: 8px;
+                padding-top: 0;
                 padding-bottom: 6px;
             }
             #hand {
@@ -1368,7 +1401,7 @@
                     <h3>Your Creature <span id="player-gen-text"></span></h3>
                     <div class="hp-bar"><div class="hp-fill" id="player-hp-fill"></div></div>
                     <div id="player-stats">HP: 50/50 | <span class="block-text">Block: 0</span></div>
-                    <div class="energy-readout" style="color: #55ccff; font-weight: bold; margin-top: 5px;">Energy: <span id="player-energy">3</span>/3</div>
+                    <div id="player-energy-readout" class="energy-readout" style="color: #55ccff; font-weight: bold; margin-top: 5px;">Energy: <span id="player-energy">3</span>/3</div>
                     <div id="player-buffs" style="color: #ffcc00; font-size: 13px; margin-top: 3px; min-height: 18px;"></div>
                     <div id="player-mutations" class="mutation-strip compact"></div>
                     <div id="player-mutation-copy" class="hud-mutation-copy"></div>
@@ -4967,10 +5000,14 @@ window.startCombat = function() {
     llmCurrentIntent = null;
     playerTurnLocked = false;
     
-    document.getElementById('player-gen-text').innerText = `(Gen ${playerGeneration})`;
-    document.getElementById('enemy-name').innerText = isLlmMode
-        ? `${getActiveLlmPersonality().name} (Gen ${enemyGeneration})`
-        : `Wild Creature (Gen ${enemyGeneration})`;
+    document.getElementById('player-gen-text').innerText = isCompactMobile()
+        ? `G${playerGeneration}`
+        : `(Gen ${playerGeneration})`;
+    document.getElementById('enemy-name').innerText = isCompactMobile()
+        ? (isLlmMode ? `${getActiveLlmPersonality().name} G${enemyGeneration}` : `Wild G${enemyGeneration}`)
+        : (isLlmMode
+            ? `${getActiveLlmPersonality().name} (Gen ${enemyGeneration})`
+            : `Wild Creature (Gen ${enemyGeneration})`);
     if (isLlmMode) {
         updateLlmPersonalityUI();
     }
@@ -5334,9 +5371,15 @@ function updateCombatUI() {
 
     document.getElementById('player-hp-fill').style.width = `${(playerHP/playerMaxHP)*100}%`;
     document.getElementById('player-stats').innerHTML = compactMobile
-        ? `HP: ${playerHP}/${playerMaxHP}<br><span class="block-text">Block: ${playerBlock}</span> | Dodge: ${getDodgePercent()}%`
+        ? `HP ${playerHP}/${playerMaxHP}<br><span class="block-text">B ${playerBlock}</span> | D ${getDodgePercent()}%`
         : `HP: ${playerHP}/${playerMaxHP} | <span class="block-text">Block: ${playerBlock}</span> | Dodge: ${getDodgePercent()}%`;
     document.getElementById('player-energy').innerText = playerEnergy;
+    const energyReadoutEl = document.getElementById('player-energy-readout');
+    if (energyReadoutEl) {
+        energyReadoutEl.innerHTML = compactMobile
+            ? `E <span id="player-energy">${playerEnergy}</span>/3`
+            : `Energy: <span id="player-energy">${playerEnergy}</span>/3`;
+    }
 
     // Show active buffs/statuses
     const buffs = [];
@@ -5403,16 +5446,16 @@ function updateCombatUI() {
     
     document.getElementById('enemy-hp-fill').style.width = `${(enemyHP/enemyMaxHP)*100}%`;
     document.getElementById('enemy-stats').innerHTML = compactMobile
-        ? `HP: ${enemyHP}/${enemyMaxHP}<br><span class="block-text">Block: ${enemyBlock}</span>`
+        ? `HP ${enemyHP}/${enemyMaxHP}<br><span class="block-text">B ${enemyBlock}</span>`
         : `HP: ${enemyHP}/${enemyMaxHP} | <span class="block-text">Block: ${enemyBlock}</span>`;
     if (isLlmMode) {
         document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
-            ? `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`
-            : (llmCurrentIntent?.intentText || 'Intent: Rival model is thinking...');
+            ? (compactMobile ? 'Skip' : `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`)
+            : (compactMobile ? (llmCurrentIntent?.intentText || 'Thinking...').replace(/^Intent:\s*/i, '') : (llmCurrentIntent?.intentText || 'Intent: Rival model is thinking...'));
     } else {
         document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
-            ? `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`
-            : `Intent: Attack for <span id="enemy-dmg">${enemyIntentDmg}</span>!`;
+            ? (compactMobile ? 'Skip' : `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`)
+            : (compactMobile ? `Atk <span id="enemy-dmg">${enemyIntentDmg}</span>` : `Intent: Attack for <span id="enemy-dmg">${enemyIntentDmg}</span>!`);
     }
     updateMutationUI();
     updateCombatInteractionState();
