@@ -5,12 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slay the Spore</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #ffeff5; color: #fff; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
-        canvas { display: block; position: absolute; top:0; left:0; z-index: 1; }
+        :root {
+            --safe-top: max(12px, env(safe-area-inset-top));
+            --safe-right: max(16px, env(safe-area-inset-right));
+            --safe-bottom: max(16px, env(safe-area-inset-bottom));
+            --safe-left: max(16px, env(safe-area-inset-left));
+            --combat-button-height: 64px;
+            --llm-chat-height: clamp(220px, 34dvh, 300px);
+            --combat-chat-offset: 0px;
+        }
+        html, body {
+            width: 100%;
+            min-height: 100%;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            min-height: 100dvh;
+            background-color: #ffeff5;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
+        canvas { display: block; position: absolute; inset: 0; z-index: 1; }
         
-        #ui-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        #ui-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: hidden;
+        }
         
-        .screen { width: 100%; height: 100%; position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .screen {
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
         
         .panel {
             background: rgba(20, 10, 30, 0.85);
@@ -35,22 +75,51 @@
             cursor: pointer; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             margin: 5px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         button:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 8px 20px rgba(255, 117, 140, 0.6); }
         button:active { transform: scale(0.95); }
         button:disabled { background: #555; box-shadow: none; cursor: not-allowed; transform: none; color: #aaa; }
         
         /* Starter Layout */
+        #start-screen {
+            padding: calc(var(--safe-top) + 14px) var(--safe-right) calc(var(--safe-bottom) + 108px) var(--safe-left);
+        }
         #start-panel { position: absolute; top: 8%; margin: 0; padding: 20px 40px;}
-        .starter-buttons { position: absolute; bottom: 10%; margin: 0; display: flex; gap: 40px; justify-content: center; width: 100%; }
+        .starter-buttons {
+            position: absolute;
+            bottom: calc(var(--safe-bottom) + 18px);
+            margin: 0;
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            width: calc(100% - var(--safe-left) - var(--safe-right));
+            left: var(--safe-left);
+            right: var(--safe-right);
+            z-index: 15;
+        }
         
         /* Combat UI */
-        #combat-screen { justify-content: space-between; padding: 20px 0; box-sizing: border-box; }
-        #combat-hud { display: flex; justify-content: space-between; width: 90%; max-width: 1200px; margin-top: 20px;}
+        #combat-screen {
+            justify-content: space-between;
+            gap: 20px;
+            padding: calc(var(--safe-top) + 8px) var(--safe-right) calc(var(--safe-bottom) + 104px) var(--safe-left);
+            box-sizing: border-box;
+        }
+        #combat-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
         
         .entity-stats {
             background: rgba(10, 5, 20, 0.8); padding: 15px; border-radius: 12px;
-            border: 1px solid #ff758c; width: 300px; pointer-events: auto;
+            border: 1px solid #ff758c; width: 300px; max-width: 420px; min-width: 0; flex: 1 1 300px; pointer-events: auto;
             display: flex; flex-direction: column; gap: 8px;
         }
         
@@ -59,7 +128,30 @@
         .block-text { color: #55ccff; font-weight: bold; }
         .intent { color: #ffcc00; font-weight: bold; font-size: 18px; margin-top: 5px; padding: 5px; background: rgba(0,0,0,0.5); border-radius: 5px; text-align: center;}
         
-        #hand { display: flex; gap: 15px; justify-content: center; perspective: 1000px; height: 180px;}
+        #hand {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: flex-end;
+            width: 90%;
+            max-width: 1200px;
+            padding: 10px 6px 18px;
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: visible;
+            perspective: 1000px;
+            height: 198px;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+            scroll-padding-inline: 24px;
+        }
+        #hand::-webkit-scrollbar {
+            height: 8px;
+        }
+        #hand::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.24);
+            border-radius: 999px;
+        }
         .card {
             width: 130px; height: 182px; background: #2a2a3e;
             border: 3px solid #5a5a7e; border-radius: 10px;
@@ -68,6 +160,9 @@
             transition: transform 0.1s ease-out, box-shadow 0.2s, border-color 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             position: relative;
             transform-style: preserve-3d;
+            flex: 0 0 auto;
+            scroll-snap-align: center;
+            user-select: none;
         }
         .card::before {
             content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -92,7 +187,14 @@
         }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1.5); opacity: 1; } 100% { transform: translateY(-50px) scale(1); opacity: 0; } }
         
-        #end-turn-btn { position: absolute; bottom: 80px; right: 5%; background: #444; border: 2px solid #aaa;}
+        #end-turn-btn {
+            position: absolute;
+            bottom: calc(var(--safe-bottom) + 12px);
+            right: var(--safe-right);
+            z-index: 25;
+            background: #444;
+            border: 2px solid #aaa;
+        }
         #end-turn-btn:hover { background: #666; }
         .mode-badge {
             display: inline-flex;
@@ -338,13 +440,14 @@
             margin: 0;
         }
         body.llm-mode {
+            --combat-chat-offset: calc(var(--llm-chat-height) + 22px);
             background:
                 radial-gradient(circle at 15% 15%, rgba(138, 234, 255, 0.16), transparent 34%),
                 radial-gradient(circle at 85% 12%, rgba(255, 150, 215, 0.16), transparent 36%),
                 #f8eaf5;
         }
         body.llm-mode #combat-screen {
-            padding-right: 392px;
+            padding-right: calc(392px + var(--safe-right));
         }
         body.llm-mode #combat-hud,
         body.llm-mode #hand {
@@ -352,7 +455,7 @@
             max-width: none;
         }
         body.llm-mode #end-turn-btn {
-            right: 400px;
+            right: calc(400px + var(--safe-right));
         }
         body.llm-mode #llm-chat-shell {
             display: flex;
@@ -621,6 +724,255 @@
             width: 100%;
             margin-top: 16px;
         }
+        @media (max-width: 960px) {
+            h1 {
+                font-size: clamp(32px, 10vw, 40px);
+            }
+            h2 {
+                font-size: clamp(20px, 6vw, 24px);
+            }
+            button {
+                font-size: 17px;
+                padding: 12px 20px;
+            }
+            #ui-layer {
+                overflow: hidden;
+            }
+            #start-screen,
+            #menu-screen,
+            #victory-screen,
+            #defeat-screen {
+                justify-content: flex-start;
+                overflow-y: auto;
+            }
+            #start-screen {
+                padding-top: calc(var(--safe-top) + 8px);
+            }
+            #start-panel {
+                position: static;
+                width: min(100%, 560px);
+                padding: 20px 18px;
+            }
+            .starter-buttons {
+                position: fixed;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 10px;
+                bottom: calc(var(--safe-bottom) + 10px);
+            }
+            .starter-buttons button {
+                width: 100%;
+                min-width: 0;
+                margin: 0;
+                padding: 12px 8px;
+                font-size: 15px;
+            }
+            #menu-screen {
+                justify-content: flex-start !important;
+                padding: calc(var(--safe-top) + 14px) var(--safe-right) calc(var(--safe-bottom) + 20px) var(--safe-left);
+            }
+            #menu-screen .panel,
+            #victory-screen .panel,
+            #defeat-screen .panel {
+                width: 100%;
+                max-width: 100%;
+                padding: 22px 18px;
+                border-radius: 18px;
+            }
+            #menu-deck,
+            .mutation-copy {
+                max-width: none;
+            }
+            #combat-screen {
+                align-items: stretch;
+                justify-content: flex-start;
+                gap: 14px;
+                overflow-y: auto;
+                padding:
+                    calc(var(--safe-top) + 10px)
+                    var(--safe-right)
+                    calc(var(--safe-bottom) + var(--combat-button-height) + 86px + var(--combat-chat-offset))
+                    var(--safe-left);
+            }
+            #combat-hud {
+                width: 100%;
+                margin-top: 0;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .entity-stats {
+                width: 100%;
+                max-width: none;
+                padding: 14px;
+            }
+            .intent {
+                font-size: 16px;
+            }
+            #hand {
+                width: calc(100% + var(--safe-left) + var(--safe-right));
+                max-width: none;
+                min-height: 174px;
+                height: auto;
+                justify-content: flex-start;
+                gap: 12px;
+                margin: 0 calc(-1 * var(--safe-right)) 0 calc(-1 * var(--safe-left));
+                padding: 8px var(--safe-right) 12px var(--safe-left);
+                scroll-padding-inline: var(--safe-left);
+            }
+            .card {
+                width: clamp(112px, 34vw, 132px);
+                height: clamp(156px, 48vw, 182px);
+                padding: 8px;
+            }
+            .card .cost {
+                top: -8px;
+                left: -8px;
+                width: 28px;
+                height: 28px;
+                border-radius: 14px;
+                font-size: 14px;
+            }
+            .card .title {
+                font-size: 14px;
+            }
+            .card .desc {
+                font-size: 12px;
+            }
+            #end-turn-btn {
+                position: fixed;
+                left: var(--safe-left);
+                right: var(--safe-right);
+                bottom: calc(var(--safe-bottom) + 10px + var(--combat-chat-offset));
+                width: auto;
+                margin: 0;
+                padding: 14px 18px;
+                font-size: 18px;
+            }
+            body.llm-mode #combat-screen {
+                padding-right: var(--safe-right);
+            }
+            body.llm-mode #combat-hud,
+            body.llm-mode #hand {
+                width: 100%;
+            }
+            body.llm-mode #llm-chat-shell {
+                top: auto;
+                left: var(--safe-left);
+                right: var(--safe-right);
+                bottom: calc(var(--safe-bottom) + 10px);
+                width: auto;
+                height: var(--llm-chat-height);
+                border-radius: 22px;
+            }
+            body.llm-mode #end-turn-btn {
+                right: var(--safe-right);
+            }
+            #llm-chat-header {
+                padding: 16px 16px 12px;
+            }
+            #llm-chat-log {
+                padding: 14px;
+            }
+            #llm-chat-form {
+                padding: 14px;
+            }
+            #llm-chat-input {
+                font-size: 16px;
+            }
+            .reward-panel {
+                max-width: 100%;
+            }
+            #reward-card-container {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                gap: 14px;
+                min-height: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 6px 2px 14px;
+                margin: 16px 0 12px;
+                scroll-snap-type: x proximity;
+            }
+            #reward-card-container .card.reward-card {
+                flex: 0 0 clamp(150px, 48vw, 180px);
+                width: clamp(150px, 48vw, 180px);
+                height: clamp(210px, 67vw, 252px);
+                scroll-snap-align: center;
+            }
+            #reward-card-container .card.reward-card .cost {
+                width: 34px;
+                height: 34px;
+                border-radius: 17px;
+                top: -10px;
+                left: -10px;
+                font-size: 15px;
+            }
+            #reward-card-container .card.reward-card .title {
+                font-size: 16px;
+                padding-bottom: 6px;
+                margin-bottom: 6px;
+            }
+            #reward-card-container .card.reward-card .desc {
+                font-size: 14px;
+            }
+            .reward-note {
+                font-size: 13px;
+                line-height: 1.45;
+            }
+            .mutation-strip {
+                gap: 8px;
+            }
+            .mutation-badge {
+                width: 48px;
+                height: 48px;
+                border-radius: 14px;
+            }
+            .choice p {
+                min-height: 0;
+            }
+        }
+        @media (max-width: 960px) and (max-height: 760px) {
+            :root {
+                --llm-chat-height: clamp(190px, 40dvh, 240px);
+            }
+            #combat-screen {
+                gap: 10px;
+            }
+            #hand {
+                min-height: 160px;
+            }
+            .card {
+                width: clamp(104px, 30vw, 120px);
+                height: clamp(146px, 43vw, 170px);
+            }
+            #end-turn-btn {
+                font-size: 16px;
+                padding: 12px 16px;
+            }
+        }
+        @media (hover: none), (pointer: coarse) {
+            button:hover {
+                transform: none;
+                box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+            }
+            .btn-small:hover {
+                background: #eee;
+                transform: none;
+            }
+            .card:hover {
+                border-color: #5a5a7e;
+                z-index: auto;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+                transform: none;
+            }
+            #reward-card-container .card.reward-card:hover {
+                transform: none;
+            }
+            #reward-card-container .card.reward-card .holo {
+                opacity: 0.76;
+                filter: saturate(1.06) brightness(1.03);
+            }
+        }
         @media (max-width: 980px) {
             .choice-grid {
                 grid-template-columns: 1fr;
@@ -716,7 +1068,7 @@
                 <h1 style="color: #4CAF50;">VICTORY!</h1>
                 <p id="victory-copy">Your creature consumed the fallen monster.</p>
                 <div id="reward-card-container"></div>
-                <p id="reward-note" class="reward-note">Hover cards to inspect them, click 1 to select it, or skip the reward.</p>
+                <p id="reward-note" class="reward-note">Tap or click a card to select it, or skip the reward.</p>
                 <div class="reward-actions">
                     <button id="reward-add-btn" onclick="claimVictoryReward()" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">Choose 1 Card & Evolve</button>
                     <button id="reward-skip-btn" class="btn-skip" onclick="skipVictoryReward()">Skip Reward & Evolve</button>
@@ -3529,6 +3881,20 @@ function initLlmModeUI() {
 
 let activeCreatures = [];
 let gameState = 'START'; 
+const TOUCH_INPUT = window.matchMedia('(hover: none), (pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+
+if (TOUCH_INPUT) {
+    document.body.classList.add('touch-device');
+}
+
+function getRewardInstructionText(count) {
+    if (!count) {
+        return 'Tap or click a card to select it, or skip the reward.';
+    }
+    return TOUCH_INPUT
+        ? `Tap a card to select 1 of ${count} cards to add to your deck, or skip the reward.`
+        : `Hover cards to inspect them, then choose 1 of ${count} cards to add to your deck, or skip the reward.`;
+}
 
 let playerGenome = [];
 let playerGeneration = 1;
@@ -4056,6 +4422,8 @@ function rollVictoryRewards(count = 3) {
 }
 
 function attachRewardCardEffects(cardEl) {
+    if (TOUCH_INPUT) return;
+
     cardEl.addEventListener('mousemove', (e) => {
         const rect = cardEl.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -4141,7 +4509,7 @@ function renderVictoryReward() {
         addBtn.disabled = false;
         addBtn.innerText = `Take ${selectedCard.name} & Evolve`;
     } else {
-        note.innerText = `Hover cards to inspect them, then choose 1 of ${pendingVictoryRewards.length} cards to add to your deck, or skip the reward.`;
+        note.innerText = getRewardInstructionText(pendingVictoryRewards.length);
         addBtn.disabled = true;
         addBtn.innerText = 'Choose 1 Card & Evolve';
     }
@@ -4326,22 +4694,24 @@ function renderHand() {
         if (canAfford) {
             cardEl.onclick = () => playCard(index);
         }
-        
-        cardEl.addEventListener('mousemove', (e) => {
-            const rect = cardEl.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const mouseX = e.clientX - centerX;
-            const mouseY = e.clientY - centerY;
-            const rotateX = Math.max(-25, Math.min(25, (mouseY / 15) * -1));
-            const rotateY = Math.max(-25, Math.min(25, (mouseX / 15)));
+
+        if (!TOUCH_INPUT) {
+            cardEl.addEventListener('mousemove', (e) => {
+                const rect = cardEl.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const mouseX = e.clientX - centerX;
+                const mouseY = e.clientY - centerY;
+                const rotateX = Math.max(-25, Math.min(25, (mouseY / 15) * -1));
+                const rotateY = Math.max(-25, Math.min(25, (mouseX / 15)));
+                
+                cardEl.style.transform = `translateY(-30px) scale(1.2) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
             
-            cardEl.style.transform = `translateY(-30px) scale(1.2) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-        
-        cardEl.addEventListener('mouseleave', () => {
-            cardEl.style.transform = '';
-        });
+            cardEl.addEventListener('mouseleave', () => {
+                cardEl.style.transform = '';
+            });
+        }
         
         handDiv.appendChild(cardEl);
     });
