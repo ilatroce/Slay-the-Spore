@@ -99,6 +99,10 @@
             box-sizing: border-box;
         }
 
+        h1, h2, button, .card .title, .card .desc {
+            overflow-wrap: anywhere;
+        }
+
         h1 {
             font-size: 60px;
             color: #ff758c;
@@ -137,6 +141,9 @@
             max-width: 100%;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            line-height: 1.15;
+            white-space: normal;
+            text-align: center;
         }
 
         button:hover {
@@ -414,6 +421,76 @@
             }
             .card .desc {
                 font-size: 14px;
+            }
+        }
+        @media (max-width: 640px) {
+            :root {
+                --compendium-card-width: 122px;
+            }
+            #main-menu,
+            #compendium-screen {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .panel {
+                padding: 20px 14px;
+                border-radius: 16px;
+            }
+            h1 {
+                font-size: clamp(32px, 10vw, 42px);
+            }
+            h2 {
+                font-size: 17px;
+                margin: 0 0 18px 0;
+            }
+            .menu-buttons {
+                gap: 10px;
+            }
+            button {
+                font-size: 15px;
+                letter-spacing: 0.06em;
+                padding: 12px 14px;
+            }
+            #compendium-screen>.panel {
+                padding: 18px 12px;
+            }
+            #compendium-grid {
+                gap: 10px;
+                padding: 10px 0 6px;
+                justify-content: flex-start;
+            }
+            .card {
+                height: 171px;
+                padding: 6px;
+                border-width: 2px;
+                border-radius: 8px;
+            }
+            .card::before {
+                border-radius: 5px;
+            }
+            .card .cost {
+                width: 22px;
+                height: 22px;
+                border-radius: 11px;
+                top: -6px;
+                left: -6px;
+                font-size: 11px;
+                border-width: 1px;
+            }
+            .card .title {
+                font-size: 10px;
+                line-height: 1.15;
+                padding-bottom: 3px;
+                margin-bottom: 3px;
+            }
+            .card .desc {
+                font-size: 9.5px;
+                line-height: 1.2;
+            }
+            #compendium-screen button.secondary {
+                width: 100% !important;
+                padding: 12px 14px !important;
+                font-size: 15px !important;
             }
         }
         @media (hover: none), (pointer: coarse) {

@@ -62,6 +62,14 @@
             backdrop-filter: blur(10px);
             pointer-events: auto;
         }
+
+        h1, h2, h3, button,
+        #menu-stats, #menu-deck, #player-stats, #enemy-stats, #player-buffs,
+        .mutation-copy, .hud-mutation-copy, .reward-note,
+        .llm-panel-title, .llm-personality-copy, .llm-random-copy, #llm-chat-subtitle,
+        .chat-message {
+            overflow-wrap: anywhere;
+        }
         
         h1, h2, h3 { margin: 0 0 15px 0; color: #ffebf0; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         h1 { font-size: 40px; color: #ff758c; margin-bottom: 5px;}
@@ -77,6 +85,9 @@
             margin: 5px;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            line-height: 1.2;
+            white-space: normal;
+            text-align: center;
         }
         button:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 8px 20px rgba(255, 117, 140, 0.6); }
         button:active { transform: scale(0.95); }
@@ -128,27 +139,31 @@
         .block-text { color: #55ccff; font-weight: bold; }
         .intent { color: #ffcc00; font-weight: bold; font-size: 18px; margin-top: 5px; padding: 5px; background: rgba(0,0,0,0.5); border-radius: 5px; text-align: center;}
         
+        #hand-wrap {
+            width: 90%;
+            max-width: 1200px;
+            padding: 42px 6px 18px;
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+            scroll-padding-inline: 24px;
+        }
         #hand {
             display: flex;
             gap: 15px;
             justify-content: center;
             align-items: flex-end;
-            width: 90%;
-            max-width: 1200px;
-            padding: 10px 6px 18px;
-            box-sizing: border-box;
-            overflow-x: auto;
-            overflow-y: visible;
             perspective: 1000px;
-            height: 198px;
-            -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x proximity;
-            scroll-padding-inline: 24px;
+            min-width: 100%;
+            min-height: 190px;
+            width: max-content;
         }
-        #hand::-webkit-scrollbar {
+        #hand-wrap::-webkit-scrollbar {
             height: 8px;
         }
-        #hand::-webkit-scrollbar-thumb {
+        #hand-wrap::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.24);
             border-radius: 999px;
         }
@@ -450,7 +465,7 @@
             padding-right: calc(392px + var(--safe-right));
         }
         body.llm-mode #combat-hud,
-        body.llm-mode #hand {
+        body.llm-mode #hand-wrap {
             width: calc(100% - 430px);
             max-width: none;
         }
@@ -468,7 +483,7 @@
                 padding: 20px 0 350px;
             }
             body.llm-mode #combat-hud,
-            body.llm-mode #hand {
+            body.llm-mode #hand-wrap {
                 width: 92%;
             }
             body.llm-mode #llm-chat-shell {
@@ -671,6 +686,18 @@
             line-height: 1.35;
             min-height: 18px;
         }
+        #menu-stats,
+        #menu-deck,
+        #player-stats,
+        #enemy-stats,
+        #player-buffs {
+            line-height: 1.4;
+            white-space: normal;
+        }
+        #menu-stats,
+        #menu-deck {
+            white-space: pre-line;
+        }
         .overlay {
             position: absolute;
             inset: 0;
@@ -723,6 +750,44 @@
         .choice button {
             width: 100%;
             margin-top: 16px;
+        }
+        @media (min-width: 961px) {
+            body:not(.llm-mode) #combat-screen {
+                justify-content: flex-start;
+                padding-bottom: calc(var(--safe-bottom) + 250px);
+            }
+            body:not(.llm-mode) #hand-wrap {
+                position: absolute;
+                left: max(var(--safe-left), 5%);
+                right: max(var(--safe-right), 5%);
+                bottom: calc(var(--safe-bottom) + 2px);
+                width: auto;
+                max-width: none;
+                padding: 72px 6px 10px;
+            }
+            body:not(.llm-mode) #hand {
+                justify-content: center;
+                min-height: 190px;
+            }
+        }
+        @media (min-width: 1361px) {
+            body.llm-mode #combat-screen {
+                justify-content: flex-start;
+                padding-bottom: calc(var(--safe-bottom) + 250px);
+            }
+            body.llm-mode #hand-wrap {
+                position: absolute;
+                left: max(var(--safe-left), 3%);
+                right: calc(400px + var(--safe-right));
+                bottom: calc(var(--safe-bottom) + 2px);
+                width: auto;
+                max-width: none;
+                padding: 72px 6px 10px;
+            }
+            body.llm-mode #hand {
+                justify-content: center;
+                min-height: 190px;
+            }
         }
         @media (max-width: 960px) {
             h1 {
@@ -808,16 +873,17 @@
             .intent {
                 font-size: 16px;
             }
-            #hand {
+            #hand-wrap {
                 width: calc(100% + var(--safe-left) + var(--safe-right));
                 max-width: none;
+                margin: 0 calc(-1 * var(--safe-right)) 0 calc(-1 * var(--safe-left));
+                padding: 18px var(--safe-right) 12px var(--safe-left);
+                scroll-padding-inline: var(--safe-left);
+            }
+            #hand {
                 min-height: 174px;
-                height: auto;
                 justify-content: flex-start;
                 gap: 12px;
-                margin: 0 calc(-1 * var(--safe-right)) 0 calc(-1 * var(--safe-left));
-                padding: 8px var(--safe-right) 12px var(--safe-left);
-                scroll-padding-inline: var(--safe-left);
             }
             .card {
                 width: clamp(112px, 34vw, 132px);
@@ -852,7 +918,7 @@
                 padding-right: var(--safe-right);
             }
             body.llm-mode #combat-hud,
-            body.llm-mode #hand {
+            body.llm-mode #hand-wrap {
                 width: 100%;
             }
             body.llm-mode #llm-chat-shell {
@@ -889,7 +955,7 @@
                 min-height: 0;
                 overflow-x: auto;
                 overflow-y: hidden;
-                padding: 6px 2px 14px;
+                padding: 16px 2px 14px;
                 margin: 16px 0 12px;
                 scroll-snap-type: x proximity;
             }
@@ -938,6 +1004,9 @@
             #combat-screen {
                 gap: 10px;
             }
+            #hand-wrap {
+                padding-top: 16px;
+            }
             #hand {
                 min-height: 160px;
             }
@@ -948,6 +1017,258 @@
             #end-turn-btn {
                 font-size: 16px;
                 padding: 12px 16px;
+            }
+        }
+        @media (max-width: 640px) {
+            :root {
+                --combat-button-height: 56px;
+                --llm-chat-height: clamp(180px, 34dvh, 220px);
+            }
+            #start-screen,
+            #menu-screen,
+            #victory-screen,
+            #defeat-screen {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            #start-panel,
+            #menu-screen .panel,
+            #victory-screen .panel,
+            #defeat-screen .panel {
+                width: min(100%, 400px);
+                padding: 16px 14px;
+                border-radius: 16px;
+            }
+            #start-title,
+            #menu-title {
+                font-size: clamp(26px, 8.5vw, 32px);
+                line-height: 1.05;
+            }
+            #start-subtitle,
+            #menu-stats,
+            #menu-flavor-copy,
+            #menu-deck,
+            .mutation-copy,
+            .reward-note,
+            #defeat-copy,
+            #victory-copy {
+                font-size: 12px;
+                line-height: 1.35;
+            }
+            .mode-badge {
+                margin-bottom: 10px;
+                padding: 6px 10px;
+                font-size: 10px;
+                letter-spacing: 0.12em;
+            }
+            .starter-buttons {
+                gap: 8px;
+                bottom: calc(var(--safe-bottom) + 8px);
+            }
+            .starter-buttons button {
+                padding: 10px 4px;
+                font-size: 13px;
+                border-radius: 20px;
+            }
+            .btn-small {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+            #fight-button,
+            .reward-actions button,
+            .choice button {
+                width: 100%;
+                margin-inline: 0;
+                font-size: 15px;
+                padding: 12px 14px;
+            }
+            #llm-mode-panel {
+                margin-bottom: 12px;
+                padding: 12px;
+                border-radius: 16px;
+            }
+            .llm-panel-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .llm-panel-title,
+            #llm-chat-header h3 {
+                font-size: 15px;
+            }
+            .llm-personality-copy,
+            .llm-random-copy,
+            #llm-chat-subtitle,
+            .chat-message {
+                font-size: 12px;
+            }
+            .llm-status-chip,
+            .llm-status-chip.compact {
+                max-width: none;
+                width: 100%;
+            }
+            #combat-screen {
+                gap: 8px;
+                padding:
+                    calc(var(--safe-top) + 8px)
+                    12px
+                    calc(var(--safe-bottom) + var(--combat-button-height) + 74px + var(--combat-chat-offset))
+                    12px;
+            }
+            .entity-stats {
+                padding: 10px 10px 12px;
+                border-radius: 10px;
+                gap: 6px;
+            }
+            .entity-stats h3 {
+                margin-bottom: 8px;
+                font-size: 15px;
+            }
+            .hp-bar {
+                height: 14px;
+            }
+            #player-stats,
+            #enemy-stats,
+            #player-buffs,
+            .hud-mutation-copy {
+                font-size: 11px;
+                line-height: 1.3;
+            }
+            .intent {
+                margin-top: 2px;
+                padding: 4px 6px;
+                font-size: 13px;
+            }
+            .mutation-strip.compact {
+                min-height: 36px;
+                gap: 6px;
+            }
+            .mutation-badge,
+            .mutation-strip.compact .mutation-badge {
+                width: 36px;
+                height: 36px;
+                padding: 4px;
+                border-radius: 10px;
+            }
+            #hand-wrap {
+                padding-top: 12px;
+                padding-bottom: 8px;
+            }
+            #hand {
+                min-height: 136px;
+                gap: 8px;
+            }
+            .card {
+                width: 92px;
+                height: 128px;
+                padding: 6px;
+                border-width: 2px;
+                border-radius: 8px;
+            }
+            .card::before {
+                border-radius: 5px;
+            }
+            .card .cost {
+                top: -6px;
+                left: -6px;
+                width: 22px;
+                height: 22px;
+                border-radius: 11px;
+                font-size: 11px;
+                border-width: 1px;
+            }
+            .card .title {
+                font-size: 10px;
+                line-height: 1.15;
+                padding-bottom: 3px;
+                margin-bottom: 3px;
+            }
+            .card .desc {
+                font-size: 9.5px;
+                line-height: 1.2;
+            }
+            #end-turn-btn {
+                left: 12px;
+                right: 12px;
+                font-size: 15px;
+                padding: 12px 14px;
+                border-radius: 20px;
+            }
+            body.llm-mode #llm-chat-shell {
+                left: 12px;
+                right: 12px;
+                border-radius: 18px;
+            }
+            #reward-card-container {
+                gap: 10px;
+                padding: 12px 0 10px;
+            }
+            #reward-card-container .card.reward-card {
+                flex-basis: 122px;
+                width: 122px;
+                height: 172px;
+            }
+            #reward-card-container .card.reward-card .cost {
+                width: 24px;
+                height: 24px;
+                border-radius: 12px;
+                top: -7px;
+                left: -7px;
+                font-size: 11px;
+            }
+            #reward-card-container .card.reward-card .title {
+                font-size: 11px;
+                padding-bottom: 3px;
+                margin-bottom: 3px;
+            }
+            #reward-card-container .card.reward-card .desc {
+                font-size: 10px;
+                line-height: 1.2;
+            }
+            .reward-actions {
+                gap: 8px;
+            }
+            .overlay {
+                padding: 12px;
+            }
+            .choice {
+                padding: 14px;
+                border-radius: 14px;
+            }
+            .choice-media {
+                width: 48px;
+                height: 48px;
+                padding: 6px;
+                border-radius: 14px;
+                margin-bottom: 10px;
+            }
+            .choice p {
+                font-size: 13px;
+                line-height: 1.35;
+            }
+        }
+        @media (max-width: 400px) {
+            #start-title,
+            #menu-title {
+                font-size: 24px;
+            }
+            .starter-buttons button {
+                font-size: 12px;
+            }
+            .card {
+                width: 84px;
+                height: 118px;
+            }
+            .card .desc {
+                font-size: 9px;
+            }
+            #reward-card-container .card.reward-card {
+                flex-basis: 112px;
+                width: 112px;
+                height: 158px;
+            }
+            #end-turn-btn {
+                font-size: 14px;
             }
         }
         @media (hover: none), (pointer: coarse) {
@@ -1042,7 +1363,9 @@
                 </div>
             </div>
             
-            <div id="hand"></div>
+            <div id="hand-wrap">
+                <div id="hand"></div>
+            </div>
             <button id="end-turn-btn" onclick="endTurn()">End Turn</button>
             <aside id="llm-chat-shell" style="display: none;">
                 <div id="llm-chat-glow"></div>
@@ -3254,6 +3577,17 @@ function updateMenuStats() {
     const maxHP = calcPlayerMaxHP();
     const baseDamage = 4 + playerGeneration * 2;
     const stats = getMutationCombatStats();
+    if (isCompactMobile()) {
+        const compactBits = [
+            `Max HP ${maxHP}`,
+            `Damage ${baseDamage}`,
+            `Dodge ${getDodgePercent()}%`
+        ];
+        if (stats.drawBonus) compactBits.push(`Draw ${getCardsPerTurn()}/turn`);
+        if (stats.attackBonus) compactBits.push(`Atk +${stats.attackBonus}`);
+        document.getElementById('menu-stats').innerText = compactBits.join('\n');
+        return;
+    }
     const extraDraw = stats.drawBonus ? ` | Cards/Turn: ${getCardsPerTurn()}` : '';
     const attackBonus = stats.attackBonus ? ` | Attack Bonus: +${stats.attackBonus}` : '';
     document.getElementById('menu-stats').innerText = `Max HP: ${maxHP} | Base Damage: ${baseDamage} | Dodge: ${getDodgePercent()}%${extraDraw}${attackBonus}`;
@@ -3887,9 +4221,18 @@ if (TOUCH_INPUT) {
     document.body.classList.add('touch-device');
 }
 
+function isCompactMobile() {
+    return window.innerWidth <= 640;
+}
+
 function getRewardInstructionText(count) {
     if (!count) {
         return 'Tap or click a card to select it, or skip the reward.';
+    }
+    if (isCompactMobile()) {
+        return TOUCH_INPUT
+            ? `Tap 1 card to keep, or skip the reward.`
+            : `Choose 1 card to keep, or skip the reward.`;
     }
     return TOUCH_INPUT
         ? `Tap a card to select 1 of ${count} cards to add to your deck, or skip the reward.`
@@ -4406,8 +4749,20 @@ function updateMenuDeckUI() {
         counts[card.name] = (counts[card.name] || 0) + 1;
     });
 
-    const summary = Object.entries(counts)
-        .sort((a, b) => a[0].localeCompare(b[0]))
+    const sortedEntries = Object.entries(counts)
+        .sort((a, b) => a[0].localeCompare(b[0]));
+
+    if (isCompactMobile()) {
+        const preview = sortedEntries
+            .slice(0, 4)
+            .map(([name, count]) => `${name} x${count}`)
+            .join(' • ');
+        const extra = sortedEntries.length > 4 ? ` • +${sortedEntries.length - 4} more` : '';
+        deckEl.innerText = `Deck: ${runDeck.length} cards\n${preview}${extra}`;
+        return;
+    }
+
+    const summary = sortedEntries
         .map(([name, count]) => `${name} x${count}`)
         .join(' | ');
 
@@ -4957,9 +5312,12 @@ function showFloatingText(target, text, color) {
 
 function updateCombatUI() {
     const mutationStats = getMutationCombatStats();
+    const compactMobile = isCompactMobile();
 
     document.getElementById('player-hp-fill').style.width = `${(playerHP/playerMaxHP)*100}%`;
-    document.getElementById('player-stats').innerHTML = `HP: ${playerHP}/${playerMaxHP} | <span class="block-text">Block: ${playerBlock}</span> | Dodge: ${getDodgePercent()}%`;
+    document.getElementById('player-stats').innerHTML = compactMobile
+        ? `HP: ${playerHP}/${playerMaxHP}<br><span class="block-text">Block: ${playerBlock}</span> | Dodge: ${getDodgePercent()}%`
+        : `HP: ${playerHP}/${playerMaxHP} | <span class="block-text">Block: ${playerBlock}</span> | Dodge: ${getDodgePercent()}%`;
     document.getElementById('player-energy').innerText = playerEnergy;
 
     // Show active buffs/statuses
@@ -5015,10 +5373,20 @@ function updateCombatUI() {
     if (mutationStats.attackSkipChance > 0)
         buffs.push('Fangs Skip');
     const buffsEl = document.getElementById('player-buffs');
-    if (buffsEl) buffsEl.innerHTML = buffs.join(' &nbsp; ');
+    if (buffsEl) {
+        if (compactMobile) {
+            const preview = buffs.slice(0, 4);
+            if (buffs.length > 4) preview.push(`+${buffs.length - 4} more`);
+            buffsEl.innerHTML = preview.join('<br>');
+        } else {
+            buffsEl.innerHTML = buffs.join(' &nbsp; ');
+        }
+    }
     
     document.getElementById('enemy-hp-fill').style.width = `${(enemyHP/enemyMaxHP)*100}%`;
-    document.getElementById('enemy-stats').innerHTML = `HP: ${enemyHP}/${enemyMaxHP} | <span class="block-text">Block: ${enemyBlock}</span>`;
+    document.getElementById('enemy-stats').innerHTML = compactMobile
+        ? `HP: ${enemyHP}/${enemyMaxHP}<br><span class="block-text">Block: ${enemyBlock}</span>`
+        : `HP: ${enemyHP}/${enemyMaxHP} | <span class="block-text">Block: ${enemyBlock}</span>`;
     if (isLlmMode) {
         document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
             ? `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`
