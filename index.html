@@ -4336,6 +4336,9 @@ window.pickStarter = function(index) {
     playerGeneration = 1;
     mutationState = defaultMutationState();
     runDeck = buildStarterDeck();
+    if (typeof scheduleCardImagePreload === 'function') {
+        scheduleCardImagePreload(runDeck);
+    }
     pendingVictoryRewards = [];
     selectedVictoryRewardIndex = -1;
     goToMenu(false);
@@ -4347,6 +4350,9 @@ function goToMenu(isEvolving = false) {
     gameState = 'MENU';
     playerTurnLocked = false;
     llmBusy = false;
+    if (typeof scheduleCardImagePreload === 'function') {
+        scheduleCardImagePreload(runDeck);
+    }
     
     // Clear scene
     activeCreatures.forEach(c => scene.remove(c));
@@ -5471,6 +5477,9 @@ function winCombat() {
     llmBusy = false;
     pendingVictoryRewards = rollVictoryRewards(3);
     selectedVictoryRewardIndex = -1;
+    if (typeof scheduleCardImagePreload === 'function') {
+        scheduleCardImagePreload(pendingVictoryRewards);
+    }
     renderVictoryReward();
     updateCombatInteractionState();
     
@@ -5550,6 +5559,9 @@ window.addEventListener('resize', () => {
 
 // Start the game!
 initLlmModeUI();
+if (typeof scheduleCardImagePreload === 'function') {
+    scheduleCardImagePreload(CARDS);
+}
 initStarters();
 animate();
 

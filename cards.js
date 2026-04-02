@@ -2,6 +2,112 @@
  * Shared card definitions and combat effect logic for Slay the Spore.
  */
 
+const RUNTIME_CARD_ART_DIR = 'CardAssets';
+const cardImagePreloadCache = new Map();
+
+function getRuntimeCardImagePath(sourcePath) {
+  const cleanPath = String(sourcePath || '').trim();
+  if (!cleanPath) return cleanPath;
+
+  const segments = cleanPath.split(/[\\/]/);
+  const filename = segments[segments.length - 1];
+  return filename ? `${RUNTIME_CARD_ART_DIR}/${filename}` : cleanPath;
+}
+
+function applyRuntimeCardImagePaths(cards) {
+  cards.forEach((card) => {
+    if (!card || typeof card !== 'object') return;
+
+    const originalImg = String(card.originalImg || card.img || '').trim();
+    if (!originalImg) return;
+
+    card.originalImg = originalImg;
+    card.img = getRuntimeCardImagePath(originalImg);
+  });
+}
+
+function preloadCardImages(cards) {
+  if (typeof Image === 'undefined') {
+    return Promise.resolve([]);
+  }
+
+  const list = Array.isArray(cards) ? cards.filter(Boolean) : [cards].filter(Boolean);
+  const relatedCardsByPath = new Map();
+
+  list.forEach((entry) => {
+    if (!entry || typeof entry === 'string') return;
+
+    const runtimePath = getRuntimeCardImagePath(entry.originalImg || entry.img);
+    if (!runtimePath) return;
+
+    if (!relatedCardsByPath.has(runtimePath)) {
+      relatedCardsByPath.set(runtimePath, []);
+    }
+
+    relatedCardsByPath.get(runtimePath).push(entry);
+  });
+
+  const uniquePaths = [...new Set(
+    list
+      .map((entry) => {
+        if (typeof entry === 'string') {
+          return getRuntimeCardImagePath(entry);
+        }
+
+        return getRuntimeCardImagePath(entry.originalImg || entry.img);
+      })
+      .filter(Boolean)
+  )];
+
+  return Promise.all(uniquePaths.map((path) => {
+    if (cardImagePreloadCache.has(path)) {
+      return cardImagePreloadCache.get(path);
+    }
+
+    const preloadPromise = new Promise((resolve) => {
+      const img = new Image();
+      img.decoding = 'async';
+
+      img.onload = () => {
+        if (typeof img.decode === 'function') {
+          img.decode().catch(() => undefined).finally(() => resolve(path));
+          return;
+        }
+
+        resolve(path);
+      };
+
+      img.onerror = () => {
+        const fallbackCards = relatedCardsByPath.get(path) || [];
+        fallbackCards.forEach((card) => {
+          if (card?.originalImg) {
+            card.img = card.originalImg;
+          }
+        });
+        resolve(path);
+      };
+
+      img.src = path;
+    });
+
+    cardImagePreloadCache.set(path, preloadPromise);
+    return preloadPromise;
+  }));
+}
+
+function scheduleCardImagePreload(cards) {
+  const run = () => {
+    void preloadCardImages(cards);
+  };
+
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(run, { timeout: 1200 });
+    return;
+  }
+
+  setTimeout(run, 150);
+}
+
 function resolveAttackDamage(ctx, base) {
   if (typeof ctx.getAttackDamage === 'function') {
     return ctx.getAttackDamage(base);
@@ -276,6 +382,8 @@ const CARDS = [
   }
 ];
 
+applyRuntimeCardImagePaths(CARDS);
+
 const STARTER_DECK_IDS = [
   'attack',
   'attack',
@@ -348,4 +456,7 @@ if (typeof window !== 'undefined') {
   window.createCombatStatus = createCombatStatus;
   window.applyTurnStartEffects = applyTurnStartEffects;
   window.applyTurnEndEffects = applyTurnEndEffects;
+  window.getRuntimeCardImagePath = getRuntimeCardImagePath;
+  window.preloadCardImages = preloadCardImages;
+  window.scheduleCardImagePreload = scheduleCardImagePreload;
 }

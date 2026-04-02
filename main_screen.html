@@ -555,6 +555,10 @@
             document.body.classList.add('touch-device');
         }
 
+        if (typeof scheduleCardImagePreload === 'function') {
+            scheduleCardImagePreload(CARDS);
+        }
+
         function openCompendium() {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('compendium-screen').style.display = 'flex';
