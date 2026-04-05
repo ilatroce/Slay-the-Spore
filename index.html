@@ -4372,6 +4372,44 @@ function cloneGenome(genome) {
     return Array.isArray(genome) ? genome.slice() : [];
 }
 
+function serializeGenome(genome) {
+    if (!Array.isArray(genome) || !genome.length) return '';
+
+    const bytes = new Uint8Array(genome.length);
+    for (let i = 0; i < genome.length; i++) {
+        const value = Math.max(0, Math.min(1, Number(genome[i]) || 0));
+        bytes[i] = Math.round(value * 255);
+    }
+
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        const slice = bytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode(...slice);
+    }
+    return btoa(binary);
+}
+
+function deserializeGenome(payload) {
+    if (Array.isArray(payload)) {
+        return cloneGenome(payload);
+    }
+    if (typeof payload !== 'string' || !payload) {
+        return [];
+    }
+
+    try {
+        const binary = atob(payload);
+        const genome = new Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            genome[i] = binary.charCodeAt(i) / 255;
+        }
+        return genome;
+    } catch (error) {
+        return [];
+    }
+}
+
 function setMultiplayerStatus(text, tone = 'info') {
     multiplayerStatusText = text;
     multiplayerStatusTone = tone;
@@ -4480,7 +4518,7 @@ function syncMultiplayerLobbyState() {
     sendMultiplayerMessage({
         type: 'lobby_state',
         ready: multiplayerLocalReady,
-        genome: cloneGenome(playerGenome),
+        genome: serializeGenome(playerGenome),
         generation: playerGeneration
     });
 }
@@ -4773,8 +4811,8 @@ function startMultiplayerMatchAsHost() {
     multiplayerMatchActive = true;
     sendMultiplayerMessage({
         type: 'match_start',
-        hostGenome: cloneGenome(playerGenome),
-        guestGenome: cloneGenome(multiplayerRemoteGenome),
+        hostGenome: serializeGenome(playerGenome),
+        guestGenome: serializeGenome(multiplayerRemoteGenome),
         firstTurn: 'host'
     });
     beginMultiplayerCombat(multiplayerRemoteGenome, true);
@@ -4804,7 +4842,7 @@ function handleMultiplayerMessage(payload) {
 
     if (payload.type === 'lobby_state') {
         multiplayerRemoteReady = !!payload.ready;
-        multiplayerRemoteGenome = cloneGenome(payload.genome);
+        multiplayerRemoteGenome = deserializeGenome(payload.genome);
         updateMultiplayerLobbyUI();
         if (multiplayerIsHost && multiplayerLocalReady && multiplayerRemoteReady && !multiplayerMatchActive) {
             startMultiplayerMatchAsHost();
@@ -4817,7 +4855,9 @@ function handleMultiplayerMessage(payload) {
         multiplayerLocalReady = true;
         multiplayerRemoteReady = true;
 
-        const remoteGenome = multiplayerIsHost ? cloneGenome(payload.guestGenome) : cloneGenome(payload.hostGenome);
+        const remoteGenome = multiplayerIsHost
+            ? deserializeGenome(payload.guestGenome)
+            : deserializeGenome(payload.hostGenome);
         const localStarts = payload.firstTurn === (multiplayerIsHost ? 'host' : 'guest');
         beginMultiplayerCombat(remoteGenome, localStarts);
         return;
