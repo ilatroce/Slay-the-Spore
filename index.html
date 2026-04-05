@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slay the Spore</title>
+    <script>
+        (function redirectRootToMenu() {
+            const pageParams = new URLSearchParams(window.location.search);
+            if (!pageParams.has('mode') && !pageParams.has('play')) {
+                window.location.replace('main_screen.html');
+            }
+        })();
+    </script>
     <style>
         :root {
             --safe-top: max(12px, env(safe-area-inset-top));
