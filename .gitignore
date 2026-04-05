@@ -1,0 +1,7 @@
+.edge-headless-smoke/
+.edge-mobile/
+edge-dom-check.txt
+
+# Local environment and OS noise
+Thumbs.db
+.DS_Store

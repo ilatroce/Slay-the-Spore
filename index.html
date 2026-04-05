@@ -227,7 +227,8 @@
             text-transform: uppercase;
             box-shadow: 0 14px 34px rgba(79, 123, 255, 0.22);
         }
-        #llm-mode-panel {
+        #llm-mode-panel,
+        #multiplayer-mode-panel {
             margin: 0 0 20px;
             padding: 18px;
             border-radius: 22px;
@@ -292,6 +293,52 @@
             font-size: 12px;
             line-height: 1.45;
             margin: 0;
+        }
+        .mode-inline-actions {
+            display: flex;
+            align-items: stretch;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .mode-id-box,
+        .mode-text-input {
+            min-width: 0;
+            flex: 1 1 auto;
+            box-sizing: border-box;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(20, 17, 38, 0.56);
+            color: #fff8fc;
+            padding: 12px 14px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .mode-id-box {
+            display: flex;
+            align-items: center;
+            min-height: 48px;
+            word-break: break-all;
+        }
+        .mode-text-input::placeholder {
+            color: rgba(255, 248, 252, 0.54);
+        }
+        .mode-text-input:focus {
+            outline: none;
+            border-color: rgba(184, 238, 255, 0.6);
+            box-shadow: 0 0 0 1px rgba(184, 238, 255, 0.24);
+        }
+        .mode-mini-button {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 108px;
+            margin: 0;
+            padding: 12px 18px;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+        }
+        #multiplayer-reset-btn {
+            width: 100%;
+            margin: 2px 0 0;
         }
         .llm-status-chip {
             display: inline-flex;
@@ -460,6 +507,12 @@
                 radial-gradient(circle at 15% 15%, rgba(138, 234, 255, 0.16), transparent 34%),
                 radial-gradient(circle at 85% 12%, rgba(255, 150, 215, 0.16), transparent 36%),
                 #f8eaf5;
+        }
+        body.multiplayer-mode {
+            background:
+                radial-gradient(circle at 18% 12%, rgba(138, 234, 255, 0.14), transparent 34%),
+                radial-gradient(circle at 82% 14%, rgba(255, 188, 120, 0.16), transparent 34%),
+                #f7edf2;
         }
         body.llm-mode #combat-screen {
             padding-right: calc(392px + var(--safe-right));
@@ -1276,6 +1329,13 @@
                 font-size: 8.5px;
                 line-height: 1.1;
             }
+            .mode-inline-actions {
+                flex-direction: column;
+            }
+            .mode-mini-button {
+                width: 100%;
+                min-width: 0;
+            }
             .reward-actions {
                 gap: 8px;
             }
@@ -1390,6 +1450,28 @@
                     <p id="llm-personality-copy" class="llm-personality-copy"></p>
                     <p id="llm-random-copy" class="llm-random-copy"></p>
                 </div>
+                <div id="multiplayer-mode-panel" style="display: none;">
+                    <div class="llm-panel-header">
+                        <div>
+                            <div class="llm-panel-kicker">PeerJS Arena</div>
+                            <div class="llm-panel-title">Share your arena code, connect with a friend, then ready up for a starter-deck duel.</div>
+                        </div>
+                        <div id="multiplayer-status-chip" class="llm-status-chip">Opening arena link...</div>
+                    </div>
+                    <div class="llm-field-label">Your Arena Code</div>
+                    <div class="mode-inline-actions">
+                        <div id="multiplayer-peer-id" class="mode-id-box">Opening PeerJS link...</div>
+                        <button id="multiplayer-copy-code-btn" class="mode-mini-button" type="button">Copy</button>
+                    </div>
+                    <div class="llm-field-label">Join a Friend</div>
+                    <div class="mode-inline-actions">
+                        <input id="multiplayer-peer-target" class="mode-text-input" type="text" maxlength="80" placeholder="Paste your friend's arena code" />
+                        <button id="multiplayer-connect-btn" class="mode-mini-button" type="button">Connect</button>
+                    </div>
+                    <p id="multiplayer-copy" class="llm-personality-copy">Pick a starter, share your code, then connect to your friend's code.</p>
+                    <p id="multiplayer-random-copy" class="llm-random-copy">Host goes first. Multiplayer duels use starter creatures and the base 8-card deck only.</p>
+                    <button id="multiplayer-reset-btn" class="btn-small" type="button">Reset Link</button>
+                </div>
                 <button id="fight-button" onclick="startCombat()">Fight Next Monster</button>
             </div>
         </div>
@@ -1447,6 +1529,7 @@
                     <button id="reward-add-btn" onclick="claimVictoryReward()" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">Choose 1 Card & Evolve</button>
                     <button id="reward-skip-btn" class="btn-skip" onclick="skipVictoryReward()">Skip Reward & Evolve</button>
                 </div>
+                <button id="multiplayer-victory-btn" onclick="location.reload()" style="display: none; background: #333;">Return to Lobby</button>
             </div>
         </div>
 
@@ -1469,6 +1552,7 @@
     </div>
 
     <script src="cards.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <script type="importmap">
         {
@@ -1553,7 +1637,9 @@ const MUTATION_DATA = {
 };
 const pageParams = new URLSearchParams(window.location.search);
 const isLlmMode = pageParams.get('mode') === 'llm';
+const isMultiplayerMode = pageParams.get('mode') === 'multiplayer';
 const hasLocalLlmSupport = typeof navigator !== 'undefined' && !!navigator.gpu;
+const hasPeerJsSupport = typeof window !== 'undefined' && typeof window.Peer === 'function';
 const DEFAULT_LLM_PERSONALITY_ID = 'friendly';
 const LLM_MODEL_PATTERNS = [
     /Qwen2\.5-1\.5B-Instruct/i,
@@ -3412,6 +3498,7 @@ let enemyWillSkipTurn = false;
 let enemySkipReason = '';
 
 function currentMutationMilestone() {
+    if (isMultiplayerMode) return null;
     return MUTATION_MILESTONES.find((milestone) => mutationState.evolutionCount >= milestone.threshold && !mutationState.choices[milestone.key]) || null;
 }
 
@@ -3563,6 +3650,9 @@ function applyAttackAftermath() {
 }
 
 function getMutationMenuCopy() {
+    if (isMultiplayerMode) {
+        return 'Multiplayer duels use starter creatures only. Mutations are disabled in this mode.';
+    }
     const chosen = getChosenMutationIds();
     const summaries = chosen.map((id) => `${MUTATION_DATA[id].label}: ${MUTATION_DATA[id].summary}`);
     const next = nextMutationMilestone();
@@ -3573,6 +3663,9 @@ function getMutationMenuCopy() {
 }
 
 function getCombatMutationCopy() {
+    if (isMultiplayerMode) {
+        return 'Starter duel: no mutations active';
+    }
     const chosen = getChosenMutationIds();
     if (!chosen.length) {
         const next = nextMutationMilestone();
@@ -3586,6 +3679,7 @@ function renderMutationIcons(elementId) {
     if (!container) return;
 
     container.innerHTML = '';
+    if (isMultiplayerMode) return;
     const chosen = getChosenMutationIds();
     if (!chosen.length) {
         const empty = document.createElement('div');
@@ -4260,6 +4354,578 @@ function initLlmModeUI() {
     }
 }
 
+function shortPeerId(id) {
+    const cleanId = String(id || '').trim();
+    if (!cleanId) return 'Unknown';
+    return cleanId.length > 12 ? `${cleanId.slice(0, 6)}...${cleanId.slice(-4)}` : cleanId;
+}
+
+function cloneGenome(genome) {
+    return Array.isArray(genome) ? genome.slice() : [];
+}
+
+function setMultiplayerStatus(text, tone = 'info') {
+    multiplayerStatusText = text;
+    multiplayerStatusTone = tone;
+
+    const chip = document.getElementById('multiplayer-status-chip');
+    if (!chip) return;
+    chip.textContent = text;
+    chip.className = `llm-status-chip ${tone}`;
+}
+
+function updateMultiplayerFightButton() {
+    if (!isMultiplayerMode) return;
+    const button = document.getElementById('fight-button');
+    if (!button) return;
+
+    if (!hasPeerJsSupport) {
+        button.textContent = 'PeerJS Unavailable';
+        button.disabled = true;
+        return;
+    }
+    if (!playerGenome.length) {
+        button.textContent = 'Pick a Starter First';
+        button.disabled = true;
+        return;
+    }
+    if (!multiplayerConnected) {
+        button.textContent = 'Connect to a Friend';
+        button.disabled = true;
+        return;
+    }
+    if (!multiplayerRemoteGenome.length) {
+        button.textContent = 'Waiting for Friend Starter';
+        button.disabled = true;
+        return;
+    }
+    if (multiplayerMatchActive) {
+        button.textContent = 'Duel in Progress';
+        button.disabled = true;
+        return;
+    }
+    if (multiplayerLocalReady) {
+        button.textContent = multiplayerIsHost ? 'Ready - Waiting for Friend' : 'Ready - Waiting for Host';
+        button.disabled = true;
+        return;
+    }
+
+    button.textContent = 'Ready for Duel';
+    button.disabled = false;
+}
+
+function updateMultiplayerLobbyUI() {
+    if (!isMultiplayerMode) return;
+
+    const peerIdEl = document.getElementById('multiplayer-peer-id');
+    const copyEl = document.getElementById('multiplayer-copy');
+    const detailEl = document.getElementById('multiplayer-random-copy');
+    const targetInput = document.getElementById('multiplayer-peer-target');
+    const connectBtn = document.getElementById('multiplayer-connect-btn');
+    const copyBtn = document.getElementById('multiplayer-copy-code-btn');
+
+    if (peerIdEl) {
+        peerIdEl.textContent = multiplayerPeerId || 'Opening PeerJS link...';
+    }
+    if (copyBtn) {
+        copyBtn.disabled = !multiplayerPeerId;
+    }
+    if (targetInput) {
+        targetInput.disabled = !multiplayerPeerId || multiplayerConnected;
+    }
+    if (connectBtn) {
+        connectBtn.disabled = !multiplayerPeerId || multiplayerConnected;
+        connectBtn.textContent = multiplayerConnected ? 'Connected' : 'Connect';
+    }
+
+    if (copyEl) {
+        if (!playerGenome.length) {
+            copyEl.textContent = 'Pick a starter first, then share your arena code with your friend.';
+        } else if (!multiplayerConnected) {
+            copyEl.textContent = 'Starter locked in. Share your code, or paste your friend\'s code to join them.';
+        } else {
+            const localReadyCopy = multiplayerLocalReady ? 'You are ready.' : 'You are not ready yet.';
+            const remoteReadyCopy = multiplayerRemoteReady
+                ? `${shortPeerId(multiplayerRemotePeerId)} is ready.`
+                : `${shortPeerId(multiplayerRemotePeerId)} is not ready yet.`;
+            copyEl.textContent = `Connected to ${shortPeerId(multiplayerRemotePeerId)}. ${localReadyCopy} ${remoteReadyCopy}`;
+        }
+    }
+
+    if (detailEl) {
+        detailEl.textContent = 'Host goes first. Multiplayer duels use starter creatures and the base 8-card deck only.';
+    }
+
+    updateMultiplayerFightButton();
+}
+
+function sendMultiplayerMessage(payload) {
+    if (!multiplayerConnection || !multiplayerConnection.open) return false;
+    multiplayerConnection.send(payload);
+    return true;
+}
+
+function syncMultiplayerLobbyState() {
+    updateMultiplayerLobbyUI();
+    if (!multiplayerConnected) return;
+
+    sendMultiplayerMessage({
+        type: 'lobby_state',
+        ready: multiplayerLocalReady,
+        genome: cloneGenome(playerGenome),
+        generation: playerGeneration
+    });
+}
+
+function resetMultiplayerSessionState(options = {}) {
+    const keepPeer = !!options.keepPeer;
+    multiplayerConnection = null;
+    multiplayerConnected = false;
+    multiplayerRemotePeerId = '';
+    multiplayerRemoteGenome = [];
+    multiplayerRemoteReady = false;
+    multiplayerLocalReady = false;
+    multiplayerMatchActive = false;
+    multiplayerCombatStatusText = 'Connect to a friend to begin.';
+    multiplayerTurnCardsPlayed = [];
+    if (!keepPeer) {
+        multiplayerPeer = null;
+        multiplayerPeerId = '';
+    }
+    updateMultiplayerLobbyUI();
+}
+
+function handleMultiplayerDisconnect(message = 'Friend disconnected. Reset the link to host again or reconnect to another code.') {
+    resetMultiplayerSessionState({ keepPeer: true });
+    setMultiplayerStatus(message, 'warning');
+
+    if (isMultiplayerMode && gameState === 'FIGHT') {
+        document.getElementById('defeat-copy').textContent = 'The duel link broke before the match could finish.';
+        loseCombat();
+    }
+}
+
+function attachMultiplayerConnection(connection, isHostSide) {
+    if (!connection) return;
+
+    if (multiplayerConnection && multiplayerConnection !== connection) {
+        multiplayerConnection.close();
+    }
+
+    multiplayerConnection = connection;
+    multiplayerRemotePeerId = connection.peer || '';
+    multiplayerRemoteGenome = [];
+    multiplayerRemoteReady = false;
+    multiplayerLocalReady = false;
+    multiplayerConnected = false;
+    multiplayerMatchActive = false;
+    multiplayerIsHost = !!isHostSide;
+    setMultiplayerStatus(`Opening duel channel to ${shortPeerId(multiplayerRemotePeerId)}...`, 'info');
+    updateMultiplayerLobbyUI();
+
+    connection.on('open', () => {
+        multiplayerConnected = true;
+        setMultiplayerStatus(`Connected to ${shortPeerId(connection.peer)}.`, 'success');
+        syncMultiplayerLobbyState();
+    });
+
+    connection.on('data', (payload) => {
+        handleMultiplayerMessage(payload);
+    });
+
+    connection.on('close', () => {
+        if (multiplayerConnection === connection) {
+            handleMultiplayerDisconnect();
+        }
+    });
+
+    connection.on('error', (error) => {
+        setMultiplayerStatus(`Connection error: ${error?.type || error?.message || 'unknown error'}.`, 'error');
+        updateMultiplayerLobbyUI();
+    });
+}
+
+function createMultiplayerPeer() {
+    if (!isMultiplayerMode || !hasPeerJsSupport) {
+        setMultiplayerStatus('PeerJS is unavailable in this browser.', 'error');
+        updateMultiplayerLobbyUI();
+        return;
+    }
+
+    if (multiplayerConnection) {
+        multiplayerConnection.close();
+    }
+    if (multiplayerPeer) {
+        multiplayerPeer.destroy();
+    }
+
+    resetMultiplayerSessionState();
+    setMultiplayerStatus('Opening PeerJS arena link...', 'info');
+    updateMultiplayerLobbyUI();
+
+    multiplayerPeer = new window.Peer();
+
+    multiplayerPeer.on('open', (id) => {
+        multiplayerPeerId = id;
+        setMultiplayerStatus('Arena code ready. Share it with your friend.', 'success');
+        updateMultiplayerLobbyUI();
+    });
+
+    multiplayerPeer.on('connection', (connection) => {
+        if (multiplayerConnection && multiplayerConnection.open && multiplayerRemotePeerId !== connection.peer) {
+            connection.on('open', () => connection.close());
+            return;
+        }
+        attachMultiplayerConnection(connection, true);
+    });
+
+    multiplayerPeer.on('disconnected', () => {
+        handleMultiplayerDisconnect('PeerJS link dropped. Reset the link to open a fresh arena code.');
+    });
+
+    multiplayerPeer.on('close', () => {
+        if (!multiplayerPeerId) return;
+        handleMultiplayerDisconnect('PeerJS link closed. Reset the link to reopen the arena code.');
+    });
+
+    multiplayerPeer.on('error', (error) => {
+        setMultiplayerStatus(`PeerJS error: ${error?.type || error?.message || 'unknown error'}.`, 'error');
+        updateMultiplayerLobbyUI();
+    });
+}
+
+async function copyMultiplayerCode() {
+    if (!multiplayerPeerId) return;
+
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(multiplayerPeerId);
+            setMultiplayerStatus('Arena code copied. Send it to your friend.', 'success');
+        } else {
+            setMultiplayerStatus('Copy failed in this browser. Select the code manually.', 'warning');
+        }
+    } catch (error) {
+        setMultiplayerStatus('Copy failed in this browser. Select the code manually.', 'warning');
+    }
+
+    updateMultiplayerLobbyUI();
+}
+
+function connectToFriendPeer() {
+    if (!multiplayerPeer || !multiplayerPeerId) {
+        setMultiplayerStatus('Wait for your arena code to finish loading first.', 'warning');
+        return;
+    }
+    if (multiplayerConnected) {
+        setMultiplayerStatus(`Already connected to ${shortPeerId(multiplayerRemotePeerId)}.`, 'info');
+        return;
+    }
+
+    const targetInput = document.getElementById('multiplayer-peer-target');
+    const targetId = String(targetInput?.value || '').trim();
+
+    if (!targetId) {
+        setMultiplayerStatus('Paste your friend\'s arena code before connecting.', 'warning');
+        return;
+    }
+    if (targetId === multiplayerPeerId) {
+        setMultiplayerStatus('Use your friend\'s arena code, not your own.', 'warning');
+        return;
+    }
+
+    const connection = multiplayerPeer.connect(targetId, {
+        reliable: true,
+        serialization: 'json'
+    });
+    attachMultiplayerConnection(connection, false);
+}
+
+function createMultiplayerSnapshot(result = 'turn_end') {
+    const localState = {
+        hp: playerHP,
+        maxHP: playerMaxHP,
+        block: playerBlock,
+        generation: playerGeneration
+    };
+    const remoteState = {
+        hp: enemyHP,
+        maxHP: enemyMaxHP,
+        block: enemyBlock,
+        generation: enemyGeneration
+    };
+
+    return {
+        result,
+        cardsPlayed: multiplayerTurnCardsPlayed.slice(),
+        host: multiplayerIsHost ? localState : remoteState,
+        guest: multiplayerIsHost ? remoteState : localState
+    };
+}
+
+function applyMultiplayerSnapshot(snapshot) {
+    const localState = multiplayerIsHost ? snapshot?.host : snapshot?.guest;
+    const remoteState = multiplayerIsHost ? snapshot?.guest : snapshot?.host;
+    if (!localState || !remoteState) return false;
+
+    playerGeneration = Number(localState.generation || 1);
+    enemyGeneration = Number(remoteState.generation || 1);
+
+    playerMaxHP = Number(localState.maxHP || calcPlayerMaxHP());
+    playerHP = Math.max(0, Number(localState.hp || 0));
+    playerBlock = Math.max(0, Number(localState.block || 0));
+
+    enemyMaxHP = Number(remoteState.maxHP || calcEnemyMaxHP(enemyGeneration));
+    enemyHP = Math.max(0, Number(remoteState.hp || 0));
+    enemyBlock = Math.max(0, Number(remoteState.block || 0));
+
+    return true;
+}
+
+function beginMultiplayerCombat(remoteGenome, localStarts) {
+    gameState = 'FIGHT';
+    multiplayerMatchActive = true;
+    multiplayerCombatStatusText = localStarts ? 'Your turn: play cards and end turn.' : `${shortPeerId(multiplayerRemotePeerId)} is taking the opening turn.`;
+    multiplayerTurnCardsPlayed = [];
+
+    document.getElementById('menu-screen').style.display = 'none';
+    document.getElementById('combat-screen').style.display = 'flex';
+    document.getElementById('victory-screen').style.display = 'none';
+    document.getElementById('defeat-screen').style.display = 'none';
+    hideMutationChoice();
+
+    if (enemyCreature) {
+        scene.remove(enemyCreature);
+        activeCreatures = activeCreatures.filter((creature) => creature !== enemyCreature);
+    }
+
+    enemyGeneration = 1;
+    enemyGenome = cloneGenome(remoteGenome);
+    enemyCreature = decodeGenome(enemyGenome, enemyGeneration);
+
+    const separation = 5 + playerGeneration;
+    playerCreature.position.set(-separation, 0, 0);
+    playerCreature.rotation.y = Math.PI / 4;
+    playerCombatCircle.position.set(-separation, 0, 0);
+    playerCombatCircle.visible = true;
+
+    enemyCreature.position.set(separation, 0, 0);
+    enemyCreature.rotation.y = -Math.PI / 4;
+    enemyCombatCircle.position.set(separation, 0, 0);
+    enemyCombatCircle.visible = true;
+    scene.add(enemyCreature);
+    activeCreatures.push(enemyCreature);
+
+    camera.position.set(0, 10 + playerGeneration * 2.5, 24 + playerGeneration * 5);
+    controls.target.set(0, playerGeneration * 0.5, 0);
+
+    playerMaxHP = calcPlayerMaxHP();
+    playerHP = playerMaxHP;
+    playerBlock = 0;
+    playerEnergy = 3;
+
+    enemyMaxHP = calcEnemyMaxHP(enemyGeneration);
+    enemyHP = enemyMaxHP;
+    enemyBlock = 0;
+    enemyIntentDmg = 0;
+    combatStatus = createCombatStatus();
+    enemyWillSkipTurn = false;
+    enemySkipReason = '';
+    llmStoredCharge = 0;
+    llmCurrentIntent = null;
+    llmBusy = false;
+
+    drawPile = [...buildStarterDeck()];
+    shuffle(drawPile);
+    discardPile = [];
+    handPile = [];
+    runDeck = buildStarterDeck();
+
+    document.getElementById('player-gen-text').innerText = isCompactMobile()
+        ? `G${playerGeneration}`
+        : `(Gen ${playerGeneration})`;
+    document.getElementById('enemy-name').innerText = isCompactMobile()
+        ? `${shortPeerId(multiplayerRemotePeerId)} G${enemyGeneration}`
+        : `${shortPeerId(multiplayerRemotePeerId)} (Gen ${enemyGeneration})`;
+
+    updateCombatUI();
+
+    if (localStarts) {
+        startTurn();
+    } else {
+        playerTurnLocked = true;
+        renderHand();
+        updateCombatUI();
+    }
+}
+
+function startMultiplayerMatchAsHost() {
+    if (!isMultiplayerMode || !multiplayerIsHost || multiplayerMatchActive) return;
+    if (!playerGenome.length || !multiplayerRemoteGenome.length) return;
+
+    multiplayerMatchActive = true;
+    sendMultiplayerMessage({
+        type: 'match_start',
+        hostGenome: cloneGenome(playerGenome),
+        guestGenome: cloneGenome(multiplayerRemoteGenome),
+        firstTurn: 'host'
+    });
+    beginMultiplayerCombat(multiplayerRemoteGenome, true);
+}
+
+function finalizeMultiplayerTurn(result) {
+    if (!isMultiplayerMode) {
+        if (result === 'victory') winCombat();
+        else if (result === 'defeat') loseCombat();
+        return;
+    }
+
+    sendMultiplayerMessage({
+        type: 'turn_snapshot',
+        snapshot: createMultiplayerSnapshot(result)
+    });
+
+    if (result === 'victory') {
+        winCombat();
+    } else if (result === 'defeat') {
+        loseCombat();
+    }
+}
+
+function handleMultiplayerMessage(payload) {
+    if (!payload || typeof payload !== 'object') return;
+
+    if (payload.type === 'lobby_state') {
+        multiplayerRemoteReady = !!payload.ready;
+        multiplayerRemoteGenome = cloneGenome(payload.genome);
+        updateMultiplayerLobbyUI();
+        if (multiplayerIsHost && multiplayerLocalReady && multiplayerRemoteReady && !multiplayerMatchActive) {
+            startMultiplayerMatchAsHost();
+        }
+        return;
+    }
+
+    if (payload.type === 'match_start') {
+        multiplayerMatchActive = true;
+        multiplayerLocalReady = true;
+        multiplayerRemoteReady = true;
+
+        const remoteGenome = multiplayerIsHost ? cloneGenome(payload.guestGenome) : cloneGenome(payload.hostGenome);
+        const localStarts = payload.firstTurn === (multiplayerIsHost ? 'host' : 'guest');
+        beginMultiplayerCombat(remoteGenome, localStarts);
+        return;
+    }
+
+    if (payload.type === 'turn_snapshot') {
+        if (!applyMultiplayerSnapshot(payload.snapshot)) return;
+
+        const playedCards = Array.isArray(payload.snapshot.cardsPlayed) && payload.snapshot.cardsPlayed.length
+            ? payload.snapshot.cardsPlayed.join(', ')
+            : 'no cards';
+
+        if (payload.snapshot.result === 'victory') {
+            multiplayerCombatStatusText = `${shortPeerId(multiplayerRemotePeerId)} finished the duel after playing ${playedCards}.`;
+            updateCombatUI();
+            loseCombat();
+            return;
+        }
+
+        if (payload.snapshot.result === 'defeat') {
+            multiplayerCombatStatusText = `${shortPeerId(multiplayerRemotePeerId)} fell after playing ${playedCards}.`;
+            updateCombatUI();
+            winCombat();
+            return;
+        }
+
+        multiplayerCombatStatusText = `Your turn: ${shortPeerId(multiplayerRemotePeerId)} played ${playedCards}.`;
+        updateCombatUI();
+        startTurn();
+    }
+}
+
+function handleMultiplayerReadyAction() {
+    if (!hasPeerJsSupport) {
+        setMultiplayerStatus('PeerJS is unavailable in this browser.', 'error');
+        return;
+    }
+    if (!playerGenome.length) {
+        setMultiplayerStatus('Pick a starter first.', 'warning');
+        return;
+    }
+    if (!multiplayerConnected) {
+        setMultiplayerStatus('Connect to a friend before you ready up.', 'warning');
+        return;
+    }
+    if (!multiplayerRemoteGenome.length) {
+        setMultiplayerStatus('Your friend still needs to pick a starter.', 'warning');
+        return;
+    }
+    if (multiplayerLocalReady || multiplayerMatchActive) {
+        return;
+    }
+
+    multiplayerLocalReady = true;
+    setMultiplayerStatus(multiplayerIsHost ? 'You are ready. Waiting for your friend.' : 'You are ready. Waiting for the host to launch the duel.', 'success');
+    syncMultiplayerLobbyState();
+
+    if (multiplayerIsHost && multiplayerRemoteReady) {
+        startMultiplayerMatchAsHost();
+    }
+}
+
+function initMultiplayerModeUI() {
+    if (!isMultiplayerMode || multiplayerUiReady) return;
+    multiplayerUiReady = true;
+
+    document.body.classList.add('multiplayer-mode');
+    document.title = 'Slay the Spore - Multiplayer';
+
+    const badge = document.getElementById('mode-badge');
+    const panel = document.getElementById('multiplayer-mode-panel');
+    const llmPanel = document.getElementById('llm-mode-panel');
+    const copyBtn = document.getElementById('multiplayer-copy-code-btn');
+    const connectBtn = document.getElementById('multiplayer-connect-btn');
+    const resetBtn = document.getElementById('multiplayer-reset-btn');
+    const targetInput = document.getElementById('multiplayer-peer-target');
+
+    if (badge) {
+        badge.style.display = 'inline-flex';
+        badge.textContent = 'Multiplayer';
+    }
+    if (panel) panel.style.display = 'block';
+    if (llmPanel) llmPanel.style.display = 'none';
+
+    document.getElementById('start-title').textContent = 'Multiplayer';
+    document.getElementById('start-subtitle').textContent = 'Pick your creature, then link up for a 1v1 duel.';
+    document.getElementById('menu-title').textContent = 'Battle Lobby';
+    document.getElementById('menu-flavor-copy').textContent = 'Share your arena code, connect to a friend, then fight with starter creatures and the base deck.';
+    document.getElementById('victory-copy').textContent = 'Your creature outlasted your friend in the arena.';
+    document.getElementById('defeat-copy').textContent = 'Your creature was outplayed in the arena duel.';
+
+    if (copyBtn) {
+        copyBtn.addEventListener('click', copyMultiplayerCode);
+    }
+    if (connectBtn) {
+        connectBtn.addEventListener('click', connectToFriendPeer);
+    }
+    if (targetInput) {
+        targetInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                connectToFriendPeer();
+            }
+        });
+    }
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            createMultiplayerPeer();
+        });
+    }
+
+    setMultiplayerStatus(multiplayerStatusText, multiplayerStatusTone);
+    updateMultiplayerLobbyUI();
+    createMultiplayerPeer();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // GAME ENGINE LOGIC
 ////////////////////////////////////////////////////////////////////////////////
@@ -4306,6 +4972,10 @@ function initStarters() {
     starters = [];
     playerTurnLocked = false;
     llmBusy = false;
+    multiplayerMatchActive = false;
+    multiplayerLocalReady = false;
+    multiplayerRemoteReady = false;
+    multiplayerCombatStatusText = 'Connect to a friend to begin.';
     mutationState = defaultMutationState();
     hideMutationChoice();
     
@@ -4314,6 +4984,10 @@ function initStarters() {
     document.getElementById('combat-screen').style.display = 'none';
     document.getElementById('victory-screen').style.display = 'none';
     document.getElementById('defeat-screen').style.display = 'none';
+    document.getElementById('reward-card-container').style.display = '';
+    document.getElementById('reward-note').style.display = '';
+    document.querySelector('.reward-actions').style.display = '';
+    document.getElementById('multiplayer-victory-btn').style.display = 'none';
     playerCombatCircle.visible = false;
     enemyCombatCircle.visible = false;
     
@@ -4342,6 +5016,10 @@ window.pickStarter = function(index) {
     pendingVictoryRewards = [];
     selectedVictoryRewardIndex = -1;
     goToMenu(false);
+    if (isMultiplayerMode) {
+        multiplayerLocalReady = false;
+        syncMultiplayerLobbyState();
+    }
 }
 
 document.getElementById('reroll-btn').addEventListener('click', initStarters);
@@ -4362,6 +5040,7 @@ function goToMenu(isEvolving = false) {
     document.getElementById('menu-screen').style.display = 'flex';
     document.getElementById('combat-screen').style.display = 'none';
     document.getElementById('victory-screen').style.display = 'none';
+    document.getElementById('defeat-screen').style.display = 'none';
     playerCombatCircle.visible = false;
     enemyCombatCircle.visible = false;
     
@@ -4414,7 +5093,7 @@ function goToMenu(isEvolving = false) {
     controls.target.set(0, 2 + playerGeneration * 0.5, 0);
     
     // UI Update
-    document.getElementById('menu-title').innerText = `Evolution Stage ${playerGeneration}`;
+    document.getElementById('menu-title').innerText = isMultiplayerMode ? 'Battle Lobby' : `Evolution Stage ${playerGeneration}`;
     updateMenuStats();
     updateMutationUI();
     updateMenuDeckUI();
@@ -4424,6 +5103,9 @@ function goToMenu(isEvolving = false) {
         if (fightButton) {
             fightButton.disabled = !hasLocalLlmSupport;
         }
+    }
+    if (isMultiplayerMode) {
+        updateMultiplayerLobbyUI();
     }
     maybePromptMutationChoice();
 }
@@ -4503,6 +5185,21 @@ let llmCurrentIntent = null;
 let llmRecentEvents = [];
 let llmChatMessages = [];
 let llmBusy = false;
+let multiplayerUiReady = false;
+let multiplayerPeer = null;
+let multiplayerConnection = null;
+let multiplayerPeerId = '';
+let multiplayerRemotePeerId = '';
+let multiplayerRemoteGenome = [];
+let multiplayerRemoteReady = false;
+let multiplayerLocalReady = false;
+let multiplayerConnected = false;
+let multiplayerIsHost = false;
+let multiplayerMatchActive = false;
+let multiplayerStatusText = hasPeerJsSupport ? 'Opening PeerJS arena link...' : 'PeerJS is unavailable in this browser.';
+let multiplayerStatusTone = hasPeerJsSupport ? 'info' : 'error';
+let multiplayerCombatStatusText = 'Connect to a friend to begin.';
+let multiplayerTurnCardsPlayed = [];
 
 // Hover interaction handled partially via CSS and partially on element events
 
@@ -4951,6 +5648,10 @@ window.skipVictoryReward = function() {
 }
 
 window.startCombat = function() {
+    if (isMultiplayerMode) {
+        handleMultiplayerReadyAction();
+        return;
+    }
     if (isLlmMode && !hasLocalLlmSupport) {
         setLlmStatus('Fight LLMs needs WebGPU. Open this in a recent Chrome or Edge build.', 'error');
         return;
@@ -5048,6 +5749,10 @@ function startTurn() {
     playerTurnLocked = !!isLlmMode;
     playerEnergy = 3 + getCombatStatusNumber('energyBonus');
     playerBlock = 0; // reset block start of turn
+    if (isMultiplayerMode) {
+        multiplayerCombatStatusText = 'Your turn: play cards and end turn.';
+        multiplayerTurnCardsPlayed = [];
+    }
 
     // Apply passive status effects (On Fire burn + strength, etc.)
     applyTurnStartEffects(makeCombatCtx());
@@ -5066,6 +5771,8 @@ function startTurn() {
     if (isLlmMode) {
         updateCombatInteractionState();
         planLlmEnemyIntent();
+    } else if (isMultiplayerMode) {
+        updateCombatUI();
     } else {
         determineEnemyIntent();
         updateCombatUI();
@@ -5246,20 +5953,45 @@ function playCard(index) {
         
         discardPile.push(card);
         handPile.splice(index, 1);
+        if (isMultiplayerMode) {
+            multiplayerTurnCardsPlayed.push(card.name);
+        }
         pushLlmEvent(`${card.name} resolved for ${Math.max(0, beforeState.enemyHP - enemyHP)} damage, ${Math.max(0, beforeState.playerHP - playerHP)} self damage, and ${Math.max(0, playerBlock - beforeState.playerBlock)} block swing.`);
         renderHand();
         updateCombatUI();
         
         if (enemyHP <= 0) {
-            winCombat();
+            if (isMultiplayerMode) {
+                finalizeMultiplayerTurn('victory');
+            } else {
+                winCombat();
+            }
         } else if (playerHP <= 0) {
-            loseCombat();
+            if (isMultiplayerMode) {
+                finalizeMultiplayerTurn('defeat');
+            } else {
+                loseCombat();
+            }
         }
     }
 }
 
 window.endTurn = function() {
     if (playerTurnLocked) return;
+    if (isMultiplayerMode) {
+        applyTurnEndEffects(makeCombatCtx());
+        discardPile.push(...handPile);
+        handPile = [];
+        playerTurnLocked = true;
+        multiplayerCombatStatusText = `${shortPeerId(multiplayerRemotePeerId)} is taking a turn...`;
+        renderHand();
+        updateCombatUI();
+        sendMultiplayerMessage({
+            type: 'turn_snapshot',
+            snapshot: createMultiplayerSnapshot('turn_end')
+        });
+        return;
+    }
     // Apply end-of-turn status resets (e.g. No Pain No Gain expires)
     applyTurnEndEffects(makeCombatCtx());
 
@@ -5458,6 +6190,8 @@ function updateCombatUI() {
         document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
             ? (compactMobile ? 'Skip' : `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`)
             : (compactMobile ? (llmCurrentIntent?.intentText || 'Thinking...').replace(/^Intent:\s*/i, '') : (llmCurrentIntent?.intentText || 'Intent: Rival model is thinking...'));
+    } else if (isMultiplayerMode) {
+        document.getElementById('enemy-intent').innerHTML = multiplayerCombatStatusText;
     } else {
         document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
             ? (compactMobile ? 'Skip' : `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`)
@@ -5475,12 +6209,24 @@ function winCombat() {
     hideMutationChoice();
     playerTurnLocked = false;
     llmBusy = false;
-    pendingVictoryRewards = rollVictoryRewards(3);
-    selectedVictoryRewardIndex = -1;
-    if (typeof scheduleCardImagePreload === 'function') {
-        scheduleCardImagePreload(pendingVictoryRewards);
+    multiplayerMatchActive = false;
+    if (isMultiplayerMode) {
+        document.getElementById('reward-card-container').style.display = 'none';
+        document.getElementById('reward-note').style.display = 'none';
+        document.querySelector('.reward-actions').style.display = 'none';
+        document.getElementById('multiplayer-victory-btn').style.display = 'inline-flex';
+    } else {
+        pendingVictoryRewards = rollVictoryRewards(3);
+        selectedVictoryRewardIndex = -1;
+        document.getElementById('reward-card-container').style.display = '';
+        document.getElementById('reward-note').style.display = '';
+        document.querySelector('.reward-actions').style.display = '';
+        document.getElementById('multiplayer-victory-btn').style.display = 'none';
+        if (typeof scheduleCardImagePreload === 'function') {
+            scheduleCardImagePreload(pendingVictoryRewards);
+        }
+        renderVictoryReward();
     }
-    renderVictoryReward();
     updateCombatInteractionState();
     
     let drop = setInterval(() => {
@@ -5505,6 +6251,11 @@ function loseCombat() {
     hideMutationChoice();
     playerTurnLocked = false;
     llmBusy = false;
+    multiplayerMatchActive = false;
+    const defeatButton = document.querySelector('#defeat-screen button');
+    if (defeatButton) {
+        defeatButton.textContent = isMultiplayerMode ? 'Return to Lobby' : 'Restart Game';
+    }
     updateCombatInteractionState();
 }
 
@@ -5559,6 +6310,7 @@ window.addEventListener('resize', () => {
 
 // Start the game!
 initLlmModeUI();
+initMultiplayerModeUI();
 if (typeof scheduleCardImagePreload === 'function') {
     scheduleCardImagePreload(CARDS);
 }
