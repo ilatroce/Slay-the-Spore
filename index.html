@@ -1537,7 +1537,7 @@
                     <button id="reward-add-btn" onclick="claimVictoryReward()" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">Choose 1 Card & Evolve</button>
                     <button id="reward-skip-btn" class="btn-skip" onclick="skipVictoryReward()">Skip Reward & Evolve</button>
                 </div>
-                <button id="multiplayer-victory-btn" onclick="handlePostCombatAction()" style="display: none; background: #333;">Return to Lobby</button>
+                <button id="multiplayer-victory-btn" type="button" disabled style="display: none; background: #333;">Waiting for Friend...</button>
             </div>
         </div>
 
@@ -4549,6 +4549,8 @@ function resetMultiplayerSessionState(options = {}) {
     multiplayerRemoteGenome = [];
     multiplayerRemoteReady = false;
     multiplayerLocalReady = false;
+    multiplayerRemoteRewardReady = false;
+    multiplayerLocalRewardReady = false;
     multiplayerMatchActive = false;
     multiplayerCombatStatusText = 'Connect to a friend to begin.';
     multiplayerTurnCardsPlayed = [];
@@ -4569,6 +4571,10 @@ function handleMultiplayerDisconnect(message = 'Friend disconnected. Reset the l
     if (isMultiplayerMode && gameState === 'FIGHT') {
         document.getElementById('defeat-copy').textContent = 'The duel link broke before the match could finish.';
         loseCombat({ countScore: false });
+    } else if (isMultiplayerMode && (gameState === 'VICTORY' || gameState === 'DEFEAT')) {
+        pendingVictoryRewards = [];
+        selectedVictoryRewardIndex = -1;
+        goToMenu(false);
     }
 }
 
@@ -4584,6 +4590,8 @@ function attachMultiplayerConnection(connection, isHostSide) {
     multiplayerRemoteGenome = [];
     multiplayerRemoteReady = false;
     multiplayerLocalReady = false;
+    multiplayerRemoteRewardReady = false;
+    multiplayerLocalRewardReady = false;
     multiplayerConnected = false;
     multiplayerMatchActive = false;
     multiplayerIsHost = !!isHostSide;
@@ -4752,8 +4760,12 @@ function beginMultiplayerCombat(remoteGenome, localStarts) {
     gameState = 'FIGHT';
     multiplayerMatchActive = true;
     multiplayerRoundOutcomeRecorded = false;
+    multiplayerLocalRewardReady = false;
+    multiplayerRemoteRewardReady = false;
     multiplayerCombatStatusText = localStarts ? 'Your turn: play cards and end turn.' : `${shortPeerId(multiplayerRemotePeerId)} is taking the opening turn.`;
     multiplayerTurnCardsPlayed = [];
+    pendingVictoryRewards = [];
+    selectedVictoryRewardIndex = -1;
 
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('combat-screen').style.display = 'flex';
@@ -4877,6 +4889,8 @@ function showMultiplayerRoundReward(outcome) {
     const titleEl = document.getElementById('reward-screen-title');
     const copyEl = document.getElementById('victory-copy');
 
+    multiplayerLocalRewardReady = false;
+    multiplayerRemoteRewardReady = false;
     document.getElementById('combat-screen').style.display = 'none';
     document.getElementById('defeat-screen').style.display = 'none';
     document.getElementById('victory-screen').style.display = 'flex';
@@ -4891,8 +4905,8 @@ function showMultiplayerRoundReward(outcome) {
     }
     if (copyEl) {
         copyEl.textContent = outcome === 'win'
-            ? `You took the round. ${getMultiplayerScoreText()}. Pick 1 card for your deck, then queue up the next duel.`
-            : `Your friend took the round. ${getMultiplayerScoreText()}. You still get to pick 1 card before the next duel.`;
+            ? `You took the round. ${getMultiplayerScoreText()}. Pick 1 card for your deck, then wait for your friend to lock in the next duel.`
+            : `Your friend took the round. ${getMultiplayerScoreText()}. Pick 1 card, then wait for your friend so the next duel can begin.`;
     }
 
     pendingVictoryRewards = rollVictoryRewards(3);
@@ -4901,6 +4915,78 @@ function showMultiplayerRoundReward(outcome) {
         scheduleCardImagePreload(pendingVictoryRewards);
     }
     renderVictoryReward();
+}
+
+function updateMultiplayerRewardWaitingState() {
+    if (!isMultiplayerMode) return;
+
+    const noteEl = document.getElementById('reward-note');
+    const actionsEl = document.querySelector('.reward-actions');
+    const waitBtn = document.getElementById('multiplayer-victory-btn');
+    if (!noteEl || !actionsEl || !waitBtn) return;
+
+    if (!multiplayerLocalRewardReady) {
+        actionsEl.style.display = '';
+        waitBtn.style.display = 'none';
+        waitBtn.disabled = true;
+        if (multiplayerRemoteRewardReady) {
+            noteEl.innerText = `${shortPeerId(multiplayerRemotePeerId)} is ready. Choose a card or skip when you're ready.`;
+        }
+        return;
+    }
+
+    actionsEl.style.display = 'none';
+    waitBtn.disabled = true;
+    waitBtn.style.display = '';
+
+    if (multiplayerRemoteRewardReady) {
+        if (multiplayerIsHost) {
+            noteEl.innerText = 'Both rewards are locked in. Starting the next duel...';
+            waitBtn.textContent = 'Starting Next Duel...';
+        } else {
+            noteEl.innerText = 'Both rewards are locked in. Waiting for the host to launch the next duel...';
+            waitBtn.textContent = 'Waiting for Host...';
+        }
+        return;
+    }
+
+    noteEl.innerText = `Reward locked in. Waiting for ${shortPeerId(multiplayerRemotePeerId)} to choose a card.`;
+    waitBtn.textContent = 'Waiting for Friend...';
+}
+
+function maybeStartNextMultiplayerRoundAsHost() {
+    if (!isMultiplayerMode || !multiplayerIsHost || multiplayerMatchActive) return;
+    if (!multiplayerLocalRewardReady || !multiplayerRemoteRewardReady) return;
+    if (!playerGenome.length || !multiplayerRemoteGenome.length) return;
+
+    setMultiplayerStatus('Both rewards are locked in. Starting the next duel.', 'success');
+    startMultiplayerMatchAsHost();
+}
+
+function finalizeMultiplayerRoundReward(reward = null) {
+    if (!isMultiplayerMode || multiplayerLocalRewardReady) return;
+
+    multiplayerLocalRewardReady = true;
+    pendingVictoryRewards = [];
+    selectedVictoryRewardIndex = -1;
+    updateMenuDeckUI();
+    updateMultiplayerRewardWaitingState();
+
+    sendMultiplayerMessage({
+        type: 'round_reward_ready',
+        keptCardName: reward?.name || '',
+        skipped: !reward
+    });
+
+    if (multiplayerRemoteRewardReady) {
+        setMultiplayerStatus('Both rewards are locked in. Starting the next duel soon.', 'success');
+    } else {
+        setMultiplayerStatus('Reward locked in. Waiting for your friend to finish.', 'success');
+    }
+
+    if (multiplayerIsHost) {
+        maybeStartNextMultiplayerRoundAsHost();
+    }
 }
 
 function handleMultiplayerMessage(payload) {
@@ -4920,12 +5006,23 @@ function handleMultiplayerMessage(payload) {
         multiplayerMatchActive = true;
         multiplayerLocalReady = true;
         multiplayerRemoteReady = true;
+        multiplayerLocalRewardReady = false;
+        multiplayerRemoteRewardReady = false;
 
         const remoteGenome = multiplayerIsHost
             ? deserializeGenome(payload.guestGenome)
             : deserializeGenome(payload.hostGenome);
         const localStarts = payload.firstTurn === (multiplayerIsHost ? 'host' : 'guest');
         beginMultiplayerCombat(remoteGenome, localStarts);
+        return;
+    }
+
+    if (payload.type === 'round_reward_ready') {
+        multiplayerRemoteRewardReady = true;
+        updateMultiplayerRewardWaitingState();
+        if (multiplayerIsHost && multiplayerLocalRewardReady) {
+            maybeStartNextMultiplayerRoundAsHost();
+        }
         return;
     }
 
@@ -5089,6 +5186,8 @@ function initStarters() {
     multiplayerMatchActive = false;
     multiplayerLocalReady = false;
     multiplayerRemoteReady = false;
+    multiplayerLocalRewardReady = false;
+    multiplayerRemoteRewardReady = false;
     multiplayerCombatStatusText = 'Connect to a friend to begin.';
     mutationState = defaultMutationState();
     hideMutationChoice();
@@ -5317,6 +5416,8 @@ let multiplayerTurnCardsPlayed = [];
 let multiplayerLocalWins = 0;
 let multiplayerRemoteWins = 0;
 let multiplayerRoundOutcomeRecorded = false;
+let multiplayerLocalRewardReady = false;
+let multiplayerRemoteRewardReady = false;
 
 // Hover interaction handled partially via CSS and partially on element events
 
@@ -5683,6 +5784,7 @@ function attachRewardCardEffects(cardEl) {
 }
 
 function selectVictoryReward(index) {
+    if (isMultiplayerMode && multiplayerLocalRewardReady) return;
     selectedVictoryRewardIndex = index;
     renderVictoryReward();
 }
@@ -5713,18 +5815,19 @@ function renderVictoryReward() {
     const note = document.getElementById('reward-note');
     const addBtn = document.getElementById('reward-add-btn');
     const skipBtn = document.getElementById('reward-skip-btn');
-    const addSuffix = isMultiplayerMode ? 'Return to Lobby' : 'Evolve';
+    const addSuffix = isMultiplayerMode ? 'Queue Next Duel' : 'Evolve';
 
     container.innerHTML = '';
 
     if (!pendingVictoryRewards.length) {
         note.innerText = isMultiplayerMode
-            ? 'No reward cards were rolled. You can still return to the lobby.'
+            ? 'No reward cards were rolled. You can still queue the next duel.'
             : 'No reward cards were rolled. You can still evolve.';
         addBtn.disabled = true;
         addBtn.innerText = `Choose 1 Card & ${addSuffix}`;
         skipBtn.disabled = false;
-        skipBtn.innerText = addSuffix;
+        skipBtn.innerText = isMultiplayerMode ? 'Queue Next Duel' : addSuffix;
+        updateMultiplayerRewardWaitingState();
         return;
     }
 
@@ -5744,12 +5847,15 @@ function renderVictoryReward() {
     }
 
     skipBtn.disabled = false;
-    skipBtn.innerText = isMultiplayerMode ? 'Skip Reward & Return to Lobby' : 'Skip Reward & Evolve';
+    skipBtn.innerText = isMultiplayerMode ? 'Skip Reward & Queue Next Duel' : 'Skip Reward & Evolve';
+    updateMultiplayerRewardWaitingState();
 }
 
 function returnMultiplayerToLobby() {
     multiplayerLocalReady = false;
     multiplayerRemoteReady = false;
+    multiplayerLocalRewardReady = false;
+    multiplayerRemoteRewardReady = false;
     multiplayerMatchActive = false;
     multiplayerRoundOutcomeRecorded = false;
     pendingVictoryRewards = [];
@@ -5780,7 +5886,7 @@ window.claimVictoryReward = function() {
     selectedVictoryRewardIndex = -1;
     updateMenuDeckUI();
     if (isMultiplayerMode) {
-        returnMultiplayerToLobby();
+        finalizeMultiplayerRoundReward(reward);
         return;
     }
     window.triggerEvolution();
@@ -5792,7 +5898,7 @@ window.skipVictoryReward = function() {
     pendingVictoryRewards = [];
     selectedVictoryRewardIndex = -1;
     if (isMultiplayerMode) {
-        returnMultiplayerToLobby();
+        finalizeMultiplayerRoundReward(null);
         return;
     }
     window.triggerEvolution();
@@ -6424,7 +6530,7 @@ function loseCombat(options = {}) {
         document.getElementById('defeat-screen').style.display = 'flex';
         const defeatButton = document.querySelector('#defeat-screen button');
         if (defeatButton) {
-            defeatButton.textContent = isMultiplayerMode ? 'Back to Lobby' : 'Restart Game';
+            defeatButton.textContent = isMultiplayerMode ? 'Back to Match Setup' : 'Restart Game';
         }
         updateCombatInteractionState();
     }
