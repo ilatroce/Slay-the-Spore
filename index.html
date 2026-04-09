@@ -47,6 +47,27 @@
             pointer-events: none;
             overflow: hidden;
         }
+
+        .run-coin-chip {
+            position: absolute;
+            top: calc(var(--safe-top) + 10px);
+            right: var(--safe-right);
+            z-index: 30;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255, 225, 126, 0.95), rgba(255, 177, 66, 0.94));
+            color: #3a2100;
+            border: 1px solid rgba(255, 249, 217, 0.9);
+            box-shadow: 0 18px 36px rgba(90, 48, 0, 0.22);
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
         
         .screen {
             width: 100%;
@@ -1422,6 +1443,7 @@
 </head>
 <body>
     <div id="ui-layer">
+        <div id="run-coin-chip" class="run-coin-chip" style="display: none;">Coins: 0</div>
         <!-- START SCREEN -->
         <div id="start-screen" class="screen">
             <div class="panel" id="start-panel">
@@ -1560,6 +1582,7 @@
     </div>
 
     <script src="cards.js"></script>
+    <script src="run_state.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -1648,6 +1671,14 @@ const isLlmMode = pageParams.get('mode') === 'llm';
 const isMultiplayerMode = pageParams.get('mode') === 'multiplayer';
 const hasLocalLlmSupport = typeof navigator !== 'undefined' && !!navigator.gpu;
 const hasPeerJsSupport = typeof window !== 'undefined' && typeof window.Peer === 'function';
+const RUN_MODE_STANDARD = 'play';
+const RUN_MODE_LLM = 'llm';
+const COIN_REWARD_MIN = 50;
+const COIN_REWARD_MAX = 150;
+const MERCHANT_ENCOUNTER_CHANCE = 0.1;
+const MERCHANT_CARD_PRICE = 450;
+const MERCHANT_REMOVE_PRICE = 150;
+const MERCHANT_SCENE_PATH = 'merchant_scene.html';
 const MULTIPLAYER_STARTING_HP = 24;
 const DEFAULT_LLM_PERSONALITY_ID = 'friendly';
 const LLM_MODEL_PATTERNS = [
@@ -3727,6 +3758,164 @@ function updateMutationUI() {
     }
 }
 
+function getCurrentRunMode() {
+    return isLlmMode ? RUN_MODE_LLM : RUN_MODE_STANDARD;
+}
+
+function canPersistSinglePlayerRun() {
+    return !isMultiplayerMode && typeof saveRunState === 'function';
+}
+
+function cloneMerchantEncounterState(state) {
+    if (!state || typeof state !== 'object') return null;
+    return {
+        active: state.active !== false,
+        offers: Array.isArray(state.offers) ? state.offers.filter(Boolean).slice(0, 3) : [],
+        cardPrice: Math.max(0, Number(state.cardPrice || MERCHANT_CARD_PRICE)),
+        removalPrice: Math.max(0, Number(state.removalPrice || MERCHANT_REMOVE_PRICE)),
+        canBuy: state.canBuy !== false,
+        canRemove: state.canRemove !== false,
+        boughtCardId: String(state.boughtCardId || ''),
+        removedCardId: String(state.removedCardId || ''),
+        visitId: String(state.visitId || '')
+    };
+}
+
+function createMerchantEncounterState() {
+    const pool = [...CARDS];
+    shuffle(pool);
+    return {
+        active: true,
+        offers: pool.slice(0, Math.min(3, pool.length)).map((card) => card.id),
+        cardPrice: MERCHANT_CARD_PRICE,
+        removalPrice: MERCHANT_REMOVE_PRICE,
+        canBuy: true,
+        canRemove: true,
+        boughtCardId: '',
+        removedCardId: '',
+        visitId: `${Date.now()}-${Math.floor(Math.random() * 100000)}`
+    };
+}
+
+function buildSinglePlayerRunSave(scene = 'menu') {
+    return {
+        version: typeof SLAY_THE_SPORE_RUN_SAVE_VERSION === 'number' ? SLAY_THE_SPORE_RUN_SAVE_VERSION : 1,
+        mode: getCurrentRunMode(),
+        scene,
+        playerGenome: cloneGenome(playerGenome),
+        playerGeneration,
+        deckIds: typeof deckToIds === 'function' ? deckToIds(runDeck) : runDeck.map((card) => card.id).filter(Boolean),
+        coins: Math.max(0, Math.floor(Number(playerCoins) || 0)),
+        mutationState: typeof cloneMutationStateForSave === 'function'
+            ? cloneMutationStateForSave(mutationState)
+            : defaultMutationState(),
+        merchantEncounter: cloneMerchantEncounterState(merchantEncounterState)
+    };
+}
+
+function persistSinglePlayerRun(scene = 'menu') {
+    if (!canPersistSinglePlayerRun() || !playerGenome.length) return;
+    saveRunState(buildSinglePlayerRunSave(scene));
+}
+
+function clearSinglePlayerRunSave() {
+    if (!canPersistSinglePlayerRun()) return;
+    clearRunState();
+}
+
+function hydrateSinglePlayerRun(save) {
+    if (!save || typeof save !== 'object') return false;
+    if (save.mode !== getCurrentRunMode()) return false;
+    if (!Array.isArray(save.playerGenome) || !save.playerGenome.length) return false;
+
+    playerGenome = cloneGenome(save.playerGenome);
+    playerGeneration = Math.max(1, Number(save.playerGeneration) || 1);
+    mutationState = typeof cloneMutationStateForSave === 'function'
+        ? cloneMutationStateForSave(save.mutationState)
+        : defaultMutationState();
+    runDeck = typeof idsToDeck === 'function' ? idsToDeck(save.deckIds) : [];
+    if (!runDeck.length) {
+        runDeck = buildStarterDeck();
+    }
+    playerCoins = Math.max(0, Math.floor(Number(save.coins) || 0));
+    pendingVictoryRewards = [];
+    selectedVictoryRewardIndex = -1;
+    pendingVictoryCoinReward = 0;
+    pendingMerchantEncounter = false;
+    merchantEncounterState = cloneMerchantEncounterState(save.merchantEncounter);
+    return true;
+}
+
+function updateRunCoinUI() {
+    const chip = document.getElementById('run-coin-chip');
+    if (!chip) return;
+
+    const showChip = !isMultiplayerMode && playerGenome.length > 0 && gameState !== 'START';
+    chip.style.display = showChip ? 'inline-flex' : 'none';
+    chip.textContent = `Coins: ${Math.max(0, Math.floor(Number(playerCoins) || 0))}`;
+}
+
+function rollCoinReward() {
+    return COIN_REWARD_MIN + Math.floor(Math.random() * (COIN_REWARD_MAX - COIN_REWARD_MIN + 1));
+}
+
+function awardVictoryCoinsAndMaybeMerchant() {
+    pendingVictoryCoinReward = rollCoinReward();
+    playerCoins += pendingVictoryCoinReward;
+    pendingMerchantEncounter = Math.random() < MERCHANT_ENCOUNTER_CHANCE;
+    merchantEncounterState = pendingMerchantEncounter ? createMerchantEncounterState() : null;
+    updateRunCoinUI();
+}
+
+function getVictorySummaryText() {
+    const coinText = `You scavenged ${pendingVictoryCoinReward} coins.`;
+    if (pendingMerchantEncounter && merchantEncounterState) {
+        return `${coinText} A wandering merchant blocks the trail ahead.`;
+    }
+    return `${coinText} The path opens toward the next evolution.`;
+}
+
+function enterMerchantEncounterScene() {
+    if (!merchantEncounterState) {
+        goToMenu(true);
+        return;
+    }
+    persistSinglePlayerRun('merchant');
+    window.location.href = MERCHANT_SCENE_PATH;
+}
+
+function mutatePlayerAfterVictory() {
+    mutationState.evolutionCount++;
+    playerGeneration++;
+    const mutationRate = 0.1 + Math.min(0.4, playerGeneration * 0.02);
+    const mutationAmount = 0.2;
+
+    const newGenome = [];
+    for (let i = 0; i < genomeLength; i++) {
+        let gene = playerGenome[i];
+        if (Math.random() < 0.2) gene = enemyGenome[i];
+        if (Math.random() < mutationRate) {
+            gene += (Math.random() - 0.5) * mutationAmount * 2;
+            gene = Math.max(0, Math.min(1, gene));
+        }
+        newGenome.push(gene);
+    }
+
+    playerGenome = newGenome;
+}
+
+function resolveSinglePlayerVictoryFlow() {
+    mutatePlayerAfterVictory();
+    if (pendingMerchantEncounter && merchantEncounterState) {
+        enterMerchantEncounterScene();
+        return;
+    }
+    pendingVictoryCoinReward = 0;
+    pendingMerchantEncounter = false;
+    merchantEncounterState = null;
+    goToMenu(true);
+}
+
 function updateMenuStats() {
     if (isMultiplayerMode) {
         const duelHP = getMultiplayerStartingHP();
@@ -3744,7 +3933,8 @@ function updateMenuStats() {
         const compactBits = [
             `Max HP ${maxHP}`,
             `Damage ${baseDamage}`,
-            `Dodge ${getDodgePercent()}%`
+            `Dodge ${getDodgePercent()}%`,
+            `Coins ${playerCoins}`
         ];
         if (stats.drawBonus) compactBits.push(`Draw ${getCardsPerTurn()}/turn`);
         if (stats.attackBonus) compactBits.push(`Atk +${stats.attackBonus}`);
@@ -3753,7 +3943,7 @@ function updateMenuStats() {
     }
     const extraDraw = stats.drawBonus ? ` | Cards/Turn: ${getCardsPerTurn()}` : '';
     const attackBonus = stats.attackBonus ? ` | Attack Bonus: +${stats.attackBonus}` : '';
-    document.getElementById('menu-stats').innerText = `Max HP: ${maxHP} | Base Damage: ${baseDamage} | Dodge: ${getDodgePercent()}%${extraDraw}${attackBonus}`;
+    document.getElementById('menu-stats').innerText = `Max HP: ${maxHP} | Base Damage: ${baseDamage} | Dodge: ${getDodgePercent()}% | Coins: ${playerCoins}${extraDraw}${attackBonus}`;
 }
 
 function createMutationTeeth(anchor, count, spread, zFront, size, flip = false, yOffset = 0) {
@@ -5181,6 +5371,12 @@ function initStarters() {
     activeCreatures.forEach(c => scene.remove(c));
     activeCreatures = [];
     starters = [];
+    playerGenome = [];
+    enemyGenome = [];
+    playerCoins = 0;
+    pendingVictoryCoinReward = 0;
+    pendingMerchantEncounter = false;
+    merchantEncounterState = null;
     playerTurnLocked = false;
     llmBusy = false;
     multiplayerMatchActive = false;
@@ -5203,6 +5399,7 @@ function initStarters() {
     document.getElementById('multiplayer-victory-btn').style.display = 'none';
     playerCombatCircle.visible = false;
     enemyCombatCircle.visible = false;
+    updateRunCoinUI();
     
     camera.position.set(0, 5, 20);
     controls.target.set(0, 2, 0);
@@ -5223,6 +5420,10 @@ window.pickStarter = function(index) {
     playerGeneration = 1;
     mutationState = defaultMutationState();
     runDeck = buildStarterDeck();
+    playerCoins = 0;
+    pendingVictoryCoinReward = 0;
+    pendingMerchantEncounter = false;
+    merchantEncounterState = null;
     if (typeof scheduleCardImagePreload === 'function') {
         scheduleCardImagePreload(runDeck);
     }
@@ -5321,6 +5522,27 @@ function goToMenu(isEvolving = false) {
         updateMultiplayerLobbyUI();
     }
     maybePromptMutationChoice();
+    updateRunCoinUI();
+    persistSinglePlayerRun('menu');
+}
+
+function bootstrapSinglePlayerRunFromSave() {
+    if (isMultiplayerMode || typeof loadRunState !== 'function') {
+        return false;
+    }
+
+    const save = loadRunState();
+    if (!hydrateSinglePlayerRun(save)) {
+        return false;
+    }
+
+    if (save.scene === 'merchant') {
+        window.location.replace(MERCHANT_SCENE_PATH);
+        return true;
+    }
+
+    goToMenu(false);
+    return true;
 }
 
 function updateEnvironment(gen) {
@@ -5377,6 +5599,10 @@ let combatStatus = {};
 let runDeck = buildStarterDeck();
 let pendingVictoryRewards = [];
 let selectedVictoryRewardIndex = -1;
+let playerCoins = 0;
+let pendingVictoryCoinReward = 0;
+let pendingMerchantEncounter = false;
+let merchantEncounterState = null;
 
 let drawPile = [];
 let handPile = [];
@@ -5870,6 +6096,7 @@ window.handlePostCombatAction = function() {
         returnMultiplayerToLobby();
         return;
     }
+    clearSinglePlayerRunSave();
     location.reload();
 }
 
@@ -5889,7 +6116,7 @@ window.claimVictoryReward = function() {
         finalizeMultiplayerRoundReward(reward);
         return;
     }
-    window.triggerEvolution();
+    resolveSinglePlayerVictoryFlow();
 }
 
 window.skipVictoryReward = function() {
@@ -5901,7 +6128,7 @@ window.skipVictoryReward = function() {
         finalizeMultiplayerRoundReward(null);
         return;
     }
-    window.triggerEvolution();
+    resolveSinglePlayerVictoryFlow();
 }
 
 window.startCombat = function() {
@@ -6455,6 +6682,7 @@ function updateCombatUI() {
             : (compactMobile ? `Atk <span id="enemy-dmg">${enemyIntentDmg}</span>` : `Intent: Attack for <span id="enemy-dmg">${enemyIntentDmg}</span>!`);
     }
     updateMutationUI();
+    updateRunCoinUI();
     updateCombatInteractionState();
 }
 
@@ -6482,6 +6710,8 @@ function winCombat(options = {}) {
             titleEl.textContent = 'VICTORY!';
             titleEl.style.color = '#4CAF50';
         }
+        awardVictoryCoinsAndMaybeMerchant();
+        document.getElementById('victory-copy').textContent = getVictorySummaryText();
         pendingVictoryRewards = rollVictoryRewards(3);
         selectedVictoryRewardIndex = -1;
         document.getElementById('reward-card-container').style.display = '';
@@ -6537,22 +6767,10 @@ function loseCombat(options = {}) {
 }
 
 window.triggerEvolution = function() {
-    mutationState.evolutionCount++;
-    playerGeneration++;
-    const mutationRate = 0.1 + Math.min(0.4, playerGeneration * 0.02); 
-    const mutationAmount = 0.2; 
-    
-    const newGenome = [];
-    for(let i=0; i<genomeLength; i++) {
-        let gene = playerGenome[i];
-        if (Math.random() < 0.2) gene = enemyGenome[i];
-        if (Math.random() < mutationRate) {
-            gene += (Math.random() - 0.5) * mutationAmount * 2;
-            gene = Math.max(0, Math.min(1, gene)); 
-        }
-        newGenome.push(gene);
-    }
-    playerGenome = newGenome;
+    mutatePlayerAfterVictory();
+    pendingVictoryCoinReward = 0;
+    pendingMerchantEncounter = false;
+    merchantEncounterState = null;
     goToMenu(true);
 }
 
@@ -6591,7 +6809,9 @@ initMultiplayerModeUI();
 if (typeof scheduleCardImagePreload === 'function') {
     scheduleCardImagePreload(CARDS);
 }
-initStarters();
+if (!bootstrapSinglePlayerRunFromSave()) {
+    initStarters();
+}
 animate();
 
     </script>

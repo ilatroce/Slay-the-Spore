@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slay the Spore - Merchant</title>
+    <style>
+        :root {
+            --safe-top: max(12px, env(safe-area-inset-top));
+            --safe-right: max(16px, env(safe-area-inset-right));
+            --safe-bottom: max(14px, env(safe-area-inset-bottom));
+            --safe-left: max(16px, env(safe-area-inset-left));
+            --card-width: 126px;
+            --card-height: 176px;
+            --remove-width: 122px;
+            --remove-height: 84px;
+            --dock-height: min(34vh, 290px);
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            min-height: 100dvh;
+            background: #d8f4dd;
+            color: #f7fff8;
+            font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui {
+            position: fixed;
+            inset: 0;
+            z-index: 6;
+            padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        #top-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .glass-panel {
+            pointer-events: auto;
+            background:
+                linear-gradient(150deg, rgba(7, 34, 30, 0.82), rgba(8, 22, 24, 0.72)),
+                radial-gradient(circle at top left, rgba(144, 255, 204, 0.14), transparent 48%);
+            border: 1px solid rgba(192, 246, 220, 0.24);
+            border-radius: 22px;
+            box-shadow: 0 18px 38px rgba(0, 39, 32, 0.18);
+            backdrop-filter: blur(16px) saturate(135%);
+        }
+
+        #merchant-info {
+            width: min(296px, 21vw);
+            padding: 14px 16px;
+        }
+
+        #chip-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            pointer-events: auto;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 14px 28px rgba(12, 44, 34, 0.14);
+            backdrop-filter: blur(14px);
+        }
+
+        .chip.mode {
+            background: rgba(11, 30, 28, 0.7);
+            color: #cbffef;
+        }
+
+        .chip.coins {
+            background: linear-gradient(135deg, rgba(255, 234, 140, 0.98), rgba(255, 188, 73, 0.96));
+            color: #412700;
+        }
+
+        .kicker {
+            margin: 0 0 6px;
+            color: #b5ffe1;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        h1, h2, h3, p, button, .card, .remove-card {
+            overflow-wrap: anywhere;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+        }
+
+        h1 {
+            color: #fff0be;
+            font-size: clamp(26px, 2.4vw, 34px);
+            line-height: 0.95;
+        }
+
+        h2 {
+            color: #f5fff8;
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        h3 {
+            color: #effff5;
+            font-size: 16px;
+        }
+
+        p {
+            margin: 0;
+            line-height: 1.35;
+        }
+
+        .info-copy {
+            margin-top: 10px;
+            color: #d2f3e2;
+            font-size: 13px;
+        }
+
+        #quote {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(255, 249, 217, 0.1);
+            color: #ffe9a9;
+            font-size: 12px;
+            font-style: italic;
+            line-height: 1.35;
+        }
+
+        .mini-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .mini-pill {
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #d8fff0;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-leave {
+            background: linear-gradient(135deg, #9bffdc, #4cc4a0);
+            color: #052018;
+        }
+
+        .btn-muted {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f2fff7;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        #status {
+            margin-top: 10px;
+            min-height: 16px;
+            color: #ecfff7;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        #layout {
+            display: none;
+            grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+            gap: 12px;
+            align-items: stretch;
+            min-height: 0;
+        }
+
+        .trade-panel {
+            pointer-events: auto;
+            min-height: var(--dock-height);
+            max-height: var(--dock-height);
+            padding: 14px 16px 16px;
+            overflow: hidden;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .price-pill {
+            flex: 0 0 auto;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 234, 158, 0.18);
+            color: #ffe59b;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .section-copy {
+            color: #c8eee0;
+            font-size: 12px;
+            min-height: 16px;
+            margin-bottom: 10px;
+        }
+
+        .market-row {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .card {
+            width: var(--card-width);
+            height: var(--card-height);
+            background: #2a2a3e;
+            border: 3px solid #5a5a7e;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transform-style: preserve-3d;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.36);
+            transition: transform 0.1s ease-out, box-shadow 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+            user-select: none;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(10, 12, 18, 0.22), rgba(5, 6, 8, 0.44));
+            border-radius: 7px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            border-color: #fff;
+            box-shadow: 0 0 22px 6px rgba(255, 255, 255, 0.28), 0 8px 18px rgba(0, 0, 0, 0.32);
+            transform: translateY(-18px) scale(1.08);
+        }
+
+        .card.is-disabled {
+            opacity: 0.58;
+        }
+
+        .card.is-disabled:hover {
+            border-color: #88aa99;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+            transform: translateY(-10px) scale(1.03);
+        }
+
+        .card .holo {
+            position: absolute;
+            inset: 0;
+            border-radius: 7px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 5;
+            --shine-x: 50%;
+            --shine-y: 50%;
+            background-image:
+                radial-gradient(circle at var(--shine-x) var(--shine-y), rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.09) 16%, rgba(255, 255, 255, 0) 30%);
+            mix-blend-mode: screen;
+            opacity: 0.82;
+        }
+
+        .card .cost {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            background: #55ccff;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border: 2px solid #fff;
+            z-index: 2;
+        }
+
+        .card .title {
+            font-weight: 800;
+            font-size: 14px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.28);
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            color: #fff;
+            z-index: 1;
+            text-shadow: 0 2px 4px #000;
+        }
+
+        .card .desc {
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 1;
+            text-shadow: 0 1px 3px #000, 0 1px 1px #000;
+            line-height: 1.2;
+        }
+
+        .card.attack .title { color: #ff758c; }
+        .card.defend .title { color: #55ccff; }
+        .card.special .title { color: #cc88ff; }
+
+        .card-footer {
+            z-index: 1;
+            padding: 7px 8px;
+            border-radius: 999px;
+            background: rgba(12, 22, 24, 0.76);
+            color: #effff6;
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card.buy-ready .card-footer {
+            background: linear-gradient(135deg, rgba(255, 220, 128, 0.96), rgba(255, 178, 64, 0.96));
+            color: #3f2300;
+        }
+
+        .remove-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(var(--remove-width), 1fr));
+            gap: 10px;
+            align-content: start;
+        }
+
+        .remove-row.dense {
+            --remove-width: 110px;
+        }
+
+        .remove-card {
+            min-height: var(--remove-height);
+            padding: 10px 10px 9px;
+            border-radius: 16px;
+            background: rgba(16, 34, 31, 0.58);
+            border: 1px solid rgba(197, 255, 226, 0.16);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 18px rgba(0, 0, 0, 0.14);
+            cursor: pointer;
+            transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease;
+        }
+
+        .remove-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.32);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 10px 22px rgba(0, 0, 0, 0.18);
+        }
+
+        .remove-card.is-disabled {
+            opacity: 0.56;
+        }
+
+        .remove-name {
+            color: #fff7c8;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.05;
+        }
+
+        .remove-count {
+            color: #c9f9e7;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .remove-footer {
+            margin-top: auto;
+            padding-top: 6px;
+            color: #f3fff9;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        #error-panel {
+            display: none;
+            pointer-events: auto;
+            max-width: 540px;
+            margin: auto;
+            padding: 18px 20px;
+        }
+
+        #error-copy {
+            margin-top: 10px;
+            color: #dff9ea;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1500px) {
+            :root {
+                --card-width: 118px;
+                --card-height: 168px;
+                --remove-width: 114px;
+                --remove-height: 80px;
+                --dock-height: min(36vh, 278px);
+            }
+
+            #merchant-info {
+                width: min(274px, 24vw);
+            }
+        }
+
+        @media (max-width: 1120px) {
+            :root {
+                --card-width: 108px;
+                --card-height: 158px;
+                --remove-width: 104px;
+                --remove-height: 76px;
+                --dock-height: min(39vh, 300px);
+            }
+
+            #merchant-info {
+                width: min(248px, 27vw);
+            }
+
+            #layout {
+                grid-template-columns: minmax(0, 1.05fr) minmax(290px, 0.95fr);
+            }
+
+            .trade-panel {
+                padding: 12px 12px 14px;
+            }
+        }
+
+        @media (max-width: 860px) {
+            #top-strip {
+                gap: 10px;
+            }
+
+            #merchant-info {
+                width: min(220px, 34vw);
+                padding: 12px;
+            }
+
+            .chip {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+        }
+    </style>
+    <script src="cards.js"></script>
+    <script src="run_state.js"></script>
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <canvas id="merchant-canvas"></canvas>
+    <div id="ui">
+        <div id="top-strip">
+            <section id="merchant-info" class="glass-panel">
+                <p class="kicker">Wandering Broker</p>
+                <h1>Spore Merchant</h1>
+                <p class="info-copy">One purchase. One purge. No haggling.</p>
+                <p id="quote"></p>
+                <div class="mini-pills">
+                    <div id="summary-buy" class="mini-pill"></div>
+                    <div id="summary-remove" class="mini-pill"></div>
+                    <div id="summary-deck" class="mini-pill"></div>
+                </div>
+                <div class="button-row">
+                    <button id="leave-btn" class="btn-leave" type="button">Leave Merchant</button>
+                    <button id="menu-btn" class="btn-muted" type="button">Main Menu</button>
+                </div>
+                <div id="status"></div>
+            </section>
+
+            <div id="chip-stack">
+                <div class="chip mode">Merchant Encounter</div>
+                <div id="coin-chip" class="chip coins">Coins: 0</div>
+            </div>
+        </div>
+
+        <div id="layout">
+            <section class="trade-panel glass-panel">
+                <div class="section-head">
+                    <div>
+                        <p class="kicker">Purchase</p>
+                        <h2>Buy 1 Card</h2>
+                    </div>
+                    <div class="price-pill">450 Coins</div>
+                </div>
+                <p id="buy-copy" class="section-copy"></p>
+                <div id="offer-grid" class="market-row"></div>
+            </section>
+
+            <section class="trade-panel glass-panel">
+                <div class="section-head">
+                    <div>
+                        <p class="kicker">Cull</p>
+                        <h2>Remove 1 Card</h2>
+                    </div>
+                    <div class="price-pill">150 Coins</div>
+                </div>
+                <p id="remove-copy" class="section-copy"></p>
+                <div id="remove-grid" class="remove-row"></div>
+            </section>
+        </div>
+
+        <div id="error-panel" class="glass-panel">
+            <p class="kicker">No Active Trade</p>
+            <h3>The merchant packed up.</h3>
+            <p id="error-copy">There is no merchant encounter save to restore.</p>
+            <div class="button-row">
+                <button id="error-return-btn" class="btn-leave" type="button">Back to Game</button>
+                <button id="error-menu-btn" class="btn-muted" type="button">Main Menu</button>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const RUN_MODE_LLM = 'llm';
+        const DEFAULT_ROUTE = 'index.html?play=1';
+        const TOUCH_INPUT = window.matchMedia('(hover: none), (pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+        const QUOTES = [
+            '"Coins now. Predation later."',
+            '"I sell timing, not fairness."',
+            '"Trim the weak. Buy the sharp."',
+            '"Survive first. Regret the price later."'
+        ];
+
+        const state = {
+            save: null,
+            route: DEFAULT_ROUTE,
+            deck: [],
+            coins: 0,
+            encounter: null,
+            valid: false
+        };
+
+        function cloneEncounter(encounter) {
+            if (!encounter || typeof encounter !== 'object') return null;
+            return {
+                active: encounter.active !== false,
+                offers: Array.isArray(encounter.offers) ? encounter.offers.filter(Boolean).slice(0, 3) : [],
+                cardPrice: Math.max(0, Number(encounter.cardPrice || 450)),
+                removalPrice: Math.max(0, Number(encounter.removalPrice || 150)),
+                canBuy: encounter.canBuy !== false,
+                canRemove: encounter.canRemove !== false,
+                boughtCardId: String(encounter.boughtCardId || ''),
+                removedCardId: String(encounter.removedCardId || '')
+            };
+        }
+
+        function getRoute(mode) {
+            return mode === RUN_MODE_LLM ? 'index.html?mode=llm' : DEFAULT_ROUTE;
+        }
+
+        function persist(scene = 'merchant') {
+            if (!state.save || typeof saveRunState !== 'function') return;
+            state.save = {
+                ...state.save,
+                scene,
+                deckIds: typeof deckToIds === 'function' ? deckToIds(state.deck) : state.deck.map((card) => card.id).filter(Boolean),
+                coins: state.coins,
+                merchantEncounter: scene === 'merchant' ? cloneEncounter(state.encounter) : null
+            };
+            saveRunState(state.save);
+        }
+
+        function uniqueDeckEntries() {
+            const counts = new Map();
+            state.deck.forEach((card) => {
+                if (!card?.id) return;
+                counts.set(card.id, {
+                    card,
+                    count: (counts.get(card.id)?.count || 0) + 1
+                });
+            });
+            return [...counts.values()].sort((a, b) => a.card.name.localeCompare(b.card.name));
+        }
+
+        function cardClass(card) {
+            return card?.type === 'attack' ? 'attack' : card?.type === 'defend' ? 'defend' : 'special';
+        }
+
+        function attachCardTiltEffects(cardEl) {
+            if (TOUCH_INPUT) return;
+
+            cardEl.addEventListener('mousemove', (event) => {
+                const rect = cardEl.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const mouseX = event.clientX - centerX;
+                const mouseY = event.clientY - centerY;
+                const rotateX = Math.max(-22, Math.min(22, (mouseY / 10) * -1));
+                const rotateY = Math.max(-22, Math.min(22, mouseX / 10));
+                cardEl.style.transform = `translateY(-18px) scale(1.08) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+                const holoEl = cardEl.querySelector('.holo');
+                if (!holoEl) return;
+                const shineX = 50 + (mouseX / rect.width) * 50;
+                const shineY = 50 + (mouseY / rect.height) * 50;
+                holoEl.style.setProperty('--shine-x', `${shineX}%`);
+                holoEl.style.setProperty('--shine-y', `${shineY}%`);
+            });
+
+            cardEl.addEventListener('mouseleave', () => {
+                cardEl.style.transform = '';
+                const holoEl = cardEl.querySelector('.holo');
+                if (!holoEl) return;
+                holoEl.style.setProperty('--shine-x', '50%');
+                holoEl.style.setProperty('--shine-y', '50%');
+            });
+        }
+
+        function setStatus(text, tone = 'neutral') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = text;
+            statusEl.style.color = tone === 'warning'
+                ? '#ffe39b'
+                : tone === 'success'
+                    ? '#b8ffd8'
+                    : '#ecfff7';
+        }
+
+        function showError(message, route = DEFAULT_ROUTE) {
+            document.getElementById('layout').style.display = 'none';
+            document.getElementById('merchant-info').style.display = 'none';
+            document.getElementById('error-panel').style.display = 'block';
+            document.getElementById('error-copy').textContent = message;
+            document.getElementById('error-return-btn').onclick = () => {
+                window.location.href = route;
+            };
+        }
+
+        function initState() {
+            const save = typeof loadRunState === 'function' ? loadRunState() : null;
+            const encounter = cloneEncounter(save?.merchantEncounter);
+            if (!save || !encounter || save.scene !== 'merchant') {
+                showError('There is no active merchant encounter saved right now.', getRoute(save?.mode));
+                return;
+            }
+
+            state.save = save;
+            state.route = getRoute(save.mode);
+            state.deck = typeof idsToDeck === 'function' ? idsToDeck(save.deckIds) : [];
+            if (!state.deck.length && typeof buildStarterDeck === 'function') {
+                state.deck = buildStarterDeck();
+            }
+            state.coins = Math.max(0, Math.floor(Number(save.coins) || 0));
+            state.encounter = encounter;
+            state.valid = true;
+            persist('merchant');
+        }
+
+        function updateSummary() {
+            document.getElementById('coin-chip').textContent = `Coins: ${state.coins}`;
+            document.getElementById('quote').textContent = QUOTES[(state.coins + state.deck.length) % QUOTES.length];
+            document.getElementById('summary-buy').textContent = state.encounter.canBuy
+                ? 'Sale: ready'
+                : state.encounter.boughtCardId
+                    ? `Bought: ${getCardById(state.encounter.boughtCardId)?.name || '1 card'}`
+                    : 'Sale: closed';
+            document.getElementById('summary-remove').textContent = state.encounter.canRemove
+                ? 'Cull: ready'
+                : state.encounter.removedCardId
+                    ? `Removed: ${getCardById(state.encounter.removedCardId)?.name || '1 card'}`
+                    : 'Cull: closed';
+            document.getElementById('summary-deck').textContent = `Deck: ${state.deck.length} cards`;
+        }
+
+        function renderOffers() {
+            const offerGrid = document.getElementById('offer-grid');
+            offerGrid.innerHTML = '';
+
+            if (!state.encounter.canBuy) {
+                document.getElementById('buy-copy').textContent = 'This visit already used the merchant sale.';
+            } else if (state.coins >= state.encounter.cardPrice) {
+                document.getElementById('buy-copy').textContent = 'Click any card to buy it immediately.';
+            } else {
+                document.getElementById('buy-copy').textContent = `You need ${state.encounter.cardPrice - state.coins} more coins to buy a card.`;
+            }
+
+            const offers = state.encounter.offers.map((id) => getCardById(id)).filter(Boolean);
+            if (!offers.length) {
+                const empty = document.createElement('p');
+                empty.className = 'section-copy';
+                empty.textContent = 'No cards were stocked for this visit.';
+                offerGrid.appendChild(empty);
+                return;
+            }
+
+            offers.forEach((card) => {
+                const canBuyNow = state.encounter.canBuy && state.coins >= state.encounter.cardPrice;
+                const footerText = !state.encounter.canBuy
+                    ? 'Sold'
+                    : canBuyNow
+                        ? `Buy ${state.encounter.cardPrice}`
+                        : `Need ${state.encounter.cardPrice - state.coins}`;
+
+                const cardEl = document.createElement('button');
+                cardEl.type = 'button';
+                cardEl.className = `card buy-card ${cardClass(card)} ${canBuyNow ? 'buy-ready' : 'is-disabled'}`;
+                cardEl.style.backgroundImage = `url('${card.img}')`;
+                cardEl.innerHTML = `
+                    <div class="holo"></div>
+                    <div class="cost">${card.cost}</div>
+                    <div class="title">${card.name}</div>
+                    <div class="desc">${card.desc}</div>
+                    <div class="card-footer">${footerText}</div>
+                `;
+                attachCardTiltEffects(cardEl);
+                cardEl.onclick = () => buyCard(card.id);
+                offerGrid.appendChild(cardEl);
+            });
+        }
+
+        function renderRemovalList() {
+            const removeGrid = document.getElementById('remove-grid');
+            removeGrid.innerHTML = '';
+            const entries = uniqueDeckEntries();
+            removeGrid.classList.toggle('dense', entries.length > 6);
+
+            if (!state.encounter.canRemove) {
+                document.getElementById('remove-copy').textContent = 'This visit already used the merchant cull.';
+            } else if (state.coins >= state.encounter.removalPrice) {
+                document.getElementById('remove-copy').textContent = 'Click a smaller card tile to purge one copy.';
+            } else {
+                document.getElementById('remove-copy').textContent = `You need ${state.encounter.removalPrice - state.coins} more coins to remove a card.`;
+            }
+
+            if (!entries.length) {
+                const empty = document.createElement('p');
+                empty.className = 'section-copy';
+                empty.textContent = 'Your deck is empty.';
+                removeGrid.appendChild(empty);
+                return;
+            }
+
+            entries.forEach(({ card, count }) => {
+                const canRemoveNow = state.encounter.canRemove && state.coins >= state.encounter.removalPrice;
+                const removeEl = document.createElement('button');
+                removeEl.type = 'button';
+                removeEl.className = `remove-card ${canRemoveNow ? '' : 'is-disabled'}`;
+                removeEl.innerHTML = `
+                    <div class="remove-name">${card.name}</div>
+                    <div class="remove-count">${count} ${count === 1 ? 'copy' : 'copies'}</div>
+                    <div class="remove-footer">${canRemoveNow ? `Remove ${state.encounter.removalPrice}` : !state.encounter.canRemove ? 'Used' : `Need ${state.encounter.removalPrice - state.coins}`}</div>
+                `;
+                removeEl.onclick = () => removeCard(card.id);
+                removeGrid.appendChild(removeEl);
+            });
+        }
+
+        function render() {
+            if (!state.valid) return;
+            document.getElementById('error-panel').style.display = 'none';
+            document.getElementById('merchant-info').style.display = '';
+            document.getElementById('layout').style.display = 'grid';
+            updateSummary();
+            renderOffers();
+            renderRemovalList();
+        }
+
+        function buyCard(cardId) {
+            if (!state.encounter.canBuy) {
+                setStatus('The merchant only sells one card per visit.', 'warning');
+                return;
+            }
+            if (state.coins < state.encounter.cardPrice) {
+                setStatus('Not enough coins for that purchase.', 'warning');
+                return;
+            }
+
+            const card = getCardById(cardId);
+            if (!card) return;
+            state.coins -= state.encounter.cardPrice;
+            state.deck.push(card);
+            state.encounter.canBuy = false;
+            state.encounter.boughtCardId = card.id;
+            persist('merchant');
+            setStatus(`Bought ${card.name}.`, 'success');
+            render();
+        }
+
+        function removeCard(cardId) {
+            if (!state.encounter.canRemove) {
+                setStatus('The merchant only removes one card per visit.', 'warning');
+                return;
+            }
+            if (state.coins < state.encounter.removalPrice) {
+                setStatus('Not enough coins to remove a card.', 'warning');
+                return;
+            }
+
+            const index = state.deck.findIndex((card) => card?.id === cardId);
+            if (index === -1) {
+                setStatus('That card is no longer in your deck.', 'warning');
+                return;
+            }
+
+            const [removed] = state.deck.splice(index, 1);
+            state.coins -= state.encounter.removalPrice;
+            state.encounter.canRemove = false;
+            state.encounter.removedCardId = removed.id;
+            persist('merchant');
+            setStatus(`Removed ${removed.name}.`, 'success');
+            render();
+        }
+
+        function leaveMerchant() {
+            if (state.valid) persist('menu');
+            window.location.href = state.route;
+        }
+
+        document.getElementById('leave-btn').onclick = leaveMerchant;
+        document.getElementById('menu-btn').onclick = () => {
+            window.location.href = 'main_screen.html';
+        };
+        document.getElementById('error-menu-btn').onclick = () => {
+            window.location.href = 'main_screen.html';
+        };
+
+        initState();
+        if (state.valid) {
+            setStatus('The merchant is ready to trade.');
+            render();
+        }
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('merchant-canvas'),
+            antialias: true
+        });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.18;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xb9f2cb);
+        scene.fog = new THREE.FogExp2(0xb9f2cb, 0.018);
+
+        const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 4.8, 8.7);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enablePan = false;
+        controls.enableDamping = true;
+        controls.enableZoom = true;
+        controls.autoRotate = false;
+        controls.minDistance = 7.2;
+        controls.maxDistance = 10.8;
+        controls.minPolarAngle = 0.9;
+        controls.maxPolarAngle = 1.45;
+        controls.target.set(0, 2.7, 0);
+
+        scene.add(new THREE.AmbientLight(0xe5fff1, 1.2));
+        scene.add(new THREE.HemisphereLight(0xc8ffe8, 0x6ca78c, 2.0));
+
+        const sun = new THREE.DirectionalLight(0xfff1cb, 2.2);
+        sun.position.set(6.5, 9.5, 4);
+        sun.castShadow = true;
+        sun.shadow.mapSize.set(1024, 1024);
+        sun.shadow.camera.left = -8;
+        sun.shadow.camera.right = 8;
+        sun.shadow.camera.top = 8;
+        sun.shadow.camera.bottom = -8;
+        scene.add(sun);
+
+        const fill = new THREE.PointLight(0x94ffdb, 1.35, 30, 2);
+        fill.position.set(-5.5, 4.8, 2.5);
+        scene.add(fill);
+
+        const rim = new THREE.PointLight(0x7ed3be, 1.0, 24, 2);
+        rim.position.set(0, 4, -5.5);
+        scene.add(rim);
+
+        const ground = new THREE.Mesh(
+            new THREE.CircleGeometry(24, 96),
+            new THREE.MeshStandardMaterial({ color: 0x7bc37d, roughness: 0.98, metalness: 0.02 })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        const glade = new THREE.Mesh(
+            new THREE.CircleGeometry(6.6, 72),
+            new THREE.MeshStandardMaterial({ color: 0x9ed279, roughness: 0.95, metalness: 0.02 })
+        );
+        glade.rotation.x = -Math.PI / 2;
+        glade.position.y = 0.01;
+        scene.add(glade);
+
+        const dais = new THREE.Mesh(
+            new THREE.CylinderGeometry(2.7, 3.25, 0.72, 56),
+            new THREE.MeshStandardMaterial({ color: 0x6d4c35, roughness: 0.84, metalness: 0.06 })
+        );
+        dais.position.y = 0.36;
+        dais.castShadow = true;
+        dais.receiveShadow = true;
+        scene.add(dais);
+
+        const ringBase = new THREE.Mesh(
+            new THREE.TorusGeometry(2.42, 0.13, 18, 72),
+            new THREE.MeshStandardMaterial({
+                color: 0xb9ffd8,
+                emissive: 0x5be1aa,
+                emissiveIntensity: 0.55,
+                roughness: 0.25,
+                metalness: 0.2
+            })
+        );
+        ringBase.rotation.x = Math.PI / 2;
+        ringBase.position.y = 0.78;
+        scene.add(ringBase);
+
+        const halo = new THREE.Mesh(
+            new THREE.CircleGeometry(2.9, 48),
+            new THREE.MeshBasicMaterial({
+                color: 0xd4fff0,
+                transparent: true,
+                opacity: 0.22
+            })
+        );
+        halo.position.set(0, 3.15, -1.9);
+        scene.add(halo);
+
+        function createTree(x, z, scale = 1) {
+            const tree = new THREE.Group();
+
+            const trunk = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.13 * scale, 0.18 * scale, 2.5 * scale, 10),
+                new THREE.MeshStandardMaterial({ color: 0x7a6946, roughness: 0.88 })
+            );
+            trunk.position.y = 1.25 * scale;
+            trunk.castShadow = true;
+            tree.add(trunk);
+
+            const crown = new THREE.Mesh(
+                new THREE.ConeGeometry(0.95 * scale, 1.8 * scale, 8),
+                new THREE.MeshStandardMaterial({ color: 0x2f8b5b, roughness: 0.8 })
+            );
+            crown.position.y = 2.45 * scale;
+            crown.castShadow = true;
+            tree.add(crown);
+
+            tree.position.set(x, 0, z);
+            scene.add(tree);
+        }
+
+        [
+            [-5.6, -1.4, 1.15],
+            [-4.8, 2.9, 0.92],
+            [5.7, -0.6, 1.08],
+            [4.9, 2.7, 0.96],
+            [-7.0, 1.2, 1.28],
+            [7.0, 1.1, 1.28],
+            [-6.4, -3.0, 1.0],
+            [6.2, -3.1, 0.98]
+        ].forEach(([x, z, scale]) => createTree(x, z, scale));
+
+        function addLantern(x, z) {
+            const group = new THREE.Group();
+            const pole = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.05, 0.05, 2.3, 10),
+                new THREE.MeshStandardMaterial({ color: 0x7b6342, roughness: 0.86 })
+            );
+            pole.position.y = 1.15;
+            group.add(pole);
+
+            const lantern = new THREE.Mesh(
+                new THREE.BoxGeometry(0.34, 0.46, 0.34),
+                new THREE.MeshStandardMaterial({
+                    color: 0xf9d58f,
+                    emissive: 0xffbc57,
+                    emissiveIntensity: 1.0,
+                    roughness: 0.26
+                })
+            );
+            lantern.position.y = 2.02;
+            group.add(lantern);
+
+            const glow = new THREE.PointLight(0xffcf78, 1.15, 7, 2);
+            glow.position.y = 2.02;
+            group.add(glow);
+
+            group.position.set(x, 0, z);
+            scene.add(group);
+            return group;
+        }
+
+        const lanterns = [
+            addLantern(-3.8, 2.3),
+            addLantern(3.8, 2.3),
+            addLantern(-3.9, -1.9),
+            addLantern(3.9, -1.9)
+        ];
+
+        function addCoinPile(x, z, count) {
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0xf3c058,
+                emissive: 0xaa6718,
+                emissiveIntensity: 0.16,
+                roughness: 0.34,
+                metalness: 0.84
+            });
+            for (let i = 0; i < count; i++) {
+                const coin = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.035, 18), mat);
+                coin.position.set(
+                    x + (Math.random() - 0.5) * 0.72,
+                    0.82 + Math.random() * 0.1,
+                    z + (Math.random() - 0.5) * 0.72
+                );
+                coin.rotation.x = Math.PI / 2;
+                coin.rotation.z = Math.random() * Math.PI;
+                scene.add(coin);
+            }
+        }
+
+        addCoinPile(-1.8, 1.3, 14);
+        addCoinPile(1.8, 1.25, 14);
+        addCoinPile(0.2, -1.5, 18);
+
+        function createMerchant() {
+            const root = new THREE.Group();
+            root.position.y = 0.78;
+            root.scale.setScalar(1.12);
+
+            const robeMat = new THREE.MeshStandardMaterial({ color: 0x3a7d68, roughness: 0.72, metalness: 0.04 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0xe0c37e, roughness: 0.38, metalness: 0.26 });
+            const skinMat = new THREE.MeshStandardMaterial({ color: 0xe4d7c1, roughness: 0.82, metalness: 0.02 });
+            const hatMat = new THREE.MeshStandardMaterial({ color: 0xb56f45, roughness: 0.62, metalness: 0.04 });
+            const eyeMat = new THREE.MeshStandardMaterial({ color: 0x131313, roughness: 0.28 });
+
+            const body = new THREE.Mesh(new THREE.ConeGeometry(1.45, 3.0, 22), robeMat);
+            body.position.y = 1.45;
+            body.castShadow = true;
+            root.add(body);
+
+            const trimRing = new THREE.Mesh(new THREE.TorusGeometry(1.02, 0.1, 10, 36), trimMat);
+            trimRing.position.set(0, 0.32, 0);
+            trimRing.rotation.x = Math.PI / 2;
+            trimRing.castShadow = true;
+            root.add(trimRing);
+
+            const shoulders = new THREE.Mesh(
+                new THREE.SphereGeometry(1.12, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2.5),
+                robeMat
+            );
+            shoulders.position.set(0, 2.35, 0);
+            shoulders.scale.y = 0.58;
+            shoulders.castShadow = true;
+            root.add(shoulders);
+
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.8, 26, 22), skinMat);
+            head.position.set(0, 3.0, 0);
+            head.castShadow = true;
+            root.add(head);
+
+            const hat = new THREE.Mesh(
+                new THREE.SphereGeometry(1.35, 26, 18, 0, Math.PI * 2, 0, Math.PI / 2.05),
+                hatMat
+            );
+            hat.position.set(0, 3.46, 0.04);
+            hat.scale.set(1.0, 0.8, 1.0);
+            hat.castShadow = true;
+            root.add(hat);
+
+            const hatRim = new THREE.Mesh(new THREE.TorusGeometry(1.02, 0.12, 12, 34), trimMat);
+            hatRim.position.set(0, 3.08, 0.02);
+            hatRim.rotation.x = Math.PI / 2;
+            root.add(hatRim);
+
+            [-0.25, 0.25].forEach((x) => {
+                const eye = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 12), eyeMat);
+                eye.position.set(x, 3.06, 0.68);
+                root.add(eye);
+            });
+
+            const nose = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 10), skinMat);
+            nose.position.set(0, 2.95, 0.76);
+            root.add(nose);
+
+            const beard = new THREE.Mesh(
+                new THREE.ConeGeometry(0.38, 0.72, 12),
+                new THREE.MeshStandardMaterial({ color: 0xe8f4ec, roughness: 0.8 })
+            );
+            beard.position.set(0, 2.56, 0.55);
+            beard.rotation.x = Math.PI;
+            root.add(beard);
+
+            const leftAnchor = new THREE.Group();
+            leftAnchor.position.set(-1.02, 2.18, 0.08);
+            root.add(leftAnchor);
+
+            const rightAnchor = new THREE.Group();
+            rightAnchor.position.set(1.02, 2.18, 0.08);
+            root.add(rightAnchor);
+
+            const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.16, 1.02, 6, 12), robeMat);
+            leftArm.rotation.z = Math.PI / 3.7;
+            leftArm.position.set(-0.32, -0.26, 0.05);
+            leftArm.castShadow = true;
+            leftAnchor.add(leftArm);
+
+            const rightArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.16, 1.02, 6, 12), robeMat);
+            rightArm.rotation.z = -Math.PI / 3.5;
+            rightArm.position.set(0.32, -0.26, 0.05);
+            rightArm.castShadow = true;
+            rightAnchor.add(rightArm);
+
+            const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 10), skinMat);
+            leftHand.position.set(-0.72, -0.72, 0.12);
+            leftAnchor.add(leftHand);
+
+            const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 10), skinMat);
+            rightHand.position.set(0.7, -0.72, 0.12);
+            rightAnchor.add(rightHand);
+
+            const satchel = new THREE.Mesh(
+                new THREE.BoxGeometry(0.7, 0.88, 0.44),
+                new THREE.MeshStandardMaterial({ color: 0x7a5534, roughness: 0.74, metalness: 0.04 })
+            );
+            satchel.position.set(0.82, 1.56, -0.74);
+            satchel.rotation.z = 0.22;
+            satchel.castShadow = true;
+            root.add(satchel);
+
+            const strap = new THREE.Mesh(
+                new THREE.TorusGeometry(1.05, 0.04, 10, 40, Math.PI * 1.08),
+                new THREE.MeshStandardMaterial({ color: 0xe2d2a3, roughness: 0.5, metalness: 0.1 })
+            );
+            strap.position.set(0.08, 2.08, -0.12);
+            strap.rotation.z = Math.PI / 3.3;
+            strap.rotation.y = Math.PI / 2;
+            root.add(strap);
+
+            const staff = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.07, 0.1, 3.2, 14),
+                new THREE.MeshStandardMaterial({ color: 0x8e6c4e, roughness: 0.84 })
+            );
+            staff.position.set(-1.18, 1.95, -0.24);
+            staff.rotation.z = Math.PI / 22;
+            staff.castShadow = true;
+            root.add(staff);
+
+            const ring = new THREE.Mesh(
+                new THREE.TorusGeometry(0.28, 0.05, 10, 24),
+                new THREE.MeshStandardMaterial({
+                    color: 0xa4ffe6,
+                    emissive: 0x51e8b8,
+                    emissiveIntensity: 1.15,
+                    roughness: 0.18,
+                    metalness: 0.36
+                })
+            );
+            ring.position.set(-1.25, 3.38, -0.22);
+            ring.rotation.y = Math.PI / 2;
+            root.add(ring);
+
+            root.userData = { leftAnchor, rightAnchor, hat, ring };
+            return root;
+        }
+
+        const merchant = createMerchant();
+        scene.add(merchant);
+
+        const fireflies = [];
+        const fireflyMat = new THREE.MeshBasicMaterial({ color: 0xc5fff0 });
+        for (let i = 0; i < 18; i++) {
+            const orb = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), fireflyMat);
+            orb.position.set((Math.random() - 0.5) * 9, 1.2 + Math.random() * 3.6, (Math.random() - 0.5) * 8);
+            orb.userData = {
+                base: orb.position.clone(),
+                speed: 0.45 + Math.random() * 0.7,
+                radius: 0.08 + Math.random() * 0.18
+            };
+            scene.add(orb);
+            fireflies.push(orb);
+        }
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+
+            merchant.position.y = 0.78 + Math.sin(t * 1.18) * 0.04;
+            merchant.rotation.y = Math.sin(t * 0.32) * 0.08;
+            merchant.userData.leftAnchor.rotation.z = Math.sin(t * 1.8) * 0.14;
+            merchant.userData.rightAnchor.rotation.z = Math.sin(t * 1.8 + 0.8) * -0.14;
+            merchant.userData.hat.rotation.z = Math.sin(t * 0.72) * 0.04;
+            merchant.userData.ring.rotation.z = t * 0.8;
+
+            ringBase.rotation.z = t * 0.18;
+            halo.material.opacity = 0.17 + Math.sin(t * 1.2) * 0.04;
+
+            lanterns.forEach((lantern, index) => {
+                lantern.rotation.z = Math.sin(t * 1.1 + index) * 0.03;
+            });
+
+            fireflies.forEach((orb, index) => {
+                const { base, speed, radius } = orb.userData;
+                orb.position.x = base.x + Math.cos(t * speed + index) * radius;
+                orb.position.y = base.y + Math.sin(t * speed * 1.2 + index) * radius * 1.8;
+                orb.position.z = base.z + Math.sin(t * speed + index * 0.7) * radius;
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
