@@ -1439,6 +1439,443 @@
                 grid-template-columns: 1fr;
             }
         }
+        body.elite-encounter {
+            background:
+                radial-gradient(circle at 20% 18%, rgba(48, 83, 107, 0.48), transparent 34%),
+                radial-gradient(circle at 78% 10%, rgba(121, 95, 56, 0.28), transparent 28%),
+                linear-gradient(180deg, #081019 0%, #101926 52%, #0b1118 100%);
+            color: #f4e7cc;
+            font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        }
+        body.elite-encounter #combat-screen {
+            justify-content: flex-start;
+            gap: 0;
+            padding: calc(var(--safe-top) + 28px) var(--safe-right) calc(var(--safe-bottom) + 136px) var(--safe-left);
+        }
+        body.elite-encounter #combat-hud {
+            width: min(1120px, 100%);
+            margin-top: 56px;
+            align-items: stretch;
+        }
+        body.elite-encounter .entity-stats {
+            background:
+                linear-gradient(140deg, rgba(20, 21, 24, 0.82), rgba(49, 34, 24, 0.58)),
+                radial-gradient(circle at top left, rgba(189, 158, 106, 0.16), transparent 56%);
+            border: 1px solid rgba(217, 185, 131, 0.34);
+            border-radius: 26px;
+            box-shadow:
+                0 22px 46px rgba(0, 0, 0, 0.34),
+                inset 0 1px 0 rgba(255, 239, 210, 0.08);
+            backdrop-filter: blur(14px);
+        }
+        body.elite-encounter .entity-stats h3 {
+            color: #f5e7c6;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        body.elite-encounter .hp-bar {
+            background: rgba(36, 27, 24, 0.92);
+            border: 1px solid rgba(218, 181, 131, 0.2);
+        }
+        body.elite-encounter .hp-fill {
+            background: linear-gradient(90deg, #ab2f26, #f2764d 72%, #ffd08e);
+        }
+        body.elite-encounter #enemy-hp-fill {
+            background: linear-gradient(90deg, #151515, #313131 58%, #868686);
+        }
+        body.elite-encounter .intent {
+            color: #f0d9a2;
+            background: rgba(25, 18, 16, 0.72);
+            border: 1px solid rgba(217, 185, 131, 0.14);
+        }
+        body.elite-encounter #elite-battle-banner {
+            display: inline-flex;
+        }
+        #elite-battle-banner {
+            position: absolute;
+            top: calc(var(--safe-top) + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 28;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 24px;
+            border-radius: 999px;
+            pointer-events: none;
+            background:
+                linear-gradient(135deg, rgba(20, 21, 26, 0.92), rgba(59, 38, 22, 0.82)),
+                radial-gradient(circle at top, rgba(234, 199, 144, 0.16), transparent 62%);
+            border: 1px solid rgba(219, 188, 138, 0.34);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.34);
+            color: #f4e7cc;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+        body.elite-encounter #hand-wrap {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            overflow: visible;
+            pointer-events: none;
+            --elite-center-x: 50vw;
+            --elite-center-y: 70vh;
+            --elite-burst-width: 620px;
+            --elite-burst-height: 420px;
+            --elite-endturn-x: 0px;
+            --elite-endturn-y: 248px;
+            --elite-endturn-rot: -8deg;
+        }
+        body.elite-encounter #hand-wrap::before {
+            content: "";
+            position: absolute;
+            left: calc(var(--elite-center-x) - min(28vw, 360px));
+            top: calc(var(--elite-center-y) - min(8vh, 112px));
+            width: min(66vw, 960px);
+            height: 190px;
+            transform: translate(-50%, -50%) rotate(-16deg);
+            background:
+                linear-gradient(104deg, transparent 0 7%, rgba(255, 245, 224, 0.16) 7% 8.2%, transparent 8.2% 100%),
+                linear-gradient(110deg,
+                    rgba(0, 0, 0, 0) 0 11%,
+                    rgba(9, 10, 15, 0.88) 11% 36%,
+                    rgba(155, 30, 39, 0.78) 36% 53%,
+                    rgba(255, 214, 159, 0.2) 53% 56%,
+                    rgba(0, 0, 0, 0) 56% 100%);
+            clip-path: polygon(0 68%, 8% 28%, 35% 0, 100% 8%, 84% 84%, 23% 100%);
+            opacity: 0.94;
+            filter: blur(0.3px) drop-shadow(0 24px 42px rgba(0, 0, 0, 0.42));
+            pointer-events: none;
+        }
+        body.elite-encounter #hand-wrap::after {
+            content: "";
+            position: absolute;
+            left: calc(var(--elite-center-x) + min(23vw, 290px));
+            top: calc(var(--elite-center-y) - min(10vh, 136px));
+            width: min(42vw, 540px);
+            height: 136px;
+            transform: translate(-50%, -50%) rotate(14deg);
+            background:
+                linear-gradient(90deg, transparent 0 14%, rgba(255, 247, 233, 0.15) 14% 15.2%, transparent 15.2% 100%),
+                linear-gradient(120deg, rgba(49, 175, 196, 0.34), rgba(255, 208, 147, 0.14) 55%, rgba(0, 0, 0, 0) 90%);
+            clip-path: polygon(6% 78%, 18% 22%, 100% 0, 88% 68%, 34% 100%, 0 100%);
+            opacity: 0.76;
+            filter: blur(0.2px) drop-shadow(0 12px 28px rgba(80, 201, 219, 0.18));
+            pointer-events: none;
+        }
+        body.elite-encounter #hand {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            display: block;
+            pointer-events: none;
+        }
+        body.elite-encounter #hand::before {
+            content: "";
+            position: absolute;
+            left: var(--elite-center-x);
+            top: var(--elite-center-y);
+            width: var(--elite-burst-width);
+            height: var(--elite-burst-height);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at center, rgba(255, 228, 178, 0.3) 0, rgba(255, 228, 178, 0.18) 18%, rgba(31, 19, 17, 0) 58%),
+                conic-gradient(from 190deg,
+                    transparent 0deg 10deg,
+                    rgba(255, 201, 124, 0.58) 10deg 12.5deg,
+                    transparent 12.5deg 24deg,
+                    rgba(218, 47, 71, 0.42) 24deg 26deg,
+                    transparent 26deg 38deg,
+                    rgba(255, 237, 199, 0.3) 38deg 39.5deg,
+                    transparent 39.5deg 52deg,
+                    rgba(86, 192, 207, 0.34) 52deg 54deg,
+                    transparent 54deg 68deg,
+                    rgba(255, 169, 114, 0.32) 68deg 70deg,
+                    transparent 70deg 84deg,
+                    rgba(255, 214, 148, 0.22) 84deg 85deg,
+                    transparent 85deg 360deg);
+            mask: radial-gradient(ellipse at center, transparent 0 20%, rgba(0, 0, 0, 0.92) 29% 67%, transparent 77%);
+            opacity: 0.97;
+            filter: blur(0.35px) drop-shadow(0 0 28px rgba(255, 205, 144, 0.22));
+            pointer-events: none;
+        }
+        body.elite-encounter #hand::after {
+            content: "";
+            position: absolute;
+            left: var(--elite-center-x);
+            top: var(--elite-center-y);
+            width: calc(var(--elite-burst-width) * 0.92);
+            height: calc(var(--elite-burst-height) * 0.88);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at center, rgba(255, 244, 229, 0.2), rgba(255, 244, 229, 0) 46%),
+                repeating-conic-gradient(from 192deg,
+                    rgba(255, 236, 205, 0.46) 0deg 1.4deg,
+                    transparent 1.4deg 11deg,
+                    rgba(95, 204, 219, 0.28) 11deg 11.8deg,
+                    transparent 11.8deg 19deg);
+            mask: radial-gradient(circle at center, transparent 0 43%, rgba(0, 0, 0, 0.82) 49% 58%, transparent 69%);
+            opacity: 0.64;
+            filter: blur(0.6px);
+            pointer-events: none;
+        }
+        body.elite-encounter .elite-command {
+            position: absolute;
+            left: var(--elite-center-x);
+            top: var(--elite-center-y);
+            width: clamp(214px, 18vw, 286px);
+            min-height: 64px;
+            padding: 0 26px 0 76px;
+            display: flex;
+            align-items: center;
+            border: none;
+            background: none;
+            color: #fff4d8;
+            cursor: pointer;
+            pointer-events: auto;
+            isolation: isolate;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+            clip-path: polygon(0 66%, 8% 14%, 72% 0, 100% 36%, 93% 100%, 12% 86%);
+            font-family: "Arial Black", "Trebuchet MS", Arial, sans-serif;
+            text-align: left;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.52);
+            transform: translate(-50%, -50%) translate(var(--elite-command-x, -220px), var(--elite-command-y, -120px)) rotate(var(--elite-command-rot, 0deg));
+            transform-origin: center center;
+            transition: transform 0.18s ease, filter 0.2s ease, opacity 0.2s ease;
+            filter:
+                drop-shadow(0 20px 34px rgba(0, 0, 0, 0.42))
+                drop-shadow(0 0 24px var(--elite-glow, rgba(255, 140, 95, 0.18)));
+        }
+        body.elite-encounter .elite-command::before,
+        body.elite-encounter #end-turn-btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            clip-path: polygon(0 66%, 8% 14%, 72% 0, 100% 36%, 93% 100%, 12% 86%);
+            background:
+                linear-gradient(90deg, rgba(8, 9, 13, 0.96) 0 10%, transparent 10% 11%, rgba(255, 248, 235, 0.18) 11% 12%, transparent 12% 100%),
+                linear-gradient(150deg, rgba(255, 255, 255, 0.14), transparent 28%),
+                linear-gradient(164deg, var(--elite-ink-a, rgba(173, 88, 62, 0.96)), var(--elite-ink-b, rgba(63, 46, 58, 0.92)) 58%, rgba(8, 9, 14, 0.98));
+            box-shadow:
+                0 20px 34px rgba(0, 0, 0, 0.36),
+                inset 0 1px 0 rgba(255, 243, 219, 0.18);
+            pointer-events: none;
+        }
+        body.elite-encounter .elite-command::after,
+        body.elite-encounter #end-turn-btn::after {
+            content: "";
+            position: absolute;
+            inset: 6px 18px 8px 16px;
+            z-index: -1;
+            clip-path: polygon(0 62%, 10% 18%, 76% 4%, 100% 34%, 92% 94%, 16% 82%);
+            background:
+                linear-gradient(105deg, transparent 0 16%, rgba(255, 245, 225, 0.42) 16% 18%, transparent 18% 100%),
+                repeating-linear-gradient(102deg, rgba(255, 255, 255, 0.08) 0 2px, transparent 2px 12px),
+                linear-gradient(90deg, rgba(255, 243, 222, 0.12), transparent 44%, rgba(20, 10, 6, 0.22));
+            opacity: 0.92;
+            pointer-events: none;
+        }
+        body.elite-encounter .elite-command:hover {
+            background: none;
+            box-shadow: none;
+            filter:
+                brightness(1.08)
+                saturate(1.1)
+                drop-shadow(0 24px 36px rgba(0, 0, 0, 0.48))
+                drop-shadow(0 0 26px var(--elite-glow, rgba(255, 140, 95, 0.24)));
+            transform: translate(-50%, -50%) translate(var(--elite-command-x, -220px), var(--elite-command-y, -120px)) rotate(var(--elite-command-rot, 0deg)) scale(1.04);
+        }
+        body.elite-encounter .elite-command:active {
+            background: none;
+            box-shadow: none;
+            transform: translate(-50%, -50%) translate(var(--elite-command-x, -220px), var(--elite-command-y, -120px)) rotate(var(--elite-command-rot, 0deg)) scale(0.99);
+        }
+        body.elite-encounter .elite-command .cost {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            width: 38px;
+            height: 38px;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 242, 218, 0.82);
+            background:
+                radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 34%),
+                linear-gradient(180deg, rgba(15, 17, 21, 0.96), rgba(7, 8, 12, 0.98));
+            color: #f7e8c4;
+            box-shadow:
+                0 0 0 4px rgba(255, 239, 211, 0.08),
+                0 0 18px var(--elite-glow, rgba(255, 140, 95, 0.16));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        body.elite-encounter .elite-command .title {
+            display: block;
+            position: relative;
+            margin: 0;
+            padding: 17px 0 15px;
+            color: #fff6df;
+            font-size: 19px;
+            line-height: 1.2;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.42);
+        }
+        body.elite-encounter .elite-command .title::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 9px;
+            width: 34px;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(255, 248, 235, 0.9), transparent);
+            transform: rotate(-12deg);
+            opacity: 0.72;
+        }
+        body.elite-encounter .elite-command .title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 7px;
+            width: min(112px, 64%);
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255, 239, 209, 0.82), var(--elite-accent, rgba(255, 194, 124, 0.58)), transparent);
+            opacity: 0.92;
+        }
+        body.elite-encounter .elite-command.attack {
+            --elite-ink-a: rgba(204, 52, 62, 0.98);
+            --elite-ink-b: rgba(72, 10, 18, 0.96);
+            --elite-accent: rgba(255, 196, 122, 0.72);
+            --elite-glow: rgba(255, 92, 92, 0.24);
+        }
+        body.elite-encounter .elite-command.defend {
+            --elite-ink-a: rgba(27, 119, 143, 0.98);
+            --elite-ink-b: rgba(8, 34, 47, 0.96);
+            --elite-accent: rgba(122, 225, 233, 0.72);
+            --elite-glow: rgba(77, 210, 224, 0.24);
+        }
+        body.elite-encounter .elite-command.special {
+            --elite-ink-a: rgba(167, 117, 40, 0.98);
+            --elite-ink-b: rgba(60, 33, 10, 0.96);
+            --elite-accent: rgba(255, 219, 133, 0.74);
+            --elite-glow: rgba(255, 189, 84, 0.22);
+        }
+        body.elite-encounter .elite-command.is-unplayable {
+            opacity: 0.48;
+            filter: saturate(0.34) grayscale(0.18);
+        }
+        body.elite-encounter .elite-command.is-unplayable:hover {
+            filter: saturate(0.34) grayscale(0.18);
+            transform: translate(-50%, -50%) translate(var(--elite-command-x, -220px), var(--elite-command-y, -120px)) rotate(var(--elite-command-rot, 0deg));
+        }
+        body.elite-encounter #end-turn-btn {
+            position: absolute;
+            left: var(--elite-center-x, 50vw);
+            top: var(--elite-center-y, 70vh);
+            right: auto;
+            bottom: auto;
+            z-index: 26;
+            min-width: 236px;
+            min-height: 58px;
+            padding: 0 34px 0 38px;
+            border: none;
+            background: none;
+            color: #fff1d7;
+            clip-path: polygon(0 64%, 10% 10%, 78% 0, 100% 38%, 91% 100%, 12% 88%);
+            font-family: "Arial Black", "Trebuchet MS", Arial, sans-serif;
+            font-size: 15px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            box-shadow: none;
+            isolation: isolate;
+            margin: 0;
+            border-radius: 0;
+            transform: translate(-50%, -50%) translate(var(--elite-endturn-x, 0px), var(--elite-endturn-y, 248px)) rotate(var(--elite-endturn-rot, -8deg));
+            transform-origin: center center;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.58);
+            filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.46));
+            pointer-events: auto;
+        }
+        body.elite-encounter #end-turn-btn:hover {
+            background: none;
+            transform: translate(-50%, -50%) translate(var(--elite-endturn-x, 0px), var(--elite-endturn-y, 248px)) rotate(var(--elite-endturn-rot, -8deg)) scale(1.04);
+            box-shadow: none;
+        }
+        body.elite-encounter #end-turn-btn:active {
+            background: none;
+            transform: translate(-50%, -50%) translate(var(--elite-endturn-x, 0px), var(--elite-endturn-y, 248px)) rotate(var(--elite-endturn-rot, -8deg)) scale(0.99);
+            box-shadow: none;
+        }
+        body.elite-encounter #end-turn-btn:disabled {
+            background: none;
+            color: rgba(247, 231, 194, 0.48);
+            transform: translate(-50%, -50%) translate(var(--elite-endturn-x, 0px), var(--elite-endturn-y, 248px)) rotate(var(--elite-endturn-rot, -8deg));
+            box-shadow: none;
+        }
+        body.elite-encounter #end-turn-btn::before {
+            --elite-ink-a: rgba(206, 47, 60, 0.98);
+            --elite-ink-b: rgba(54, 12, 18, 0.98);
+        }
+        body.elite-encounter .damage-number {
+            font-size: 34px;
+            text-shadow: 0 3px 18px rgba(0, 0, 0, 0.62);
+        }
+        @media (max-width: 900px) {
+            body.elite-encounter #combat-hud {
+                margin-top: 64px;
+            }
+            body.elite-encounter #hand-wrap {
+                --elite-burst-width: 450px;
+                --elite-burst-height: 320px;
+            }
+            body.elite-encounter #hand-wrap::before {
+                width: min(78vw, 620px);
+                height: 152px;
+            }
+            body.elite-encounter #hand-wrap::after {
+                width: min(56vw, 360px);
+                height: 108px;
+            }
+            body.elite-encounter .elite-command {
+                width: min(248px, 60vw);
+                min-height: 54px;
+                padding-left: 64px;
+            }
+            body.elite-encounter .elite-command .cost {
+                width: 32px;
+                height: 32px;
+                left: 18px;
+                font-size: 12px;
+            }
+            body.elite-encounter .elite-command .title {
+                font-size: 15px;
+            }
+            body.elite-encounter #end-turn-btn {
+                min-width: 188px;
+                min-height: 50px;
+                font-size: 13px;
+            }
+            body.elite-encounter #end-turn-btn:hover,
+            body.elite-encounter #end-turn-btn:active,
+            body.elite-encounter #end-turn-btn:disabled {
+                transform: translate(-50%, -50%) translate(var(--elite-endturn-x, 0px), var(--elite-endturn-y, 224px)) rotate(var(--elite-endturn-rot, -8deg));
+            }
+        }
     </style>
 </head>
 <body>
@@ -1508,6 +1945,7 @@
 
         <!-- COMBAT SCREEN -->
         <div id="combat-screen" class="screen" style="display: none;">
+            <div id="elite-battle-banner">Elite Encounter</div>
             <div id="combat-hud">
                 <div class="entity-stats player-hud">
                     <h3>Your Creature <span id="player-gen-text"></span></h3>
@@ -1583,6 +2021,7 @@
 
     <script src="cards.js"></script>
     <script src="run_state.js"></script>
+    <script src="ost.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
     <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -1669,6 +2108,7 @@ const MUTATION_DATA = {
 const pageParams = new URLSearchParams(window.location.search);
 const isLlmMode = pageParams.get('mode') === 'llm';
 const isMultiplayerMode = pageParams.get('mode') === 'multiplayer';
+const isElitePreviewMode = pageParams.get('scene') === 'elite' && pageParams.get('preview') === '1';
 const hasLocalLlmSupport = typeof navigator !== 'undefined' && !!navigator.gpu;
 const hasPeerJsSupport = typeof window !== 'undefined' && typeof window.Peer === 'function';
 const RUN_MODE_STANDARD = 'play';
@@ -1676,9 +2116,13 @@ const RUN_MODE_LLM = 'llm';
 const COIN_REWARD_MIN = 50;
 const COIN_REWARD_MAX = 150;
 const MERCHANT_ENCOUNTER_CHANCE = 0.1;
+const ELITE_ENCOUNTER_CHANCE = 0.1;
 const MERCHANT_CARD_PRICE = 450;
 const MERCHANT_REMOVE_PRICE = 150;
 const MERCHANT_SCENE_PATH = 'merchant_scene.html';
+const ELITE_SCENE_PATH = 'elite_scene.html';
+const ELITE_SCENE_KEY = 'elite';
+const ELITE_HP_MULTIPLIER = 1.3;
 const MULTIPLAYER_STARTING_HP = 24;
 const DEFAULT_LLM_PERSONALITY_ID = 'friendly';
 const LLM_MODEL_PATTERNS = [
@@ -1983,6 +2427,283 @@ function makeParticleTexture() {
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
+}
+
+const eliteShardTextureCache = new Map();
+const eliteShardGeometryCache = {};
+const eliteShardPlaneGeometryCache = {};
+let eliteBurstTextureCache = null;
+
+function getEliteShardPalette(type = 'special', isCommit = false) {
+    if (isCommit) {
+        return {
+            start: '#d92d43',
+            end: '#2a0810',
+            accent: '#ffe6bb',
+            face: 0x86152a,
+            edge: 0x18060a,
+            glow: 0xff6e7f
+        };
+    }
+
+    if (type === 'attack') {
+        return {
+            start: '#d13b4e',
+            end: '#3d0610',
+            accent: '#ffd59a',
+            face: 0x8a1830,
+            edge: 0x17060b,
+            glow: 0xff7d85
+        };
+    }
+
+    if (type === 'defend') {
+        return {
+            start: '#1b8fb2',
+            end: '#082736',
+            accent: '#d9fbff',
+            face: 0x116883,
+            edge: 0x07121c,
+            glow: 0x66e6ff
+        };
+    }
+
+    return {
+        start: '#b97d22',
+        end: '#351c08',
+        accent: '#ffe3a8',
+        face: 0x8c5a18,
+        edge: 0x1c1107,
+        glow: 0xffc663
+    };
+}
+
+function traceEliteShardPath(ctx, width, height, inset = 0) {
+    const left = 44 + inset;
+    const right = width - 28 - inset;
+    const top = 22 + inset;
+    const bottom = height - 22 - inset;
+
+    ctx.beginPath();
+    ctx.moveTo(left, bottom * 0.74);
+    ctx.lineTo(left + width * 0.1, top + 10);
+    ctx.lineTo(right - width * 0.26, top);
+    ctx.lineTo(right, top + height * 0.34);
+    ctx.lineTo(right - width * 0.08, bottom);
+    ctx.lineTo(left + width * 0.16, bottom - height * 0.08);
+    ctx.closePath();
+}
+
+function getEliteShardLabelTexture({ label = '', cost = 0, type = 'special', disabled = false, isCommit = false } = {}) {
+    const cacheKey = `${isCommit ? 'commit' : 'card'}|${type}|${disabled ? 'disabled' : 'live'}|${cost}|${label}`;
+    if (eliteShardTextureCache.has(cacheKey)) {
+        return eliteShardTextureCache.get(cacheKey);
+    }
+
+    const width = 1024;
+    const height = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    const palette = getEliteShardPalette(type, isCommit);
+    const opacity = disabled ? 0.55 : 1;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.save();
+    ctx.globalAlpha = opacity;
+
+    traceEliteShardPath(ctx, width, height, 0);
+    ctx.fillStyle = 'rgba(10, 8, 10, 0.96)';
+    ctx.fill();
+
+    ctx.save();
+    traceEliteShardPath(ctx, width, height, 12);
+    ctx.clip();
+
+    const fillGradient = ctx.createLinearGradient(0, 0, width, height * 0.2);
+    fillGradient.addColorStop(0, palette.start);
+    fillGradient.addColorStop(0.58, palette.end);
+    fillGradient.addColorStop(1, '#07080b');
+    ctx.fillStyle = fillGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    const slashGradient = ctx.createLinearGradient(0, 0, width, 0);
+    slashGradient.addColorStop(0, 'rgba(255,255,255,0)');
+    slashGradient.addColorStop(0.15, 'rgba(255,248,236,0.1)');
+    slashGradient.addColorStop(0.18, 'rgba(255,248,236,0)');
+    slashGradient.addColorStop(0.54, 'rgba(255,248,236,0)');
+    slashGradient.addColorStop(0.58, 'rgba(255,248,236,0.22)');
+    slashGradient.addColorStop(0.62, 'rgba(255,248,236,0)');
+    slashGradient.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = slashGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 17; i++) {
+        const x = 300 + i * 34;
+        ctx.beginPath();
+        ctx.moveTo(x, 48);
+        ctx.lineTo(x - 22, 205);
+        ctx.stroke();
+    }
+
+    const flare = ctx.createLinearGradient(0, 0, 0, height);
+    flare.addColorStop(0, 'rgba(255,255,255,0.3)');
+    flare.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = flare;
+    ctx.fillRect(78, 24, 48, height - 52);
+
+    ctx.restore();
+
+    ctx.strokeStyle = 'rgba(255,242,220,0.22)';
+    ctx.lineWidth = 6;
+    traceEliteShardPath(ctx, width, height, 10);
+    ctx.stroke();
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255,238,214,0.44)';
+    ctx.beginPath();
+    ctx.moveTo(188, 196);
+    ctx.lineTo(640, 160);
+    ctx.stroke();
+
+    if (!isCommit) {
+        const orbX = 132;
+        const orbY = 128;
+        const orbGradient = ctx.createRadialGradient(orbX - 12, orbY - 14, 4, orbX, orbY, 64);
+        orbGradient.addColorStop(0, 'rgba(255,255,255,0.95)');
+        orbGradient.addColorStop(0.22, 'rgba(255,255,255,0.26)');
+        orbGradient.addColorStop(1, 'rgba(9,10,14,1)');
+        ctx.fillStyle = orbGradient;
+        ctx.beginPath();
+        ctx.arc(orbX, orbY, 56, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = 'rgba(255,245,230,0.75)';
+        ctx.beginPath();
+        ctx.arc(orbX, orbY, 54, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff3d4';
+        ctx.font = '900 74px Arial Black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(cost), orbX, orbY + 4);
+    }
+
+    ctx.fillStyle = palette.accent;
+    ctx.font = isCommit ? '900 58px Arial Black' : '900 66px Arial Black';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.42)';
+    ctx.shadowBlur = 12;
+    ctx.fillText(String(label).toUpperCase(), isCommit ? 174 : 228, 122);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(255,250,238,0.9)';
+    ctx.fillRect(isCommit ? 164 : 214, 168, isCommit ? 160 : 210, 4);
+
+    ctx.restore();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    eliteShardTextureCache.set(cacheKey, texture);
+    return texture;
+}
+
+function getEliteBurstTexture() {
+    if (eliteBurstTextureCache) return eliteBurstTextureCache;
+
+    const size = 768;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const center = size * 0.5;
+
+    ctx.clearRect(0, 0, size, size);
+    ctx.translate(center, center);
+
+    for (let i = 0; i < 34; i++) {
+        ctx.save();
+        ctx.rotate((Math.PI * 2 * i) / 34 + (i % 3) * 0.04);
+        const rayLength = 180 + (i % 5) * 26;
+        const rayWidth = 5 + (i % 4) * 3;
+        const rayGradient = ctx.createLinearGradient(0, 0, rayLength, 0);
+        rayGradient.addColorStop(0, 'rgba(255,236,204,0.42)');
+        rayGradient.addColorStop(0.34, i % 2 === 0 ? 'rgba(255,108,127,0.2)' : 'rgba(92,214,255,0.18)');
+        rayGradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = rayGradient;
+        ctx.beginPath();
+        ctx.moveTo(10, -rayWidth * 0.42);
+        ctx.lineTo(rayLength, 0);
+        ctx.lineTo(10, rayWidth * 0.42);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    const coreGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, 180);
+    coreGlow.addColorStop(0, 'rgba(255,231,194,0.38)');
+    coreGlow.addColorStop(0.42, 'rgba(255,231,194,0.14)');
+    coreGlow.addColorStop(1, 'rgba(255,231,194,0)');
+    ctx.fillStyle = coreGlow;
+    ctx.beginPath();
+    ctx.arc(0, 0, 180, 0, Math.PI * 2);
+    ctx.fill();
+
+    eliteBurstTextureCache = new THREE.CanvasTexture(canvas);
+    eliteBurstTextureCache.colorSpace = THREE.SRGBColorSpace;
+    return eliteBurstTextureCache;
+}
+
+function getEliteShardGeometry(kind = 'card') {
+    if (eliteShardGeometryCache[kind]) return eliteShardGeometryCache[kind];
+
+    const width = kind === 'commit' ? 2.5 : 3.25;
+    const height = kind === 'commit' ? 0.74 : 0.88;
+    const shape = new THREE.Shape();
+    shape.moveTo(-width * 0.56, -height * 0.04);
+    shape.lineTo(-width * 0.44, height * 0.42);
+    shape.lineTo(width * 0.2, height * 0.46);
+    shape.lineTo(width * 0.56, height * 0.14);
+    shape.lineTo(width * 0.44, -height * 0.34);
+    shape.lineTo(-width * 0.36, -height * 0.45);
+    shape.lineTo(-width * 0.6, -height * 0.14);
+    shape.closePath();
+
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+        depth: kind === 'commit' ? 0.14 : 0.18,
+        bevelEnabled: true,
+        bevelSize: 0.045,
+        bevelThickness: 0.035,
+        bevelSegments: 2,
+        curveSegments: 10,
+        steps: 1
+    });
+    geometry.center();
+    eliteShardGeometryCache[kind] = geometry;
+    return geometry;
+}
+
+function getEliteShardPlaneGeometry(kind = 'card') {
+    if (eliteShardPlaneGeometryCache[kind]) return eliteShardPlaneGeometryCache[kind];
+
+    let geometry;
+    if (kind === 'burst') {
+        geometry = new THREE.PlaneGeometry(1, 1);
+    } else if (kind === 'commit') {
+        geometry = new THREE.PlaneGeometry(2.9, 0.86);
+    } else {
+        geometry = new THREE.PlaneGeometry(3.7, 1.06);
+    }
+
+    eliteShardPlaneGeometryCache[kind] = geometry;
+    return geometry;
 }
 
 let grassBladeTextureCache = null;
@@ -2443,9 +3164,51 @@ function loadDataTexture(path, repeatX, repeatY) {
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.maxPolarAngle = Math.PI / 2 + 0.1; 
-controls.minDistance = 2;
-controls.maxDistance = 1000;
+
+function applyDefaultCameraControls() {
+    controls.enabled = true;
+    controls.enableRotate = true;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.screenSpacePanning = false;
+    controls.rotateSpeed = 1;
+    controls.zoomSpeed = 1;
+    controls.panSpeed = 1;
+    controls.minPolarAngle = 0;
+    controls.maxPolarAngle = Math.PI / 2 + 0.1;
+    controls.minDistance = 2;
+    controls.maxDistance = 1000;
+}
+
+function applyEliteCameraControls() {
+    controls.enabled = true;
+    controls.enableRotate = true;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.screenSpacePanning = true;
+    controls.rotateSpeed = 0.92;
+    controls.zoomSpeed = 0.9;
+    controls.panSpeed = 0.95;
+    controls.minPolarAngle = 0.18;
+    controls.maxPolarAngle = Math.PI / 2 + 0.22;
+    controls.minDistance = 5.5;
+    controls.maxDistance = 32 + playerGeneration * 2;
+}
+
+applyDefaultCameraControls();
+
+const eliteActionRaycaster = new THREE.Raycaster();
+const eliteActionPointer = new THREE.Vector2(2, 2);
+const eliteActionAnchorWorld = new THREE.Vector3();
+const eliteActionCameraRight = new THREE.Vector3();
+const eliteActionCameraUp = new THREE.Vector3();
+const eliteActionCameraForward = new THREE.Vector3();
+const eliteActionWorldUp = new THREE.Vector3(0, 1, 0);
+const eliteActionTemp = new THREE.Vector3();
+const eliteActionEntries = [];
+const eliteActionHitMeshes = [];
+let eliteHoveredActionEntry = null;
+let eliteActionBurstMesh = null;
 
 const ambientLight = new THREE.AmbientLight(0xf7ffef, 1.05);
 scene.add(ambientLight);
@@ -2473,6 +3236,14 @@ scene.add(fillLight);
 const rimLight = new THREE.DirectionalLight(0xffd98c, 0.45);
 rimLight.position.set(-10, 18, 38);
 scene.add(rimLight);
+
+const eliteActionShardRoot = new THREE.Group();
+eliteActionShardRoot.visible = false;
+scene.add(eliteActionShardRoot);
+
+renderer.domElement.addEventListener('pointermove', handleEliteActionPointerMove);
+renderer.domElement.addEventListener('pointerleave', clearEliteActionHover);
+renderer.domElement.addEventListener('pointerdown', handleEliteActionPointerDown);
 
 const meadowTexture = makeMeadowTexture();
 const clearingTexture = loadTerrainTexture('https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/aerial_grass_rock/aerial_grass_rock_diff_2k.jpg', 10, 10);
@@ -3758,12 +4529,492 @@ function updateMutationUI() {
     }
 }
 
+let activeEncounterScene = pageParams.get('scene') === ELITE_SCENE_KEY ? ELITE_SCENE_KEY : '';
+let eliteVictoryAwaitingContinue = false;
+const eliteUiAnchorWorld = new THREE.Vector3();
+const eliteUiAnchorScreen = new THREE.Vector3();
+const eliteUiBounds = new THREE.Box3();
+const eliteUiBoundsCenter = new THREE.Vector3();
+const eliteUiBoundsSize = new THREE.Vector3();
+const eliteUiProbeTop = new THREE.Vector3();
+const eliteUiProbeBottom = new THREE.Vector3();
+const eliteUiProbeLeft = new THREE.Vector3();
+const eliteUiProbeRight = new THREE.Vector3();
+const eliteUiProjectedTop = new THREE.Vector3();
+const eliteUiProjectedBottom = new THREE.Vector3();
+const eliteUiProjectedLeft = new THREE.Vector3();
+const eliteUiProjectedRight = new THREE.Vector3();
+const eliteUiAnchorOffset = new THREE.Vector3();
+const eliteUiTopOffset = new THREE.Vector3();
+const eliteUiBottomOffset = new THREE.Vector3();
+const eliteUiLeftOffset = new THREE.Vector3();
+const eliteUiRightOffset = new THREE.Vector3();
+const eliteActionWorldLayout = {
+    anchorY: 1.9,
+    radiusX: 2.2,
+    radiusY: 1.3,
+    depth: 0.9,
+    commitY: -1.2,
+    scale: 0.78,
+    burstScale: 4.8
+};
+const eliteUiLayout = {
+    centerX: 0,
+    centerY: 0,
+    radiusX: 260,
+    radiusY: 180
+};
+let eliteUiAnchorLocked = false;
+
+function projectEliteUiPoint(worldPoint, target = eliteUiAnchorScreen) {
+    target.copy(worldPoint).project(camera);
+    return {
+        x: (target.x * 0.5 + 0.5) * window.innerWidth,
+        y: (-target.y * 0.5 + 0.5) * window.innerHeight
+    };
+}
+
+function lockEliteActionAnchor() {
+    if (!playerCreature) return;
+
+    eliteUiBounds.setFromObject(playerCreature);
+    eliteUiBounds.getCenter(eliteUiBoundsCenter);
+    eliteUiBounds.getSize(eliteUiBoundsSize);
+
+    const width = Math.max(1.8, eliteUiBoundsSize.x);
+    const height = Math.max(2.2, eliteUiBoundsSize.y);
+    const verticalAnchor = Math.max(height * 0.58, 1.4 + playerCreature.scale.y * 0.78);
+
+    eliteUiAnchorOffset.set(0, verticalAnchor, 0);
+    eliteUiTopOffset.set(0, verticalAnchor + height * 0.7, 0);
+    eliteUiBottomOffset.set(0, verticalAnchor - height * 0.7, 0);
+    eliteUiLeftOffset.set(-width * 1.04, verticalAnchor, 0);
+    eliteUiRightOffset.set(width * 1.04, verticalAnchor, 0);
+
+    eliteActionWorldLayout.anchorY = verticalAnchor - height * 0.28;
+    eliteActionWorldLayout.radiusX = Math.max(1.78, Math.min(3.28, width * 0.92 + 0.4));
+    eliteActionWorldLayout.radiusY = Math.max(1.06, Math.min(1.72, height * 0.28 + 0.42));
+    eliteActionWorldLayout.depth = Math.max(0.68, Math.min(1.44, width * 0.24 + 0.46));
+    eliteActionWorldLayout.commitY = -Math.max(0.94, Math.min(1.48, height * 0.4 + 0.18));
+    eliteActionWorldLayout.scale = Math.max(0.56, Math.min(0.92, 0.46 + width * 0.085));
+    eliteActionWorldLayout.burstScale = Math.max(3.9, Math.min(5.8, width * 0.92 + height * 0.36));
+    eliteUiAnchorLocked = true;
+}
+
+function updateEliteActionAnchor() {
+    if (!isEliteEncounterActive() || !playerCreature) return;
+    if (!eliteUiAnchorLocked) {
+        lockEliteActionAnchor();
+        if (!eliteUiAnchorLocked) return;
+    }
+
+    eliteUiAnchorWorld.copy(playerCreature.position).add(eliteUiAnchorOffset);
+    eliteUiProbeTop.copy(playerCreature.position).add(eliteUiTopOffset);
+    eliteUiProbeBottom.copy(playerCreature.position).add(eliteUiBottomOffset);
+    eliteUiProbeLeft.copy(playerCreature.position).add(eliteUiLeftOffset);
+    eliteUiProbeRight.copy(playerCreature.position).add(eliteUiRightOffset);
+
+    const center = projectEliteUiPoint(eliteUiAnchorWorld, eliteUiAnchorScreen);
+    const top = projectEliteUiPoint(eliteUiProbeTop, eliteUiProjectedTop);
+    const bottom = projectEliteUiPoint(eliteUiProbeBottom, eliteUiProjectedBottom);
+    const left = projectEliteUiPoint(eliteUiProbeLeft, eliteUiProjectedLeft);
+    const right = projectEliteUiPoint(eliteUiProbeRight, eliteUiProjectedRight);
+    const projectedWidth = Math.abs(right.x - left.x);
+    const projectedHeight = Math.abs(bottom.y - top.y);
+
+    eliteUiLayout.centerX = center.x;
+    eliteUiLayout.centerY = center.y + Math.max(28, projectedHeight * 0.18);
+    eliteUiLayout.radiusX = Math.max(188, Math.min(390, projectedWidth * 0.94 + 124));
+    eliteUiLayout.radiusY = Math.max(154, Math.min(302, projectedHeight * 0.88 + 92));
+    const desiredEndTurnY = eliteUiLayout.radiusY * 0.44 + 26;
+    const availableBottom = Math.max(82, window.innerHeight - eliteUiLayout.centerY - 64);
+
+    document.body.style.setProperty('--elite-center-x', `${eliteUiLayout.centerX}px`);
+    document.body.style.setProperty('--elite-center-y', `${eliteUiLayout.centerY}px`);
+    document.body.style.setProperty('--elite-burst-width', `${Math.round(eliteUiLayout.radiusX * 2.56)}px`);
+    document.body.style.setProperty('--elite-burst-height', `${Math.round(eliteUiLayout.radiusY * 2.14)}px`);
+    document.body.style.setProperty('--elite-endturn-x', `0px`);
+    document.body.style.setProperty('--elite-endturn-y', `${Math.round(Math.min(desiredEndTurnY, availableBottom))}px`);
+    document.body.style.setProperty('--elite-endturn-rot', `-8deg`);
+}
+
+function disposeEliteActionMaterials(node) {
+    if (!node || !node.material) return;
+    const materials = Array.isArray(node.material) ? node.material : [node.material];
+    materials.forEach((material) => {
+        if (!material) return;
+        material.dispose();
+    });
+}
+
+function clearEliteActionHover() {
+    eliteHoveredActionEntry = null;
+    renderer.domElement.style.cursor = '';
+}
+
+function clearEliteActionShards() {
+    clearEliteActionHover();
+
+    eliteActionEntries.splice(0).forEach((entry) => {
+        eliteActionShardRoot.remove(entry.group);
+        entry.group.traverse(disposeEliteActionMaterials);
+    });
+
+    if (eliteActionBurstMesh) {
+        eliteActionShardRoot.remove(eliteActionBurstMesh);
+        eliteActionBurstMesh.traverse(disposeEliteActionMaterials);
+        eliteActionBurstMesh = null;
+    }
+
+    eliteActionHitMeshes.length = 0;
+    eliteActionShardRoot.visible = false;
+}
+
+function createEliteActionBurstMesh() {
+    const burst = new THREE.Mesh(
+        getEliteShardPlaneGeometry('burst'),
+        new THREE.MeshBasicMaterial({
+            map: getEliteBurstTexture(),
+            transparent: true,
+            opacity: 0.28,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending,
+            toneMapped: false,
+            fog: false
+        })
+    );
+    burst.renderOrder = 10;
+    return burst;
+}
+
+function createEliteActionShardEntry({ id, label, cost = 0, type = 'special', disabled = false, kind = 'card', action = null } = {}) {
+    const isCommit = kind === 'commit';
+    const palette = getEliteShardPalette(type, isCommit);
+    const group = new THREE.Group();
+    const width = isCommit ? 2.72 : 3.48;
+    const height = isCommit ? 0.84 : 1.02;
+    const shadow = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+            color: 0x000000,
+            transparent: true,
+            opacity: disabled ? 0.16 : 0.24,
+            depthTest: false,
+            depthWrite: false,
+            toneMapped: false
+        })
+    );
+    shadow.position.set(0.1, -0.08, -0.02);
+    shadow.scale.set(width * 1.04, height * 1.02, 1);
+
+    const glow = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+            color: palette.glow,
+            transparent: true,
+            opacity: disabled ? 0.08 : 0.18,
+            depthTest: false,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            toneMapped: false,
+            fog: false
+        })
+    );
+    glow.scale.set(width * 1.14, height * 1.08, 1);
+
+    const shell = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+            map: getEliteShardLabelTexture({ label, cost, type, disabled, isCommit }),
+            transparent: true,
+            depthTest: false,
+            depthWrite: false,
+            toneMapped: false
+        })
+    );
+    shell.scale.set(width, height, 1);
+
+    group.add(glow);
+    group.add(shadow);
+    group.add(shell);
+
+    const entry = {
+        id,
+        kind,
+        disabled,
+        action,
+        group,
+        shell,
+        glow,
+        shadow,
+        labelPlane: shell,
+        pulseOffset: Math.random() * Math.PI * 2,
+        baseScale: isCommit ? 0.8 : 0.92
+    };
+
+    shell.userData.eliteActionEntry = entry;
+    eliteActionEntries.push(entry);
+    eliteActionHitMeshes.push(shell);
+    eliteActionShardRoot.add(group);
+    return entry;
+}
+
+function renderEliteActionShards() {
+    clearEliteActionShards();
+    if (!isEliteEncounterActive() || !playerCreature) return;
+    if (!eliteUiAnchorLocked) {
+        lockEliteActionAnchor();
+        if (!eliteUiAnchorLocked) return;
+    }
+
+    eliteActionBurstMesh = createEliteActionBurstMesh();
+    eliteActionShardRoot.add(eliteActionBurstMesh);
+
+    handPile.forEach((card, index) => {
+        const canAfford = playerEnergy >= card.cost && !playerTurnLocked;
+        createEliteActionShardEntry({
+            id: `card-${index}-${card.id}`,
+            label: card.name,
+            cost: card.cost,
+            type: card.type,
+            disabled: !canAfford,
+            kind: 'card',
+            action: () => playCard(index)
+        });
+    });
+
+    createEliteActionShardEntry({
+        id: 'commit-turn',
+        label: 'Commit Turn',
+        type: 'special',
+        disabled: playerTurnLocked,
+        kind: 'commit',
+        action: () => window.endTurn()
+    });
+
+    eliteActionShardRoot.visible = true;
+}
+
+function getEliteActionCardSlot(count, index) {
+    const divisor = Math.max(1, count - 1);
+    const progress = count === 1 ? 0.5 : index / divisor;
+    const centered = progress - 0.5;
+    const spread = Math.max(1.18, Math.min(1.86, 1.06 + Math.min(count, 7) * 0.12));
+    return {
+        progress,
+        centered,
+        lift: 1 - Math.min(1, Math.abs(centered) * 1.56),
+        angle: centered * spread,
+        rot: centered * 18
+    };
+}
+
+function updateEliteActionShardScene(timeSecs = 0) {
+    try {
+        if (!eliteActionEntries.length || !isEliteEncounterActive() || gameState !== 'FIGHT' || !playerCreature) {
+            eliteActionShardRoot.visible = false;
+            return;
+        }
+        if (!eliteUiAnchorLocked) {
+            lockEliteActionAnchor();
+            if (!eliteUiAnchorLocked) return;
+        }
+
+        const layoutScale = Math.max(0.82, Math.min(1.18, playerCreature.scale.y * 0.7));
+        const cardEntries = eliteActionEntries.filter((entry) => entry.kind === 'card');
+        const commitEntry = eliteActionEntries.find((entry) => entry.kind === 'commit');
+        const cardCount = cardEntries.length;
+        const countScale = Math.max(0.72, 1 - Math.max(0, cardCount - 3) * 0.07);
+        const sizeScale = Math.max(0.68, Math.min(1.02, (0.74 + playerCreature.scale.y * 0.14) * countScale));
+        const radiusX = Math.max(0.38, (0.38 + Math.min(cardCount, 7) * 0.05) * layoutScale);
+        const radiusY = Math.max(1.28, (eliteActionWorldLayout.radiusY * 1.02 + Math.min(cardCount, 7) * 0.08) * layoutScale);
+        const radiusZ = Math.max(0.32, eliteActionWorldLayout.depth * 0.52 * layoutScale);
+        const anchorY = Math.max(0.96, eliteActionWorldLayout.anchorY * 0.78) * layoutScale;
+        const anchorZ = Math.max(1.88, (eliteActionWorldLayout.depth * 2.04 + Math.min(cardCount, 7) * 0.05) * layoutScale);
+        const commitLeft = Math.max(1.88, radiusY * 1.1 + 0.52 * layoutScale);
+        const commitLift = Math.max(0.56, radiusY * 0.28 + 0.18 * layoutScale);
+        const commitForward = Math.max(0.26, radiusZ * 0.34 + 0.12 * layoutScale);
+
+        eliteActionAnchorWorld.copy(playerCreature.position);
+        eliteActionAnchorWorld.y += anchorY;
+        eliteActionAnchorWorld.z += anchorZ;
+
+        if (eliteActionBurstMesh) {
+            eliteActionBurstMesh.visible = true;
+            eliteActionBurstMesh.position.copy(eliteActionAnchorWorld);
+            eliteActionBurstMesh.position.y += radiusY * 0.06;
+            eliteActionBurstMesh.position.z -= 0.08 * layoutScale;
+            eliteActionBurstMesh.lookAt(camera.position);
+            const burstScale = eliteActionWorldLayout.burstScale * 0.54 * layoutScale * (1 + Math.sin(timeSecs * 1.8) * 0.03);
+            eliteActionBurstMesh.scale.set(burstScale, burstScale, 1);
+            eliteActionBurstMesh.material.opacity = 0.22 + Math.sin(timeSecs * 2.2) * 0.03;
+        }
+
+        eliteActionShardRoot.visible = true;
+
+        cardEntries.forEach((entry, index) => {
+            const slot = getEliteActionCardSlot(cardCount, index);
+            const drift = Math.sin(timeSecs * 2.4 + entry.pulseOffset) * 0.035;
+            const offsetX = slot.centered * radiusX;
+            const offsetY = Math.sin(slot.angle) * radiusY;
+            const offsetZ = Math.cos(slot.angle) * radiusZ + (0.22 + slot.lift * 0.18) * layoutScale;
+
+            entry.group.position.copy(eliteActionAnchorWorld);
+            entry.group.position.x += offsetX;
+            entry.group.position.y += offsetY + drift;
+            entry.group.position.z += offsetZ;
+
+            const hovered = eliteHoveredActionEntry === entry && !entry.disabled;
+            const pulse = 1 + Math.sin(timeSecs * 3.2 + entry.pulseOffset) * 0.018;
+            const hoverScale = hovered ? 1.1 : 1;
+            const disabledScale = entry.disabled ? 0.92 : 1;
+            const scale = sizeScale * entry.baseScale * pulse * hoverScale * disabledScale;
+            entry.group.scale.setScalar(scale);
+            const rotation = THREE.MathUtils.degToRad(slot.rot);
+            entry.shell.material.rotation = rotation;
+            entry.glow.material.rotation = rotation;
+            entry.shadow.material.rotation = rotation;
+            entry.shell.material.opacity = entry.disabled ? 0.62 : hovered ? 1 : 0.96;
+            entry.glow.material.opacity = entry.disabled ? 0.06 : hovered ? 0.28 : 0.16;
+            entry.shadow.material.opacity = hovered ? 0.3 : entry.disabled ? 0.14 : 0.22;
+        });
+
+        if (commitEntry) {
+            commitEntry.group.position.copy(eliteActionAnchorWorld);
+            commitEntry.group.position.x -= commitLeft;
+            commitEntry.group.position.y += commitLift;
+            commitEntry.group.position.z += commitForward;
+            commitEntry.group.position.x += Math.sin(timeSecs * 1.8) * 0.04;
+            commitEntry.group.position.y += Math.cos(timeSecs * 1.8 + commitEntry.pulseOffset) * 0.03;
+
+            const hovered = eliteHoveredActionEntry === commitEntry && !commitEntry.disabled;
+            const pulse = 1 + Math.sin(timeSecs * 2.6 + commitEntry.pulseOffset) * 0.015;
+            const hoverScale = hovered ? 1.08 : 1;
+            const scale = sizeScale * 0.94 * pulse * hoverScale * (commitEntry.disabled ? 0.94 : 1);
+            commitEntry.group.scale.setScalar(scale);
+            const rotation = THREE.MathUtils.degToRad(-11);
+            commitEntry.shell.material.rotation = rotation;
+            commitEntry.glow.material.rotation = rotation;
+            commitEntry.shadow.material.rotation = rotation;
+            commitEntry.shell.material.opacity = commitEntry.disabled ? 0.6 : hovered ? 1 : 0.94;
+            commitEntry.glow.material.opacity = commitEntry.disabled ? 0.04 : hovered ? 0.24 : 0.13;
+            commitEntry.shadow.material.opacity = hovered ? 0.28 : commitEntry.disabled ? 0.14 : 0.2;
+        }
+    } catch (error) {
+        eliteActionShardRoot.visible = false;
+        console.error('Elite action shard layout failed', error);
+    }
+}
+
+function getEliteActionEntryAtClientPoint(clientX, clientY) {
+    if (!isEliteEncounterActive() || gameState !== 'FIGHT' || !eliteActionHitMeshes.length) return null;
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    eliteActionPointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    eliteActionPointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    eliteActionRaycaster.setFromCamera(eliteActionPointer, camera);
+
+    const intersections = eliteActionRaycaster.intersectObjects(eliteActionHitMeshes, false);
+    for (let i = 0; i < intersections.length; i++) {
+        const entry = intersections[i].object?.userData?.eliteActionEntry;
+        if (entry) {
+            return entry;
+        }
+    }
+
+    return null;
+}
+
+function handleEliteActionPointerMove(event) {
+    if (!isEliteEncounterActive()) return;
+
+    const entry = getEliteActionEntryAtClientPoint(event.clientX, event.clientY);
+    eliteHoveredActionEntry = entry && !entry.disabled ? entry : null;
+    renderer.domElement.style.cursor = eliteHoveredActionEntry ? 'pointer' : '';
+}
+
+function handleEliteActionPointerDown(event) {
+    if (!isEliteEncounterActive()) return;
+
+    const entry = getEliteActionEntryAtClientPoint(event.clientX, event.clientY);
+    if (!entry || entry.disabled || typeof entry.action !== 'function') return;
+
+    event.preventDefault();
+    entry.action();
+}
+
+function isEliteEncounterActive() {
+    return activeEncounterScene === ELITE_SCENE_KEY;
+}
+
+function isLlmCombatEnabled() {
+    return isLlmMode && !isEliteEncounterActive();
+}
+
+function syncSoundtrackMode() {
+    if (typeof window.setSlayTheSporeMusicMode !== 'function') return;
+    window.setSlayTheSporeMusicMode(isEliteEncounterActive() && gameState === 'FIGHT' ? 'elite' : 'normal');
+}
+
+function getSinglePlayerRoute(scene = '') {
+    const params = new URLSearchParams();
+    if (isLlmMode) {
+        params.set('mode', 'llm');
+    } else {
+        params.set('play', '1');
+    }
+    if (scene) {
+        params.set('scene', scene);
+    }
+    return `index.html?${params.toString()}`;
+}
+
+function setActiveEncounterScene(sceneName = '') {
+    activeEncounterScene = sceneName || '';
+    eliteUiAnchorLocked = false;
+    const eliteActive = isEliteEncounterActive();
+    if (eliteActive) {
+        applyEliteCameraControls();
+    } else {
+        applyDefaultCameraControls();
+    }
+    document.body.classList.toggle('elite-encounter', eliteActive);
+
+    const banner = document.getElementById('elite-battle-banner');
+    if (banner) {
+        banner.style.display = eliteActive ? 'inline-flex' : 'none';
+    }
+
+    const handWrap = document.getElementById('hand-wrap');
+    if (handWrap) {
+        handWrap.style.display = eliteActive ? 'none' : '';
+    }
+
+    const endTurnBtn = document.getElementById('end-turn-btn');
+    if (endTurnBtn) {
+        endTurnBtn.textContent = eliteActive ? 'Commit Turn' : 'End Turn';
+        endTurnBtn.style.display = eliteActive ? 'none' : '';
+    }
+
+    if (!eliteActive) {
+        clearEliteActionShards();
+    }
+
+    if (!eliteActive) {
+        eliteVictoryAwaitingContinue = false;
+        const skipBtn = document.getElementById('reward-skip-btn');
+        if (skipBtn) {
+            skipBtn.style.display = '';
+        }
+    }
+
+    syncSoundtrackMode();
+}
+
 function getCurrentRunMode() {
     return isLlmMode ? RUN_MODE_LLM : RUN_MODE_STANDARD;
 }
 
 function canPersistSinglePlayerRun() {
-    return !isMultiplayerMode && typeof saveRunState === 'function';
+    return !isMultiplayerMode && !isElitePreviewMode && typeof saveRunState === 'function';
 }
 
 function cloneMerchantEncounterState(state) {
@@ -3797,6 +5048,27 @@ function createMerchantEncounterState() {
     };
 }
 
+function cloneEliteEncounterState(state) {
+    if (!state || typeof state !== 'object') return null;
+    return {
+        active: state.active !== false,
+        enemyGenome: cloneGenome(state.enemyGenome),
+        enemyGeneration: Math.max(1, Number(state.enemyGeneration) || 1),
+        hpMultiplier: Math.max(1, Number(state.hpMultiplier) || ELITE_HP_MULTIPLIER),
+        visitId: String(state.visitId || '')
+    };
+}
+
+function createEliteEncounterState() {
+    return {
+        active: true,
+        enemyGenome: randomGenome(),
+        enemyGeneration: Math.max(1, playerGeneration),
+        hpMultiplier: ELITE_HP_MULTIPLIER,
+        visitId: `${Date.now()}-${Math.floor(Math.random() * 100000)}`
+    };
+}
+
 function buildSinglePlayerRunSave(scene = 'menu') {
     return {
         version: typeof SLAY_THE_SPORE_RUN_SAVE_VERSION === 'number' ? SLAY_THE_SPORE_RUN_SAVE_VERSION : 1,
@@ -3809,7 +5081,8 @@ function buildSinglePlayerRunSave(scene = 'menu') {
         mutationState: typeof cloneMutationStateForSave === 'function'
             ? cloneMutationStateForSave(mutationState)
             : defaultMutationState(),
-        merchantEncounter: cloneMerchantEncounterState(merchantEncounterState)
+        merchantEncounter: cloneMerchantEncounterState(merchantEncounterState),
+        eliteEncounter: cloneEliteEncounterState(eliteEncounterState)
     };
 }
 
@@ -3843,6 +5116,8 @@ function hydrateSinglePlayerRun(save) {
     pendingVictoryCoinReward = 0;
     pendingMerchantEncounter = false;
     merchantEncounterState = cloneMerchantEncounterState(save.merchantEncounter);
+    pendingEliteEncounter = false;
+    eliteEncounterState = cloneEliteEncounterState(save.eliteEncounter);
     return true;
 }
 
@@ -3859,11 +5134,22 @@ function rollCoinReward() {
     return COIN_REWARD_MIN + Math.floor(Math.random() * (COIN_REWARD_MAX - COIN_REWARD_MIN + 1));
 }
 
-function awardVictoryCoinsAndMaybeMerchant() {
+function awardVictoryCoinsAndMaybeEncounter() {
     pendingVictoryCoinReward = rollCoinReward();
     playerCoins += pendingVictoryCoinReward;
-    pendingMerchantEncounter = Math.random() < MERCHANT_ENCOUNTER_CHANCE;
-    merchantEncounterState = pendingMerchantEncounter ? createMerchantEncounterState() : null;
+    pendingMerchantEncounter = false;
+    merchantEncounterState = null;
+    pendingEliteEncounter = false;
+    eliteEncounterState = null;
+
+    const encounterRoll = Math.random();
+    if (encounterRoll < MERCHANT_ENCOUNTER_CHANCE) {
+        pendingMerchantEncounter = true;
+        merchantEncounterState = createMerchantEncounterState();
+    } else if (encounterRoll < MERCHANT_ENCOUNTER_CHANCE + ELITE_ENCOUNTER_CHANCE) {
+        pendingEliteEncounter = true;
+    }
+
     updateRunCoinUI();
 }
 
@@ -3871,6 +5157,9 @@ function getVictorySummaryText() {
     const coinText = `You scavenged ${pendingVictoryCoinReward} coins.`;
     if (pendingMerchantEncounter && merchantEncounterState) {
         return `${coinText} A wandering merchant blocks the trail ahead.`;
+    }
+    if (pendingEliteEncounter) {
+        return `${coinText} A shrouded elite spore crawls from the dark ahead.`;
     }
     return `${coinText} The path opens toward the next evolution.`;
 }
@@ -3882,6 +5171,14 @@ function enterMerchantEncounterScene() {
     }
     persistSinglePlayerRun('merchant');
     window.location.href = MERCHANT_SCENE_PATH;
+}
+
+function enterEliteEncounterScene() {
+    if (!eliteEncounterState) {
+        eliteEncounterState = createEliteEncounterState();
+    }
+    persistSinglePlayerRun(ELITE_SCENE_KEY);
+    window.location.href = ELITE_SCENE_PATH;
 }
 
 function mutatePlayerAfterVictory() {
@@ -3910,9 +5207,15 @@ function resolveSinglePlayerVictoryFlow() {
         enterMerchantEncounterScene();
         return;
     }
+    if (pendingEliteEncounter) {
+        enterEliteEncounterScene();
+        return;
+    }
     pendingVictoryCoinReward = 0;
     pendingMerchantEncounter = false;
     merchantEncounterState = null;
+    pendingEliteEncounter = false;
+    eliteEncounterState = null;
     goToMenu(true);
 }
 
@@ -4440,7 +5743,7 @@ function executeLlmEnemyIntent() {
 
 async function handleLlmChatSubmit(event) {
     event.preventDefault();
-    if (!isLlmMode || gameState !== 'FIGHT' || llmBusy) return;
+    if (!isLlmCombatEnabled() || gameState !== 'FIGHT' || llmBusy) return;
 
     const input = document.getElementById('llm-chat-input');
     if (!input) return;
@@ -4497,7 +5800,7 @@ async function handleLlmChatSubmit(event) {
 }
 
 function updateLlmPersonalityUI() {
-    if (!isLlmMode) return;
+    if (!isLlmMode || isEliteEncounterActive()) return;
     const personality = getActiveLlmPersonality();
     const copy = document.getElementById('llm-personality-copy');
     const randomCopy = document.getElementById('llm-random-copy');
@@ -4530,7 +5833,7 @@ function updateLlmPersonalityUI() {
 }
 
 function initLlmModeUI() {
-    if (!isLlmMode || llmUiReady) return;
+    if (!isLlmMode || llmUiReady || isEliteEncounterActive()) return;
     llmUiReady = true;
 
     document.body.classList.add('llm-mode');
@@ -4948,6 +6251,7 @@ function applyMultiplayerSnapshot(snapshot) {
 
 function beginMultiplayerCombat(remoteGenome, localStarts) {
     gameState = 'FIGHT';
+    syncSoundtrackMode();
     multiplayerMatchActive = true;
     multiplayerRoundOutcomeRecorded = false;
     multiplayerLocalRewardReady = false;
@@ -5368,6 +6672,8 @@ let enemyCreature = null;
 // Temporary spawn for starters
 let starters = [];
 function initStarters() {
+    setActiveEncounterScene('');
+    controls.enabled = true;
     activeCreatures.forEach(c => scene.remove(c));
     activeCreatures = [];
     starters = [];
@@ -5377,6 +6683,8 @@ function initStarters() {
     pendingVictoryCoinReward = 0;
     pendingMerchantEncounter = false;
     merchantEncounterState = null;
+    pendingEliteEncounter = false;
+    eliteEncounterState = null;
     playerTurnLocked = false;
     llmBusy = false;
     multiplayerMatchActive = false;
@@ -5396,10 +6704,14 @@ function initStarters() {
     document.getElementById('reward-card-container').style.display = '';
     document.getElementById('reward-note').style.display = '';
     document.querySelector('.reward-actions').style.display = '';
+    document.getElementById('reward-skip-btn').style.display = '';
     document.getElementById('multiplayer-victory-btn').style.display = 'none';
     playerCombatCircle.visible = false;
     enemyCombatCircle.visible = false;
     updateRunCoinUI();
+    if (isLlmMode && !llmUiReady) {
+        initLlmModeUI();
+    }
     
     camera.position.set(0, 5, 20);
     controls.target.set(0, 2, 0);
@@ -5416,6 +6728,7 @@ function initStarters() {
 }
 
 window.pickStarter = function(index) {
+    setActiveEncounterScene('');
     playerGenome = [...starters[index].userData.genome];
     playerGeneration = 1;
     mutationState = defaultMutationState();
@@ -5424,6 +6737,8 @@ window.pickStarter = function(index) {
     pendingVictoryCoinReward = 0;
     pendingMerchantEncounter = false;
     merchantEncounterState = null;
+    pendingEliteEncounter = false;
+    eliteEncounterState = null;
     if (typeof scheduleCardImagePreload === 'function') {
         scheduleCardImagePreload(runDeck);
     }
@@ -5439,7 +6754,10 @@ window.pickStarter = function(index) {
 document.getElementById('reroll-btn').addEventListener('click', initStarters);
 
 function goToMenu(isEvolving = false) {
+    setActiveEncounterScene('');
+    controls.enabled = true;
     gameState = 'MENU';
+    syncSoundtrackMode();
     playerTurnLocked = false;
     llmBusy = false;
     if (typeof scheduleCardImagePreload === 'function') {
@@ -5455,6 +6773,10 @@ function goToMenu(isEvolving = false) {
     document.getElementById('combat-screen').style.display = 'none';
     document.getElementById('victory-screen').style.display = 'none';
     document.getElementById('defeat-screen').style.display = 'none';
+    document.getElementById('reward-card-container').style.display = '';
+    document.getElementById('reward-note').style.display = '';
+    document.querySelector('.reward-actions').style.display = '';
+    document.getElementById('reward-skip-btn').style.display = '';
     playerCombatCircle.visible = false;
     enemyCombatCircle.visible = false;
     
@@ -5512,6 +6834,9 @@ function goToMenu(isEvolving = false) {
     updateMutationUI();
     updateMenuDeckUI();
     if (isLlmMode) {
+        if (!llmUiReady) {
+            initLlmModeUI();
+        }
         updateLlmPersonalityUI();
         const fightButton = document.getElementById('fight-button');
         if (fightButton) {
@@ -5526,18 +6851,59 @@ function goToMenu(isEvolving = false) {
     persistSinglePlayerRun('menu');
 }
 
+function bootstrapElitePreview() {
+    playerGenome = randomGenome();
+    playerGeneration = 4;
+    mutationState = defaultMutationState();
+    runDeck = buildStarterDeck();
+    playerCoins = 0;
+    pendingVictoryRewards = [];
+    selectedVictoryRewardIndex = -1;
+    pendingVictoryCoinReward = 0;
+    pendingMerchantEncounter = false;
+    merchantEncounterState = null;
+    pendingEliteEncounter = false;
+    eliteEncounterState = {
+        ...createEliteEncounterState(),
+        enemyGeneration: playerGeneration
+    };
+
+    if (typeof scheduleCardImagePreload === 'function') {
+        scheduleCardImagePreload(runDeck);
+    }
+
+    startEliteEncounterCombat();
+    return true;
+}
+
 function bootstrapSinglePlayerRunFromSave() {
     if (isMultiplayerMode || typeof loadRunState !== 'function') {
         return false;
     }
 
+    if (isElitePreviewMode) {
+        return bootstrapElitePreview();
+    }
+
     const save = loadRunState();
     if (!hydrateSinglePlayerRun(save)) {
+        if (pageParams.get('scene') === ELITE_SCENE_KEY) {
+            return bootstrapElitePreview();
+        }
         return false;
     }
 
     if (save.scene === 'merchant') {
         window.location.replace(MERCHANT_SCENE_PATH);
+        return true;
+    }
+
+    if (save.scene === ELITE_SCENE_KEY) {
+        if (pageParams.get('scene') !== ELITE_SCENE_KEY) {
+            window.location.replace(ELITE_SCENE_PATH);
+            return true;
+        }
+        startEliteEncounterCombat();
         return true;
     }
 
@@ -5603,6 +6969,8 @@ let playerCoins = 0;
 let pendingVictoryCoinReward = 0;
 let pendingMerchantEncounter = false;
 let merchantEncounterState = null;
+let pendingEliteEncounter = false;
+let eliteEncounterState = null;
 
 let drawPile = [];
 let handPile = [];
@@ -5765,10 +7133,10 @@ function updateCombatInteractionState() {
         endTurnBtn.disabled = !canInteract;
     }
     if (sendBtn) {
-        sendBtn.disabled = !isLlmMode || gameState !== 'FIGHT' || llmBusy || !hasLocalLlmSupport;
+        sendBtn.disabled = !isLlmCombatEnabled() || gameState !== 'FIGHT' || llmBusy || !hasLocalLlmSupport;
     }
     if (sendInput) {
-        sendInput.disabled = !isLlmMode || gameState !== 'FIGHT' || llmBusy || !hasLocalLlmSupport;
+        sendInput.disabled = !isLlmCombatEnabled() || gameState !== 'FIGHT' || llmBusy || !hasLocalLlmSupport;
     }
 }
 
@@ -5852,7 +7220,7 @@ async function createMainThreadLlmEngine(modelId) {
 }
 
 async function prepareLlmEngine() {
-    if (!isLlmMode) return null;
+    if (!isLlmCombatEnabled()) return null;
     if (!hasLocalLlmSupport) {
         throw new Error('WebGPU is unavailable in this browser.');
     }
@@ -6097,10 +7465,25 @@ window.handlePostCombatAction = function() {
         return;
     }
     clearSinglePlayerRunSave();
-    location.reload();
+    setActiveEncounterScene('');
+    window.location.href = getSinglePlayerRoute();
 }
 
 window.claimVictoryReward = function() {
+    if (eliteVictoryAwaitingContinue) {
+        eliteVictoryAwaitingContinue = false;
+        pendingVictoryRewards = [];
+        selectedVictoryRewardIndex = -1;
+        pendingVictoryCoinReward = 0;
+        pendingMerchantEncounter = false;
+        merchantEncounterState = null;
+        pendingEliteEncounter = false;
+        eliteEncounterState = null;
+        persistSinglePlayerRun('menu');
+        setActiveEncounterScene('');
+        window.location.href = getSinglePlayerRoute();
+        return;
+    }
     const reward = pendingVictoryRewards[selectedVictoryRewardIndex];
     if (!reward) return;
     document.getElementById('reward-add-btn').disabled = true;
@@ -6120,6 +7503,7 @@ window.claimVictoryReward = function() {
 }
 
 window.skipVictoryReward = function() {
+    if (eliteVictoryAwaitingContinue) return;
     document.getElementById('reward-add-btn').disabled = true;
     document.getElementById('reward-skip-btn').disabled = true;
     pendingVictoryRewards = [];
@@ -6131,12 +7515,263 @@ window.skipVictoryReward = function() {
     resolveSinglePlayerVictoryFlow();
 }
 
+function showEliteVictoryScreen() {
+    eliteVictoryAwaitingContinue = true;
+    pendingVictoryRewards = [];
+    selectedVictoryRewardIndex = -1;
+    document.getElementById('combat-screen').style.display = 'none';
+    document.getElementById('victory-screen').style.display = 'flex';
+    document.getElementById('reward-card-container').style.display = 'none';
+    document.getElementById('reward-note').style.display = 'none';
+    document.querySelector('.reward-actions').style.display = '';
+    document.getElementById('multiplayer-victory-btn').style.display = 'none';
+
+    const titleEl = document.getElementById('reward-screen-title');
+    if (titleEl) {
+        titleEl.textContent = 'ELITE VANQUISHED';
+        titleEl.style.color = '#f0d9a2';
+    }
+
+    document.getElementById('victory-copy').textContent = 'The black spore dissolves into smoke. Your creature survives the ambush and stalks back to the trail.';
+
+    const addBtn = document.getElementById('reward-add-btn');
+    const skipBtn = document.getElementById('reward-skip-btn');
+    addBtn.disabled = false;
+    addBtn.innerText = 'Return to Trail';
+    skipBtn.disabled = true;
+    skipBtn.style.display = 'none';
+}
+
+function applyEliteEncounterEnvironment() {
+    updateEnvironment(playerGeneration);
+    scene.background.set(0x09131d);
+    scene.fog.color.set(0x09131d);
+    scene.fog.density = 0.021;
+    ambientLight.color.set(0xc7d5e0);
+    ambientLight.intensity = 0.62;
+    hemiLight.intensity = 0.72;
+    hemiLight.color.set(0x94bbd8);
+    hemiLight.groundColor.set(0x140f0c);
+    dirLight.color.set(0xa1c2e7);
+    dirLight.intensity = 0.88;
+    fillLight.color.set(0x6d9bc4);
+    fillLight.intensity = 0.52;
+    rimLight.color.set(0xf0c180);
+    rimLight.intensity = 1.08;
+    groundMat.color.set(0x203540);
+    playerCombatBase.material.color.set(0x2b4552);
+    enemyCombatCircle.children[0].material.color.set(0x31231c);
+}
+
+function applyEliteShadowToCreature(root) {
+    root.traverse((node) => {
+        if (!node.isMesh) return;
+
+        if (Array.isArray(node.material)) {
+            node.material = node.material.map((material) => {
+                if (!material) return material;
+                if (material.isMeshNormalMaterial) {
+                    return new THREE.MeshStandardMaterial({
+                        color: 0x060606,
+                        roughness: 0.92,
+                        metalness: 0.02
+                    });
+                }
+                if (material.color) material.color.set(0x050505);
+                if (material.emissive) {
+                    material.emissive.set(0x111111);
+                    material.emissiveIntensity = 0.5;
+                }
+                if ('roughness' in material) material.roughness = 0.92;
+                if ('metalness' in material) material.metalness = 0.02;
+                if ('transparent' in material) {
+                    material.transparent = true;
+                    material.opacity = Math.min(0.96, material.opacity ?? 1);
+                }
+                material.needsUpdate = true;
+                return material;
+            });
+            return;
+        }
+
+        if (node.material?.isMeshNormalMaterial) {
+            node.material = new THREE.MeshStandardMaterial({
+                color: 0x060606,
+                roughness: 0.92,
+                metalness: 0.02
+            });
+        } else if (node.material) {
+            if (node.material.color) node.material.color.set(0x050505);
+            if (node.material.emissive) {
+                node.material.emissive.set(0x111111);
+                node.material.emissiveIntensity = 0.5;
+            }
+            if ('roughness' in node.material) node.material.roughness = 0.92;
+            if ('metalness' in node.material) node.material.metalness = 0.02;
+            if ('transparent' in node.material) {
+                node.material.transparent = true;
+                node.material.opacity = Math.min(0.96, node.material.opacity ?? 1);
+            }
+            node.material.needsUpdate = true;
+        }
+    });
+}
+
+function attachEliteSmoke(root) {
+    const smokeGroup = new THREE.Group();
+    const smokeMat = new THREE.MeshStandardMaterial({
+        color: 0x050505,
+        transparent: true,
+        opacity: 0.24,
+        depthWrite: false,
+        roughness: 1
+    });
+
+    const puffs = Array.from({ length: 18 }, (_, index) => {
+        const puff = new THREE.Mesh(
+            new THREE.SphereGeometry(0.26 + Math.random() * 0.26, 10, 10),
+            smokeMat.clone()
+        );
+        puff.userData.seed = index * 0.17 + Math.random() * 0.3;
+        puff.userData.radius = 0.45 + Math.random() * 0.9;
+        puff.userData.height = 0.85 + Math.random() * 1.6;
+        puff.userData.speed = 0.16 + Math.random() * 0.18;
+        puff.userData.spin = 1.4 + Math.random() * 1.8;
+        puff.userData.baseScale = 0.75 + Math.random() * 0.65;
+        smokeGroup.add(puff);
+        return puff;
+    });
+
+    smokeGroup.position.set(0, 1.4, 0);
+    root.add(smokeGroup);
+    root.userData.animations.push((time) => {
+        puffs.forEach((puff) => {
+            const cycle = (time * puff.userData.speed + puff.userData.seed) % 1;
+            const angle = puff.userData.seed * Math.PI * 2 + cycle * puff.userData.spin * Math.PI * 2;
+            const radial = puff.userData.radius * (0.42 + cycle * 0.76);
+            puff.position.set(
+                Math.cos(angle) * radial,
+                cycle * puff.userData.height,
+                Math.sin(angle) * radial * 0.72
+            );
+            const scale = puff.userData.baseScale * (0.72 + cycle * 1.05);
+            puff.scale.setScalar(scale);
+            puff.material.opacity = 0.28 * (1 - cycle * 0.72);
+        });
+    });
+}
+
+function positionEliteCombatants() {
+    const playerPosition = new THREE.Vector3(4.2, 0, 5.8);
+    const enemyPosition = new THREE.Vector3(-0.8, 0, -7.4);
+
+    playerCreature.position.copy(playerPosition);
+    playerCreature.rotation.y = Math.PI + 0.52;
+    playerCombatCircle.position.set(playerPosition.x, 0, playerPosition.z);
+    playerCombatCircle.visible = true;
+
+    enemyCreature.position.copy(enemyPosition);
+    enemyCreature.rotation.y = 0.14;
+    enemyCombatCircle.position.set(enemyPosition.x, 0, enemyPosition.z);
+    enemyCombatCircle.visible = true;
+
+    camera.position.set(10.8, 7.6 + playerGeneration * 0.5, 18.6);
+    controls.target.set(0.5, 2.1 + playerGeneration * 0.34, -4.3);
+    applyEliteCameraControls();
+    controls.update();
+    eliteUiAnchorLocked = false;
+}
+
+function startEliteEncounterCombat() {
+    if (!playerGenome.length) {
+        goToMenu(false);
+        return;
+    }
+
+    setActiveEncounterScene(ELITE_SCENE_KEY);
+    eliteVictoryAwaitingContinue = false;
+
+    activeCreatures.forEach((creature) => scene.remove(creature));
+    activeCreatures = [];
+    if (enemyCreature) {
+        scene.remove(enemyCreature);
+        enemyCreature = null;
+    }
+
+    document.title = 'Slay the Spore - Elite Encounter';
+    gameState = 'FIGHT';
+    syncSoundtrackMode();
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('menu-screen').style.display = 'none';
+    document.getElementById('victory-screen').style.display = 'none';
+    document.getElementById('defeat-screen').style.display = 'none';
+    document.getElementById('combat-screen').style.display = 'flex';
+    hideMutationChoice();
+
+    applyEliteEncounterEnvironment();
+
+    playerCreature = buildPlayerCreature(playerGenome, playerGeneration);
+    scene.add(playerCreature);
+    activeCreatures.push(playerCreature);
+
+    eliteEncounterState = cloneEliteEncounterState(eliteEncounterState) || createEliteEncounterState();
+    enemyGeneration = Math.max(1, Number(eliteEncounterState.enemyGeneration) || playerGeneration);
+    enemyGenome = cloneGenome(eliteEncounterState.enemyGenome);
+    if (!enemyGenome.length) {
+        enemyGenome = randomGenome();
+        eliteEncounterState.enemyGenome = cloneGenome(enemyGenome);
+    }
+
+    enemyCreature = decodeGenome(enemyGenome, enemyGeneration);
+    applyEliteShadowToCreature(enemyCreature);
+    attachEliteSmoke(enemyCreature);
+    scene.add(enemyCreature);
+    activeCreatures.push(enemyCreature);
+
+    positionEliteCombatants();
+    lockEliteActionAnchor();
+    updateEliteActionAnchor();
+
+    playerMaxHP = calcPlayerMaxHP();
+    playerHP = playerMaxHP;
+    playerBlock = 0;
+    playerEnergy = 3;
+
+    enemyMaxHP = Math.max(1, Math.ceil(calcEnemyMaxHP(enemyGeneration) * Math.max(1, eliteEncounterState.hpMultiplier || ELITE_HP_MULTIPLIER)));
+    enemyHP = enemyMaxHP;
+    enemyBlock = 0;
+    enemyIntentDmg = 0;
+    llmStoredCharge = 0;
+    llmCurrentIntent = null;
+    playerTurnLocked = false;
+    combatStatus = createCombatStatus();
+    enemyWillSkipTurn = false;
+    enemySkipReason = '';
+
+    document.getElementById('player-gen-text').innerText = isCompactMobile()
+        ? `G${playerGeneration}`
+        : `(Gen ${playerGeneration})`;
+    document.getElementById('enemy-name').innerText = isCompactMobile()
+        ? `Elite G${enemyGeneration}`
+        : `Elite Spore (Gen ${enemyGeneration})`;
+
+    drawPile = [...runDeck];
+    shuffle(drawPile);
+    discardPile = [];
+    handPile = [];
+
+    updateCombatUI();
+    startTurn();
+}
+
 window.startCombat = function() {
     if (isMultiplayerMode) {
         handleMultiplayerReadyAction();
         return;
     }
-    if (isLlmMode && !hasLocalLlmSupport) {
+    setActiveEncounterScene('');
+    controls.enabled = true;
+    if (isLlmCombatEnabled() && !hasLocalLlmSupport) {
         setLlmStatus('Fight LLMs needs WebGPU. Open this in a recent Chrome or Edge build.', 'error');
         return;
     }
@@ -6146,7 +7781,8 @@ window.startCombat = function() {
     }
 
     gameState = 'FIGHT';
-    if (isLlmMode) {
+    syncSoundtrackMode();
+    if (isLlmCombatEnabled()) {
         rollLlmPersonalityId();
     }
     document.getElementById('menu-screen').style.display = 'none';
@@ -6195,11 +7831,11 @@ window.startCombat = function() {
         ? `G${playerGeneration}`
         : `(Gen ${playerGeneration})`;
     document.getElementById('enemy-name').innerText = isCompactMobile()
-        ? (isLlmMode ? `${getActiveLlmPersonality().name} G${enemyGeneration}` : `Wild G${enemyGeneration}`)
-        : (isLlmMode
+        ? (isLlmCombatEnabled() ? `${getActiveLlmPersonality().name} G${enemyGeneration}` : `Wild G${enemyGeneration}`)
+        : (isLlmCombatEnabled()
             ? `${getActiveLlmPersonality().name} (Gen ${enemyGeneration})`
             : `Wild Creature (Gen ${enemyGeneration})`);
-    if (isLlmMode) {
+    if (isLlmCombatEnabled()) {
         updateLlmPersonalityUI();
     }
     
@@ -6214,7 +7850,7 @@ window.startCombat = function() {
     discardPile = [];
     handPile = [];
 
-    if (isLlmMode) {
+    if (isLlmCombatEnabled()) {
         resetLlmBattleState();
     }
     
@@ -6230,7 +7866,7 @@ function shuffle(array) {
 }
 
 function startTurn() {
-    playerTurnLocked = !!isLlmMode;
+    playerTurnLocked = !!isLlmCombatEnabled();
     playerEnergy = 3 + getCombatStatusNumber('energyBonus');
     playerBlock = 0; // reset block start of turn
     if (isMultiplayerMode) {
@@ -6252,7 +7888,7 @@ function startTurn() {
     
     // Draw cards, including mutation bonuses
     drawCards(getCardsPerTurn());
-    if (isLlmMode) {
+    if (isLlmCombatEnabled()) {
         updateCombatInteractionState();
         planLlmEnemyIntent();
     } else if (isMultiplayerMode) {
@@ -6280,11 +7916,23 @@ function drawCards(num) {
 function renderHand() {
     const handDiv = document.getElementById('hand');
     handDiv.innerHTML = '';
-    
+    const isElite = isEliteEncounterActive();
+
+    if (isElite) {
+        try {
+            renderEliteActionShards();
+            updateEliteActionAnchor();
+        } catch (error) {
+            clearEliteActionShards();
+            console.error('Elite hand render failed', error);
+        }
+        return;
+    }
+
     handPile.forEach((card, index) => {
         const cardClass = card.type === 'attack' ? 'attack' : card.type === 'defend' ? 'defend' : 'special';
         const canAfford = playerEnergy >= card.cost && !playerTurnLocked;
-        
+
         const cardEl = document.createElement('div');
         cardEl.className = `card ${cardClass}`;
         cardEl.style.backgroundImage = `url('${card.img}')`;
@@ -6300,6 +7948,8 @@ function renderHand() {
         
         if (canAfford) {
             cardEl.onclick = () => playCard(index);
+        } else {
+            cardEl.onclick = null;
         }
 
         if (!TOUCH_INPUT) {
@@ -6480,7 +8130,7 @@ window.endTurn = function() {
     applyTurnEndEffects(makeCombatCtx());
 
     if (enemyHP > 0) {
-        if (isLlmMode) {
+        if (isLlmCombatEnabled()) {
             const mutationStats = getMutationCombatStats();
             if (!enemyWillSkipTurn && llmCurrentIntent && !llmCurrentIntent.skip && llmCurrentIntent.damage > 0 && mutationStats.clawsCounter && playerBlock > 0) {
                 const counterDamage = playerBlock;
@@ -6580,8 +8230,10 @@ function showFloatingText(target, text, color) {
     div.innerText = text;
     div.style.color = color;
     
-    div.style.left = target === 'player' ? '30%' : '70%';
-    div.style.top = '40%';
+    div.style.left = target === 'player'
+        ? (isEliteEncounterActive() ? '64%' : '30%')
+        : (isEliteEncounterActive() ? '42%' : '70%');
+    div.style.top = isEliteEncounterActive() ? '46%' : '40%';
     
     document.getElementById('ui-layer').appendChild(div);
     setTimeout(() => div.remove(), 1000);
@@ -6670,7 +8322,7 @@ function updateCombatUI() {
     document.getElementById('enemy-stats').innerHTML = compactMobile
         ? `HP ${enemyHP}/${enemyMaxHP}<br><span class="block-text">B ${enemyBlock}</span>`
         : `HP: ${enemyHP}/${enemyMaxHP} | <span class="block-text">Block: ${enemyBlock}</span>`;
-    if (isLlmMode) {
+    if (isLlmCombatEnabled()) {
         document.getElementById('enemy-intent').innerHTML = enemyWillSkipTurn
             ? (compactMobile ? 'Skip' : `Intent: Skip turn${enemySkipReason ? ` (${enemySkipReason})` : ''}`)
             : (compactMobile ? (llmCurrentIntent?.intentText || 'Thinking...').replace(/^Intent:\s*/i, '') : (llmCurrentIntent?.intentText || 'Intent: Rival model is thinking...'));
@@ -6689,6 +8341,7 @@ function updateCombatUI() {
 function winCombat(options = {}) {
     const countScore = options.countScore !== false;
     gameState = 'VICTORY';
+    syncSoundtrackMode();
     enemyCombatCircle.visible = false;
     hideMutationChoice();
     playerTurnLocked = false;
@@ -6702,6 +8355,9 @@ function winCombat(options = {}) {
     if (isMultiplayerMode) {
         showMultiplayerRoundReward('win');
         updateCombatInteractionState();
+    } else if (isEliteEncounterActive()) {
+        showEliteVictoryScreen();
+        updateCombatInteractionState();
     } else {
         document.getElementById('combat-screen').style.display = 'none';
         document.getElementById('victory-screen').style.display = 'flex';
@@ -6710,7 +8366,7 @@ function winCombat(options = {}) {
             titleEl.textContent = 'VICTORY!';
             titleEl.style.color = '#4CAF50';
         }
-        awardVictoryCoinsAndMaybeMerchant();
+        awardVictoryCoinsAndMaybeEncounter();
         document.getElementById('victory-copy').textContent = getVictorySummaryText();
         pendingVictoryRewards = rollVictoryRewards(3);
         selectedVictoryRewardIndex = -1;
@@ -6741,6 +8397,7 @@ function winCombat(options = {}) {
 function loseCombat(options = {}) {
     const countScore = options.countScore !== false;
     gameState = 'DEFEAT';
+    syncSoundtrackMode();
     playerCombatCircle.visible = false;
     enemyCombatCircle.visible = false;
     hideMutationChoice();
@@ -6771,6 +8428,8 @@ window.triggerEvolution = function() {
     pendingVictoryCoinReward = 0;
     pendingMerchantEncounter = false;
     merchantEncounterState = null;
+    pendingEliteEncounter = false;
+    eliteEncounterState = null;
     goToMenu(true);
 }
 
@@ -6794,6 +8453,13 @@ function animate() {
     }
     
     controls.update();
+    try {
+        updateEliteActionAnchor();
+        updateEliteActionShardScene(timeSecs);
+    } catch (error) {
+        clearEliteActionShards();
+        console.error('Elite overlay update failed', error);
+    }
     renderer.render(scene, camera);
 }
 
@@ -6801,6 +8467,13 @@ window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    try {
+        updateEliteActionAnchor();
+        updateEliteActionShardScene(clock.getElapsedTime());
+    } catch (error) {
+        clearEliteActionShards();
+        console.error('Elite overlay resize failed', error);
+    }
 });
 
 // Start the game!

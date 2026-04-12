@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slay the Spore - Elite Encounter</title>
+    <style>
+        html, body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at 22% 20%, rgba(62, 96, 121, 0.26), transparent 32%),
+                radial-gradient(circle at 78% 16%, rgba(132, 96, 55, 0.18), transparent 24%),
+                linear-gradient(180deg, #081019 0%, #111826 60%, #090f16 100%);
+            color: #f4e7cc;
+            font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        }
+
+        .panel {
+            width: min(540px, calc(100vw - 32px));
+            padding: 28px 30px;
+            border-radius: 28px;
+            background:
+                linear-gradient(140deg, rgba(20, 21, 24, 0.84), rgba(58, 40, 24, 0.62)),
+                radial-gradient(circle at top left, rgba(208, 181, 128, 0.16), transparent 52%);
+            border: 1px solid rgba(219, 188, 138, 0.3);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: clamp(32px, 5vw, 46px);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        p {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.55;
+            color: rgba(244, 231, 204, 0.86);
+        }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h1>Elite Encounter</h1>
+        <p>The trail darkens. Bringing your run into the over-the-shoulder elite fight...</p>
+    </div>
+
+    <script src="run_state.js"></script>
+    <script>
+        (function routeEliteEncounter() {
+            const save = typeof loadRunState === 'function' ? loadRunState() : null;
+            const params = new URLSearchParams();
+            const useSavedEliteEncounter = save?.scene === 'elite';
+
+            if (useSavedEliteEncounter && save?.mode === 'llm') {
+                params.set('mode', 'llm');
+            } else {
+                params.set('play', '1');
+            }
+
+            params.set('scene', 'elite');
+            if (!useSavedEliteEncounter) {
+                params.set('preview', '1');
+            }
+            window.location.replace(`index.html?${params.toString()}`);
+        })();
+    </script>
+</body>
+</html>
