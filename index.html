@@ -1447,6 +1447,12 @@
             color: #f4e7cc;
             font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
         }
+        body.super-elite-encounter {
+            background:
+                radial-gradient(circle at 18% 18%, rgba(40, 141, 204, 0.36), transparent 34%),
+                radial-gradient(circle at 82% 14%, rgba(66, 212, 255, 0.24), transparent 28%),
+                linear-gradient(180deg, #050d15 0%, #0a1b2a 52%, #07111a 100%);
+        }
         body.elite-encounter #combat-screen {
             justify-content: flex-start;
             gap: 0;
@@ -1491,6 +1497,23 @@
         body.elite-encounter #elite-battle-banner {
             display: inline-flex;
         }
+        body.super-elite-encounter .entity-stats {
+            background:
+                linear-gradient(145deg, rgba(9, 24, 36, 0.84), rgba(18, 72, 97, 0.52)),
+                radial-gradient(circle at top left, rgba(117, 219, 255, 0.12), transparent 58%);
+            border-color: rgba(112, 206, 255, 0.34);
+        }
+        body.super-elite-encounter .hp-fill {
+            background: linear-gradient(90deg, #2b88c8, #63d3ff 72%, #d1f7ff);
+        }
+        body.super-elite-encounter #enemy-hp-fill {
+            background: linear-gradient(90deg, #0f2840, #1b6db0 58%, #8feaff);
+        }
+        body.super-elite-encounter .intent {
+            color: #bfeeff;
+            background: rgba(6, 21, 31, 0.8);
+            border-color: rgba(111, 206, 255, 0.2);
+        }
         #elite-battle-banner {
             position: absolute;
             top: calc(var(--safe-top) + 6px);
@@ -1514,6 +1537,16 @@
             font-weight: 700;
             letter-spacing: 0.22em;
             text-transform: uppercase;
+        }
+        body.super-elite-encounter #elite-battle-banner {
+            background:
+                linear-gradient(135deg, rgba(8, 26, 40, 0.94), rgba(8, 70, 98, 0.86)),
+                radial-gradient(circle at top, rgba(167, 235, 255, 0.2), transparent 62%);
+            border-color: rgba(118, 217, 255, 0.42);
+            color: #d3f6ff;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.34),
+                0 0 30px rgba(77, 201, 255, 0.2);
         }
         body.elite-encounter #hand-wrap {
             position: absolute;
@@ -1835,6 +1868,77 @@
             font-size: 34px;
             text-shadow: 0 3px 18px rgba(0, 0, 0, 0.62);
         }
+        #super-elite-dodge-hud {
+            position: absolute;
+            left: max(20px, calc(var(--safe-left) + 12px));
+            bottom: calc(var(--safe-bottom) + 22px);
+            z-index: 32;
+            width: min(350px, calc(100vw - 32px));
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 16px 18px;
+            border-radius: 24px;
+            pointer-events: none;
+            background:
+                linear-gradient(145deg, rgba(5, 16, 27, 0.9), rgba(15, 62, 86, 0.82)),
+                radial-gradient(circle at top left, rgba(120, 226, 255, 0.16), transparent 58%);
+            border: 1px solid rgba(114, 214, 255, 0.34);
+            box-shadow:
+                0 18px 34px rgba(0, 0, 0, 0.32),
+                0 0 28px rgba(64, 182, 255, 0.12);
+            backdrop-filter: blur(14px);
+        }
+        #super-elite-dodge-label {
+            color: rgba(175, 237, 255, 0.76);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+        #super-elite-attack-callout {
+            min-height: 42px;
+            color: #e9fbff;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+        #super-elite-dodge-status {
+            color: rgba(185, 240, 255, 0.94);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        #super-elite-dodge-keys {
+            display: flex;
+            gap: 10px;
+        }
+        .super-elite-key {
+            min-width: 46px;
+            padding: 10px 0;
+            border-radius: 14px;
+            border: 1px solid rgba(128, 220, 255, 0.28);
+            background: linear-gradient(180deg, rgba(12, 34, 48, 0.94), rgba(5, 14, 24, 0.98));
+            color: rgba(217, 248, 255, 0.84);
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease;
+        }
+        .super-elite-key.is-hot {
+            border-color: rgba(130, 230, 255, 0.92);
+            color: #ffffff;
+            box-shadow:
+                0 0 0 1px rgba(152, 238, 255, 0.36),
+                0 0 18px rgba(87, 208, 255, 0.32);
+            transform: translateY(-2px);
+        }
+        .super-elite-key.is-cooling {
+            border-color: rgba(255, 184, 122, 0.44);
+            color: rgba(255, 222, 191, 0.88);
+            box-shadow: 0 0 14px rgba(255, 169, 98, 0.16);
+        }
         @media (max-width: 900px) {
             body.elite-encounter #combat-hud {
                 margin-top: 64px;
@@ -1874,6 +1978,22 @@
             body.elite-encounter #end-turn-btn:active,
             body.elite-encounter #end-turn-btn:disabled {
                 transform: translate(-50%, -50%) translate(var(--elite-endturn-x, 0px), var(--elite-endturn-y, 224px)) rotate(var(--elite-endturn-rot, -8deg));
+            }
+            #super-elite-dodge-hud {
+                width: min(320px, calc(100vw - 26px));
+                left: 13px;
+                bottom: calc(var(--safe-bottom) + 14px);
+                padding: 14px 15px;
+                gap: 8px;
+            }
+            #super-elite-attack-callout {
+                min-height: 36px;
+                font-size: 13px;
+            }
+            .super-elite-key {
+                min-width: 42px;
+                padding: 8px 0;
+                font-size: 14px;
             }
         }
     </style>
@@ -1961,6 +2081,16 @@
                     <div class="hp-bar"><div class="hp-fill" id="enemy-hp-fill"></div></div>
                     <div id="enemy-stats">HP: 40/40 | <span class="block-text">Block: 0</span></div>
                     <div class="intent" id="enemy-intent">Intent: Attack for <span id="enemy-dmg">0</span>!</div>
+                </div>
+            </div>
+            <div id="super-elite-dodge-hud">
+                <div id="super-elite-dodge-label">Blue Surge Evasion</div>
+                <div id="super-elite-attack-callout">W clears horizontal waves. A or D dodge vertical slashes.</div>
+                <div id="super-elite-dodge-status">Dodge Ready</div>
+                <div id="super-elite-dodge-keys">
+                    <div class="super-elite-key" data-super-key="W">W</div>
+                    <div class="super-elite-key" data-super-key="A">A</div>
+                    <div class="super-elite-key" data-super-key="D">D</div>
                 </div>
             </div>
             
@@ -2108,7 +2238,6 @@ const MUTATION_DATA = {
 const pageParams = new URLSearchParams(window.location.search);
 const isLlmMode = pageParams.get('mode') === 'llm';
 const isMultiplayerMode = pageParams.get('mode') === 'multiplayer';
-const isElitePreviewMode = pageParams.get('scene') === 'elite' && pageParams.get('preview') === '1';
 const hasLocalLlmSupport = typeof navigator !== 'undefined' && !!navigator.gpu;
 const hasPeerJsSupport = typeof window !== 'undefined' && typeof window.Peer === 'function';
 const RUN_MODE_STANDARD = 'play';
@@ -2117,12 +2246,17 @@ const COIN_REWARD_MIN = 50;
 const COIN_REWARD_MAX = 150;
 const MERCHANT_ENCOUNTER_CHANCE = 0.1;
 const ELITE_ENCOUNTER_CHANCE = 0.1;
+const SUPER_ELITE_ENCOUNTER_CHANCE = 0.05;
 const MERCHANT_CARD_PRICE = 450;
 const MERCHANT_REMOVE_PRICE = 150;
 const MERCHANT_SCENE_PATH = 'merchant_scene.html';
 const ELITE_SCENE_PATH = 'elite_scene.html';
+const SUPER_ELITE_SCENE_PATH = 'super_elite_scene.html';
 const ELITE_SCENE_KEY = 'elite';
+const SUPER_ELITE_SCENE_KEY = 'super-elite';
 const ELITE_HP_MULTIPLIER = 1.3;
+const SUPER_ELITE_HP_MULTIPLIER = 1.6;
+const SUPER_ELITE_REWARD_COINS = 500;
 const MULTIPLAYER_STARTING_HP = 24;
 const DEFAULT_LLM_PERSONALITY_ID = 'friendly';
 const LLM_MODEL_PATTERNS = [
@@ -2132,6 +2266,52 @@ const LLM_MODEL_PATTERNS = [
     /Qwen2-0\.5B-Instruct/i,
     /SmolLM2-1\.7B-Instruct/i
 ];
+
+function normalizeEncounterSceneKey(sceneName = '') {
+    return sceneName === SUPER_ELITE_SCENE_KEY
+        ? SUPER_ELITE_SCENE_KEY
+        : (sceneName === ELITE_SCENE_KEY ? ELITE_SCENE_KEY : '');
+}
+
+function getEncounterSceneConfig(sceneName = ELITE_SCENE_KEY) {
+    const sceneKey = normalizeEncounterSceneKey(sceneName) || ELITE_SCENE_KEY;
+    if (sceneKey === SUPER_ELITE_SCENE_KEY) {
+        return {
+            sceneKey,
+            path: SUPER_ELITE_SCENE_PATH,
+            bannerLabel: 'SUPER ELITE',
+            documentTitle: 'Slay the Spore - Super Elite Encounter',
+            enemyLabel: 'Super Elite',
+            victoryTitle: 'SUPER ELITE SHATTERED',
+            victoryTitleColor: '#8fd9ff',
+            victoryCopy: `Blue energy cracks apart around the super elite. Your creature survives the storm and pockets ${SUPER_ELITE_REWARD_COINS} coins.`,
+            summaryCopy: 'A super elite spore crackles with blue energy up ahead.',
+            hpMultiplier: SUPER_ELITE_HP_MULTIPLIER,
+            rewardCoins: SUPER_ELITE_REWARD_COINS,
+            sizeMultiplier: 2.35,
+            playerSizeMultiplier: 0.82
+        };
+    }
+
+    return {
+        sceneKey: ELITE_SCENE_KEY,
+        path: ELITE_SCENE_PATH,
+        bannerLabel: 'Elite Encounter',
+        documentTitle: 'Slay the Spore - Elite Encounter',
+        enemyLabel: 'Elite',
+        victoryTitle: 'ELITE VANQUISHED',
+        victoryTitleColor: '#f0d9a2',
+        victoryCopy: 'The black spore dissolves into smoke. Your creature survives the ambush and stalks back to the trail.',
+        summaryCopy: 'A shrouded elite spore crawls from the dark ahead.',
+        hpMultiplier: ELITE_HP_MULTIPLIER,
+        rewardCoins: 0,
+        sizeMultiplier: 1,
+        playerSizeMultiplier: 1
+    };
+}
+
+const initialEncounterScene = normalizeEncounterSceneKey(pageParams.get('scene'));
+const isEncounterPreviewMode = !!initialEncounterScene && pageParams.get('preview') === '1';
 const LLM_ACTION_LIBRARY = {
     jab: {
         label: 'Quick Jab',
@@ -3241,6 +3421,10 @@ const eliteActionShardRoot = new THREE.Group();
 eliteActionShardRoot.visible = false;
 scene.add(eliteActionShardRoot);
 
+const superEliteWaveRoot = new THREE.Group();
+superEliteWaveRoot.visible = false;
+scene.add(superEliteWaveRoot);
+
 renderer.domElement.addEventListener('pointermove', handleEliteActionPointerMove);
 renderer.domElement.addEventListener('pointerleave', clearEliteActionHover);
 renderer.domElement.addEventListener('pointerdown', handleEliteActionPointerDown);
@@ -4074,8 +4258,12 @@ function decodeGenome(genome, generation) {
     const root = new THREE.Group();
     root.userData.animations = [];
     
+    const dodgeRoot = new THREE.Group();
+    root.add(dodgeRoot);
+    root.userData.dodgeRoot = dodgeRoot;
+
     const animationRoot = new THREE.Group();
-    root.add(animationRoot);
+    dodgeRoot.add(animationRoot);
     root.userData.animationRoot = animationRoot;
     
     const grassGeo = new THREE.CylinderGeometry(2.6, 2.6, 0.05, 32);
@@ -4529,8 +4717,23 @@ function updateMutationUI() {
     }
 }
 
-let activeEncounterScene = pageParams.get('scene') === ELITE_SCENE_KEY ? ELITE_SCENE_KEY : '';
+let activeEncounterScene = initialEncounterScene;
 let eliteVictoryAwaitingContinue = false;
+const SUPER_ELITE_DODGE_DURATION = 0.8;
+const SUPER_ELITE_WAVE_INTERVAL_MIN = 2;
+const SUPER_ELITE_WAVE_INTERVAL_MAX = 4;
+const SUPER_ELITE_WAVE_TELEGRAPH_TIME = 0.32;
+const SUPER_ELITE_WAVE_TRAVEL_TIME = 0.8;
+const SUPER_ELITE_WAVE_TOTAL_TIME = SUPER_ELITE_WAVE_TELEGRAPH_TIME + SUPER_ELITE_WAVE_TRAVEL_TIME;
+const SUPER_ELITE_WAVE_RECOVERY_FADE = 0.18;
+const superEliteWaveAttacks = [];
+let superEliteWaveIdCounter = 0;
+let superEliteNextWaveAt = Number.POSITIVE_INFINITY;
+let superEliteDodgeState = null;
+const superElitePressedKeys = new Set();
+const superElitePlayerBasePosition = new THREE.Vector3();
+let superElitePlayerBaseReady = false;
+let superElitePlayerBaseRotationY = 0;
 const eliteUiAnchorWorld = new THREE.Vector3();
 const eliteUiAnchorScreen = new THREE.Vector3();
 const eliteUiBounds = new THREE.Box3();
@@ -4942,7 +5145,11 @@ function handleEliteActionPointerDown(event) {
 }
 
 function isEliteEncounterActive() {
-    return activeEncounterScene === ELITE_SCENE_KEY;
+    return activeEncounterScene === ELITE_SCENE_KEY || activeEncounterScene === SUPER_ELITE_SCENE_KEY;
+}
+
+function isSuperEliteEncounterActive() {
+    return activeEncounterScene === SUPER_ELITE_SCENE_KEY;
 }
 
 function isLlmCombatEnabled() {
@@ -4951,7 +5158,20 @@ function isLlmCombatEnabled() {
 
 function syncSoundtrackMode() {
     if (typeof window.setSlayTheSporeMusicMode !== 'function') return;
-    window.setSlayTheSporeMusicMode(isEliteEncounterActive() && gameState === 'FIGHT' ? 'elite' : 'normal');
+    if (gameState !== 'FIGHT') {
+        window.setSlayTheSporeMusicMode('normal');
+        return;
+    }
+    if (isSuperEliteEncounterActive()) {
+        window.setSlayTheSporeMusicMode('super-elite');
+        return;
+    }
+    window.setSlayTheSporeMusicMode(isEliteEncounterActive() ? 'elite' : 'normal');
+}
+
+function getEncounterScenePath(sceneName = '') {
+    const config = getEncounterSceneConfig(sceneName);
+    return config.path;
 }
 
 function getSinglePlayerRoute(scene = '') {
@@ -4968,19 +5188,31 @@ function getSinglePlayerRoute(scene = '') {
 }
 
 function setActiveEncounterScene(sceneName = '') {
-    activeEncounterScene = sceneName || '';
+    activeEncounterScene = normalizeEncounterSceneKey(sceneName);
     eliteUiAnchorLocked = false;
     const eliteActive = isEliteEncounterActive();
+    const superEliteActive = isSuperEliteEncounterActive();
+    const encounterConfig = getEncounterSceneConfig(activeEncounterScene || ELITE_SCENE_KEY);
     if (eliteActive) {
         applyEliteCameraControls();
     } else {
         applyDefaultCameraControls();
     }
     document.body.classList.toggle('elite-encounter', eliteActive);
+    document.body.classList.toggle('super-elite-encounter', superEliteActive);
 
     const banner = document.getElementById('elite-battle-banner');
     if (banner) {
+        banner.textContent = encounterConfig.bannerLabel;
         banner.style.display = eliteActive ? 'inline-flex' : 'none';
+    }
+
+    const dodgeHud = document.getElementById('super-elite-dodge-hud');
+    if (dodgeHud) {
+        dodgeHud.style.display = superEliteActive ? 'flex' : 'none';
+    }
+    if (!superEliteActive) {
+        resetSuperEliteEncounterState(typeof clock !== 'undefined' ? clock.getElapsedTime() : 0);
     }
 
     const handWrap = document.getElementById('hand-wrap');
@@ -5014,7 +5246,7 @@ function getCurrentRunMode() {
 }
 
 function canPersistSinglePlayerRun() {
-    return !isMultiplayerMode && !isElitePreviewMode && typeof saveRunState === 'function';
+    return !isMultiplayerMode && !isEncounterPreviewMode && typeof saveRunState === 'function';
 }
 
 function cloneMerchantEncounterState(state) {
@@ -5050,21 +5282,25 @@ function createMerchantEncounterState() {
 
 function cloneEliteEncounterState(state) {
     if (!state || typeof state !== 'object') return null;
+    const encounterConfig = getEncounterSceneConfig(state.sceneKey);
     return {
         active: state.active !== false,
+        sceneKey: encounterConfig.sceneKey,
         enemyGenome: cloneGenome(state.enemyGenome),
         enemyGeneration: Math.max(1, Number(state.enemyGeneration) || 1),
-        hpMultiplier: Math.max(1, Number(state.hpMultiplier) || ELITE_HP_MULTIPLIER),
+        hpMultiplier: Math.max(1, Number(state.hpMultiplier) || encounterConfig.hpMultiplier),
         visitId: String(state.visitId || '')
     };
 }
 
-function createEliteEncounterState() {
+function createEliteEncounterState(sceneName = ELITE_SCENE_KEY) {
+    const encounterConfig = getEncounterSceneConfig(sceneName);
     return {
         active: true,
+        sceneKey: encounterConfig.sceneKey,
         enemyGenome: randomGenome(),
         enemyGeneration: Math.max(1, playerGeneration),
-        hpMultiplier: ELITE_HP_MULTIPLIER,
+        hpMultiplier: encounterConfig.hpMultiplier,
         visitId: `${Date.now()}-${Math.floor(Math.random() * 100000)}`
     };
 }
@@ -5148,6 +5384,10 @@ function awardVictoryCoinsAndMaybeEncounter() {
         merchantEncounterState = createMerchantEncounterState();
     } else if (encounterRoll < MERCHANT_ENCOUNTER_CHANCE + ELITE_ENCOUNTER_CHANCE) {
         pendingEliteEncounter = true;
+        eliteEncounterState = createEliteEncounterState(ELITE_SCENE_KEY);
+    } else if (encounterRoll < MERCHANT_ENCOUNTER_CHANCE + ELITE_ENCOUNTER_CHANCE + SUPER_ELITE_ENCOUNTER_CHANCE) {
+        pendingEliteEncounter = true;
+        eliteEncounterState = createEliteEncounterState(SUPER_ELITE_SCENE_KEY);
     }
 
     updateRunCoinUI();
@@ -5159,7 +5399,8 @@ function getVictorySummaryText() {
         return `${coinText} A wandering merchant blocks the trail ahead.`;
     }
     if (pendingEliteEncounter) {
-        return `${coinText} A shrouded elite spore crawls from the dark ahead.`;
+        const encounterConfig = getEncounterSceneConfig(eliteEncounterState?.sceneKey);
+        return `${coinText} ${encounterConfig.summaryCopy}`;
     }
     return `${coinText} The path opens toward the next evolution.`;
 }
@@ -5175,10 +5416,12 @@ function enterMerchantEncounterScene() {
 
 function enterEliteEncounterScene() {
     if (!eliteEncounterState) {
-        eliteEncounterState = createEliteEncounterState();
+        eliteEncounterState = createEliteEncounterState(ELITE_SCENE_KEY);
     }
-    persistSinglePlayerRun(ELITE_SCENE_KEY);
-    window.location.href = ELITE_SCENE_PATH;
+    const sceneKey = normalizeEncounterSceneKey(eliteEncounterState.sceneKey) || ELITE_SCENE_KEY;
+    eliteEncounterState.sceneKey = sceneKey;
+    persistSinglePlayerRun(sceneKey);
+    window.location.href = getEncounterScenePath(sceneKey);
 }
 
 function mutatePlayerAfterVictory() {
@@ -6851,7 +7094,8 @@ function goToMenu(isEvolving = false) {
     persistSinglePlayerRun('menu');
 }
 
-function bootstrapElitePreview() {
+function bootstrapElitePreview(sceneName = ELITE_SCENE_KEY) {
+    const sceneKey = normalizeEncounterSceneKey(sceneName) || ELITE_SCENE_KEY;
     playerGenome = randomGenome();
     playerGeneration = 4;
     mutationState = defaultMutationState();
@@ -6864,7 +7108,7 @@ function bootstrapElitePreview() {
     merchantEncounterState = null;
     pendingEliteEncounter = false;
     eliteEncounterState = {
-        ...createEliteEncounterState(),
+        ...createEliteEncounterState(sceneKey),
         enemyGeneration: playerGeneration
     };
 
@@ -6881,14 +7125,14 @@ function bootstrapSinglePlayerRunFromSave() {
         return false;
     }
 
-    if (isElitePreviewMode) {
-        return bootstrapElitePreview();
+    if (isEncounterPreviewMode) {
+        return bootstrapElitePreview(initialEncounterScene);
     }
 
     const save = loadRunState();
     if (!hydrateSinglePlayerRun(save)) {
-        if (pageParams.get('scene') === ELITE_SCENE_KEY) {
-            return bootstrapElitePreview();
+        if (initialEncounterScene) {
+            return bootstrapElitePreview(initialEncounterScene);
         }
         return false;
     }
@@ -6898,9 +7142,10 @@ function bootstrapSinglePlayerRunFromSave() {
         return true;
     }
 
-    if (save.scene === ELITE_SCENE_KEY) {
-        if (pageParams.get('scene') !== ELITE_SCENE_KEY) {
-            window.location.replace(ELITE_SCENE_PATH);
+    const savedEncounterScene = normalizeEncounterSceneKey(save.scene);
+    if (savedEncounterScene) {
+        if (initialEncounterScene !== savedEncounterScene) {
+            window.location.replace(getEncounterScenePath(savedEncounterScene));
             return true;
         }
         startEliteEncounterCombat();
@@ -7526,24 +7771,54 @@ function showEliteVictoryScreen() {
     document.querySelector('.reward-actions').style.display = '';
     document.getElementById('multiplayer-victory-btn').style.display = 'none';
 
-    const titleEl = document.getElementById('reward-screen-title');
-    if (titleEl) {
-        titleEl.textContent = 'ELITE VANQUISHED';
-        titleEl.style.color = '#f0d9a2';
+    const encounterConfig = getEncounterSceneConfig(activeEncounterScene || eliteEncounterState?.sceneKey);
+    if (encounterConfig.rewardCoins > 0) {
+        playerCoins += encounterConfig.rewardCoins;
+        pendingVictoryCoinReward = encounterConfig.rewardCoins;
+        updateRunCoinUI();
+    } else {
+        pendingVictoryCoinReward = 0;
     }
 
-    document.getElementById('victory-copy').textContent = 'The black spore dissolves into smoke. Your creature survives the ambush and stalks back to the trail.';
+    const titleEl = document.getElementById('reward-screen-title');
+    if (titleEl) {
+        titleEl.textContent = encounterConfig.victoryTitle;
+        titleEl.style.color = encounterConfig.victoryTitleColor;
+    }
+
+    document.getElementById('victory-copy').textContent = encounterConfig.victoryCopy;
 
     const addBtn = document.getElementById('reward-add-btn');
     const skipBtn = document.getElementById('reward-skip-btn');
     addBtn.disabled = false;
-    addBtn.innerText = 'Return to Trail';
+    addBtn.innerText = encounterConfig.rewardCoins > 0 ? `Return to Trail (+${encounterConfig.rewardCoins} Coins)` : 'Return to Trail';
     skipBtn.disabled = true;
     skipBtn.style.display = 'none';
 }
 
 function applyEliteEncounterEnvironment() {
     updateEnvironment(playerGeneration);
+    if (isSuperEliteEncounterActive()) {
+        scene.background.set(0x061524);
+        scene.fog.color.set(0x061524);
+        scene.fog.density = 0.024;
+        ambientLight.color.set(0xc3e8ff);
+        ambientLight.intensity = 0.74;
+        hemiLight.intensity = 0.84;
+        hemiLight.color.set(0x76cfff);
+        hemiLight.groundColor.set(0x09131b);
+        dirLight.color.set(0x8bd6ff);
+        dirLight.intensity = 1.04;
+        fillLight.color.set(0x40a8ff);
+        fillLight.intensity = 0.68;
+        rimLight.color.set(0x9ef0ff);
+        rimLight.intensity = 1.22;
+        groundMat.color.set(0x15364b);
+        playerCombatBase.material.color.set(0x1e4661);
+        enemyCombatCircle.children[0].material.color.set(0x10242f);
+        return;
+    }
+
     scene.background.set(0x09131d);
     scene.fog.color.set(0x09131d);
     scene.fog.density = 0.021;
@@ -7661,12 +7936,534 @@ function attachEliteSmoke(root) {
     });
 }
 
+function attachSuperEliteEnergy(root) {
+    const energyGroup = new THREE.Group();
+    const orbGeometry = new THREE.SphereGeometry(0.1, 10, 10);
+    const ringGeometry = new THREE.TorusGeometry(1.55, 0.05, 10, 48);
+    const auraLight = new THREE.PointLight(0x55c8ff, 1.9, 11, 2);
+    auraLight.position.set(0, 1.55, 0);
+    energyGroup.add(auraLight);
+
+    const rings = Array.from({ length: 3 }, (_, index) => {
+        const ring = new THREE.Mesh(
+            ringGeometry,
+            new THREE.MeshBasicMaterial({
+                color: index === 1 ? 0xa3edff : 0x4fa6ff,
+                transparent: true,
+                opacity: 0.44 - index * 0.08,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        ring.rotation.x = Math.PI / 2 + index * 0.18;
+        ring.userData.radius = 1.25 + index * 0.38;
+        ring.userData.offset = index * 0.58;
+        energyGroup.add(ring);
+        return ring;
+    });
+
+    const sparks = Array.from({ length: 14 }, (_, index) => {
+        const spark = new THREE.Mesh(
+            orbGeometry,
+            new THREE.MeshBasicMaterial({
+                color: index % 3 === 0 ? 0xd6fbff : 0x64cfff,
+                transparent: true,
+                opacity: 0.72,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        spark.userData.radius = 1.2 + Math.random() * 1.1;
+        spark.userData.height = 0.6 + Math.random() * 2.1;
+        spark.userData.speed = 0.55 + Math.random() * 0.95;
+        spark.userData.phase = Math.random() * Math.PI * 2;
+        spark.userData.seed = index * 0.37 + Math.random();
+        energyGroup.add(spark);
+        return spark;
+    });
+
+    energyGroup.position.set(0, 1.1, 0);
+    root.add(energyGroup);
+    root.userData.animations.push((time) => {
+        rings.forEach((ring, index) => {
+            const pulse = 0.9 + Math.sin(time * (1.2 + index * 0.2) + ring.userData.offset) * 0.12;
+            ring.scale.setScalar(pulse);
+            ring.rotation.z = time * (0.5 + index * 0.24) + ring.userData.offset;
+            ring.position.y = 0.2 + Math.sin(time * 1.8 + ring.userData.offset) * 0.18 + index * 0.24;
+            ring.material.opacity = 0.26 + (Math.sin(time * 2.6 + ring.userData.offset) + 1) * 0.09;
+        });
+
+        sparks.forEach((spark) => {
+            const t = time * spark.userData.speed + spark.userData.phase;
+            spark.position.set(
+                Math.cos(t * 1.2 + spark.userData.seed) * spark.userData.radius,
+                0.15 + Math.sin(t * 0.9 + spark.userData.seed) * 0.42 + spark.userData.height,
+                Math.sin(t + spark.userData.seed) * spark.userData.radius * 0.7
+            );
+            const scale = 0.55 + (Math.sin(t * 3.8) + 1) * 0.22;
+            spark.scale.setScalar(scale);
+            spark.material.opacity = 0.28 + (Math.sin(t * 4.3 + spark.userData.seed) + 1) * 0.22;
+        });
+
+        auraLight.intensity = 1.5 + (Math.sin(time * 3.2) + 1) * 0.32;
+    });
+}
+
+function disposeSuperEliteWaveNode(node) {
+    if (!node) return;
+    node.traverse((child) => {
+        if (!child.isMesh) return;
+        if (child.geometry) child.geometry.dispose();
+        const materials = Array.isArray(child.material) ? child.material : [child.material];
+        materials.forEach((material) => {
+            if (material) material.dispose();
+        });
+    });
+}
+
+function clearSuperEliteWaveAttacks() {
+    while (superEliteWaveAttacks.length) {
+        const attack = superEliteWaveAttacks.pop();
+        if (attack?.group) {
+            superEliteWaveRoot.remove(attack.group);
+            disposeSuperEliteWaveNode(attack.group);
+        }
+    }
+    superEliteWaveRoot.visible = false;
+}
+
+function queueNextSuperEliteWave(timeSecs) {
+    superEliteNextWaveAt = timeSecs + SUPER_ELITE_WAVE_INTERVAL_MIN + Math.random() * (SUPER_ELITE_WAVE_INTERVAL_MAX - SUPER_ELITE_WAVE_INTERVAL_MIN);
+}
+
+function resetSuperEliteEncounterState(timeSecs = 0) {
+    clearSuperEliteWaveAttacks();
+    superEliteDodgeState = null;
+    clearSuperElitePressedKeys();
+    superEliteNextWaveAt = isSuperEliteEncounterActive() ? timeSecs + 0.9 : Number.POSITIVE_INFINITY;
+}
+
+function getSuperEliteWaveDamage() {
+    return Math.max(2, Math.round(calcEnemyBaseDmg(enemyGeneration) * 0.175));
+}
+
+function buildSuperEliteWavePattern() {
+    if (Math.random() < 0.5) {
+        return {
+            category: 'horizontal',
+            requiredKeys: ['KeyW'],
+            keyLabel: 'W',
+            hudLabel: 'Horizontal wave incoming. Jump it with W.',
+            rotationZ: 0,
+            width: 12.8,
+            height: 1.14,
+            startY: 1.1,
+            endY: 1.7,
+            offsetX: 0
+        };
+    }
+
+    const dodgeLeft = Math.random() < 0.5;
+    return {
+        category: 'vertical',
+        requiredKeys: [dodgeLeft ? 'KeyA' : 'KeyD'],
+        keyLabel: dodgeLeft ? 'A' : 'D',
+        hudLabel: dodgeLeft ? 'Vertical wave. Flip left with A.' : 'Vertical wave. Flip right with D.',
+        rotationZ: 0,
+        width: 1.46,
+        height: 6.4,
+        startY: 2.1,
+        endY: 2.1,
+        offsetX: dodgeLeft ? -1.15 : 1.15
+    };
+}
+
+function createSuperEliteWaveMesh(pattern) {
+    const group = new THREE.Group();
+    const outer = new THREE.Mesh(
+        new THREE.PlaneGeometry(pattern.width * 1.46, pattern.height * 1.72),
+        new THREE.MeshBasicMaterial({
+            color: 0x1b6ab3,
+            transparent: true,
+            opacity: 0.18,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending,
+            toneMapped: false
+        })
+    );
+    const mid = new THREE.Mesh(
+        new THREE.PlaneGeometry(pattern.width * 1.16, pattern.height * 1.2),
+        new THREE.MeshBasicMaterial({
+            color: 0x53c8ff,
+            transparent: true,
+            opacity: 0.34,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending,
+            toneMapped: false
+        })
+    );
+    const core = new THREE.Mesh(
+        new THREE.PlaneGeometry(pattern.width, Math.max(0.2, pattern.height * 0.64)),
+        new THREE.MeshBasicMaterial({
+            color: 0xe2fbff,
+            transparent: true,
+            opacity: 0.82,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending,
+            toneMapped: false
+        })
+    );
+
+    group.add(outer);
+    group.add(mid);
+    group.add(core);
+    return {
+        group,
+        layers: [
+            { mesh: outer, baseOpacity: 0.18 },
+            { mesh: mid, baseOpacity: 0.34 },
+            { mesh: core, baseOpacity: 0.82 }
+        ]
+    };
+}
+
+function spawnSuperEliteWaveAttack(timeSecs) {
+    if (!playerCreature || !enemyCreature) return;
+
+    const pattern = buildSuperEliteWavePattern();
+    const meshData = createSuperEliteWaveMesh(pattern);
+    const startX = THREE.MathUtils.lerp(enemyCreature.position.x, playerCreature.position.x, 0.1) + pattern.offsetX * 0.34;
+    const endX = playerCreature.position.x + pattern.offsetX * 0.12;
+    const startZ = enemyCreature.position.z + 1.6;
+    const endZ = playerCreature.position.z + 0.18;
+    const attack = {
+        id: ++superEliteWaveIdCounter,
+        ...pattern,
+        spawnedAt: timeSecs,
+        hitAt: timeSecs + SUPER_ELITE_WAVE_TOTAL_TIME,
+        resolvedAt: 0,
+        cleanupAt: timeSecs + SUPER_ELITE_WAVE_TOTAL_TIME + SUPER_ELITE_WAVE_RECOVERY_FADE,
+        damage: getSuperEliteWaveDamage(),
+        startX,
+        endX,
+        startY: pattern.startY,
+        endY: pattern.endY,
+        startZ,
+        endZ,
+        group: meshData.group,
+        layers: meshData.layers,
+        dodged: false,
+        resolved: false
+    };
+
+    attack.group.position.set(startX, attack.startY, startZ);
+    superEliteWaveRoot.add(attack.group);
+    superEliteWaveRoot.visible = true;
+    superEliteWaveAttacks.push(attack);
+}
+
+function getCurrentSuperEliteWave(timeSecs) {
+    for (let i = 0; i < superEliteWaveAttacks.length; i++) {
+        const attack = superEliteWaveAttacks[i];
+        if (!attack.resolved && timeSecs <= attack.hitAt) {
+            return attack;
+        }
+    }
+    return null;
+}
+
+function getSuperEliteInputFromPressedKeys() {
+    const hasW = superElitePressedKeys.has('KeyW');
+    const hasA = superElitePressedKeys.has('KeyA');
+    const hasD = superElitePressedKeys.has('KeyD');
+
+    if (hasW && hasA) {
+        return {
+            inputId: 'WA',
+            keys: ['KeyW', 'KeyA']
+        };
+    }
+    if (hasW && hasD) {
+        return {
+            inputId: 'WD',
+            keys: ['KeyW', 'KeyD']
+        };
+    }
+    if (hasW) {
+        return {
+            inputId: 'W',
+            keys: ['KeyW']
+        };
+    }
+    if (hasA) {
+        return {
+            inputId: 'A',
+            keys: ['KeyA']
+        };
+    }
+    if (hasD) {
+        return {
+            inputId: 'D',
+            keys: ['KeyD']
+        };
+    }
+    return null;
+}
+
+function doesSuperEliteInputMatchAttack(input, attack) {
+    if (!input || !attack || !Array.isArray(attack.requiredKeys)) return false;
+    if (input.keys.length !== attack.requiredKeys.length) return false;
+    return attack.requiredKeys.every((requiredKey) => input.keys.includes(requiredKey));
+}
+
+function updateSuperEliteDodgeHud(timeSecs) {
+    const hud = document.getElementById('super-elite-dodge-hud');
+    const callout = document.getElementById('super-elite-attack-callout');
+    const status = document.getElementById('super-elite-dodge-status');
+    if (!hud || !callout || !status) return;
+
+    if (!isSuperEliteEncounterActive() || gameState !== 'FIGHT') {
+        return;
+    }
+
+    const activeAttack = getCurrentSuperEliteWave(timeSecs);
+    const cooldownRemaining = superEliteDodgeState ? Math.max(0, superEliteDodgeState.endsAt - timeSecs) : 0;
+    callout.textContent = activeAttack
+        ? activeAttack.hudLabel
+        : 'Blue energy is building. Stay loose for the next wave.';
+    status.textContent = cooldownRemaining > 0
+        ? `Recovering ${cooldownRemaining.toFixed(1)}s`
+        : 'Dodge Ready';
+
+    document.querySelectorAll('[data-super-key]').forEach((keyEl) => {
+        const keyLabel = keyEl.getAttribute('data-super-key');
+        keyEl.classList.toggle('is-hot', !!activeAttack && activeAttack.requiredKeys?.includes(`Key${keyLabel}`) && cooldownRemaining <= 0);
+        keyEl.classList.toggle('is-cooling', cooldownRemaining > 0 && superEliteDodgeState?.keys?.includes(`Key${keyLabel}`));
+    });
+}
+
+function startSuperEliteDodge(input, timeSecs) {
+    superEliteDodgeState = {
+        inputId: input.inputId,
+        keys: [...input.keys],
+        startAt: timeSecs,
+        endsAt: timeSecs + SUPER_ELITE_DODGE_DURATION
+    };
+}
+
+function updateSuperEliteDodgeAnimation(timeSecs) {
+    if (!playerCreature || !superElitePlayerBaseReady) return;
+    const dodgeRoot = getCreatureDodgeRoot(playerCreature);
+    if (!dodgeRoot) return;
+
+    if (!isSuperEliteEncounterActive()) {
+        dodgeRoot.position.set(0, 0, 0);
+        dodgeRoot.rotation.set(0, 0, 0);
+        superEliteDodgeState = null;
+        return;
+    }
+
+    if (gameState !== 'FIGHT') {
+        playerCreature.position.copy(superElitePlayerBasePosition);
+        playerCreature.rotation.set(0, superElitePlayerBaseRotationY, 0);
+        dodgeRoot.position.set(0, 0, 0);
+        dodgeRoot.rotation.set(0, 0, 0);
+        playerCombatCircle.position.set(superElitePlayerBasePosition.x, 0, superElitePlayerBasePosition.z);
+        superEliteDodgeState = null;
+        return;
+    }
+
+    playerCreature.position.copy(superElitePlayerBasePosition);
+    playerCreature.rotation.set(0, superElitePlayerBaseRotationY, 0);
+    dodgeRoot.position.set(0, 0, 0);
+    dodgeRoot.rotation.set(0, 0, 0);
+    playerCombatCircle.position.set(superElitePlayerBasePosition.x, 0, superElitePlayerBasePosition.z);
+    if (enemyCreature) {
+        enemyCombatCircle.position.set(enemyCreature.position.x, 0, enemyCreature.position.z);
+    }
+
+    if (!superEliteDodgeState) return;
+
+    const progress = THREE.MathUtils.clamp((timeSecs - superEliteDodgeState.startAt) / SUPER_ELITE_DODGE_DURATION, 0, 1);
+    if (progress >= 1) {
+        superEliteDodgeState = null;
+        return;
+    }
+
+    const liftArc = Math.pow(Math.sin(progress * Math.PI), 0.72);
+    const travelArc = Math.pow(Math.sin(progress * Math.PI), 0.88);
+    const flipArc = THREE.MathUtils.smootherstep(progress, 0, 1);
+    const hasW = superEliteDodgeState.keys.includes('KeyW');
+    const direction = superEliteDodgeState.keys.includes('KeyA')
+        ? 1
+        : (superEliteDodgeState.keys.includes('KeyD') ? -1 : 0);
+
+    if (hasW && direction !== 0) {
+        dodgeRoot.position.x += travelArc * 6.4 * direction;
+        dodgeRoot.position.y += liftArc * 6.2;
+        dodgeRoot.position.z -= travelArc * 4.6;
+        dodgeRoot.rotation.x = flipArc * Math.PI * 2.95;
+        dodgeRoot.rotation.z = direction * flipArc * Math.PI * 2.2;
+    } else if (hasW) {
+        dodgeRoot.position.y += liftArc * 7.6;
+        dodgeRoot.position.z -= travelArc * 5.2;
+        dodgeRoot.rotation.x = flipArc * Math.PI * 3.1;
+    } else if (direction !== 0) {
+        dodgeRoot.position.x += travelArc * 7.8 * direction;
+        dodgeRoot.position.y += liftArc * 3.4;
+        dodgeRoot.position.z -= travelArc * 2.6;
+        dodgeRoot.rotation.z = direction * flipArc * Math.PI * 3.15;
+    }
+}
+
+function resolveSuperEliteWaveAttack(attack, options = {}) {
+    if (!attack || attack.resolved) return;
+
+    attack.resolved = true;
+    attack.dodged = !!options.dodged;
+    attack.resolvedAt = typeof options.timeSecs === 'number' ? options.timeSecs : attack.hitAt;
+    attack.cleanupAt = attack.resolvedAt + SUPER_ELITE_WAVE_RECOVERY_FADE;
+
+    if (attack.dodged) {
+        showFloatingText('player', 'Dodged!', '#8fe8ff');
+        return;
+    }
+
+    dealDamage('player', attack.damage, { isEnemyAttack: true, bypassPassiveDodge: true });
+    if (playerHP <= 0) {
+        loseCombat();
+    }
+}
+
+function triggerSuperEliteDodge(input, timeSecs) {
+    startSuperEliteDodge(input, timeSecs);
+    const activeAttack = getCurrentSuperEliteWave(timeSecs);
+    if (activeAttack && doesSuperEliteInputMatchAttack(input, activeAttack)) {
+        resolveSuperEliteWaveAttack(activeAttack, { dodged: true, timeSecs });
+    }
+}
+
+function updateSuperEliteWaveAttacks(timeSecs) {
+    if (!isSuperEliteEncounterActive() || gameState !== 'FIGHT' || !playerCreature || !enemyCreature) {
+        if (!isSuperEliteEncounterActive() || gameState !== 'FIGHT') {
+            clearSuperEliteWaveAttacks();
+        }
+        return;
+    }
+
+    if (!Number.isFinite(superEliteNextWaveAt)) {
+        queueNextSuperEliteWave(timeSecs);
+    }
+
+    if (timeSecs >= superEliteNextWaveAt && !superEliteWaveAttacks.some((attack) => !attack.resolved)) {
+        spawnSuperEliteWaveAttack(timeSecs);
+        queueNextSuperEliteWave(timeSecs);
+    }
+
+    for (let index = superEliteWaveAttacks.length - 1; index >= 0; index--) {
+        const attack = superEliteWaveAttacks[index];
+        const elapsed = Math.max(0, timeSecs - attack.spawnedAt);
+        const telegraphProgress = THREE.MathUtils.clamp(elapsed / SUPER_ELITE_WAVE_TELEGRAPH_TIME, 0, 1);
+        const travelProgress = THREE.MathUtils.clamp((elapsed - SUPER_ELITE_WAVE_TELEGRAPH_TIME) / SUPER_ELITE_WAVE_TRAVEL_TIME, 0, 1);
+        const moveProgress = THREE.MathUtils.smootherstep(travelProgress, 0, 1);
+
+        attack.group.position.set(
+            THREE.MathUtils.lerp(attack.startX, attack.endX, moveProgress),
+            THREE.MathUtils.lerp(attack.startY, attack.endY, moveProgress),
+            THREE.MathUtils.lerp(attack.startZ, attack.endZ, moveProgress)
+        );
+        attack.group.quaternion.copy(camera.quaternion);
+        attack.group.rotateZ(attack.rotationZ);
+
+        const fadeProgress = attack.resolved
+            ? THREE.MathUtils.clamp((timeSecs - attack.resolvedAt) / SUPER_ELITE_WAVE_RECOVERY_FADE, 0, 1)
+            : 0;
+        const scale = attack.resolved
+            ? 1.1 + fadeProgress * 0.75
+            : (elapsed < SUPER_ELITE_WAVE_TELEGRAPH_TIME
+                ? 0.76 + telegraphProgress * 0.34
+                : 1.02 + Math.sin(timeSecs * 18 + attack.id) * 0.04);
+        attack.group.scale.setScalar(scale);
+
+        attack.layers.forEach((entry, layerIndex) => {
+            if (!entry?.mesh?.material) return;
+            const activeOpacity = elapsed < SUPER_ELITE_WAVE_TELEGRAPH_TIME
+                ? entry.baseOpacity * (0.44 + telegraphProgress * 0.76)
+                : entry.baseOpacity * (0.92 - travelProgress * 0.18);
+            entry.mesh.material.opacity = attack.resolved
+                ? Math.max(0, entry.baseOpacity * (1 - fadeProgress) * (layerIndex === 2 && attack.dodged ? 0.55 : 1))
+                : activeOpacity;
+        });
+
+        if (!attack.resolved && timeSecs >= attack.hitAt) {
+            resolveSuperEliteWaveAttack(attack, { timeSecs });
+        }
+
+        if (timeSecs >= attack.cleanupAt) {
+            superEliteWaveRoot.remove(attack.group);
+            disposeSuperEliteWaveNode(attack.group);
+            superEliteWaveAttacks.splice(index, 1);
+        }
+    }
+
+    superEliteWaveRoot.visible = superEliteWaveAttacks.length > 0;
+}
+
+function handleSuperEliteDodgeKeydown(event) {
+    if (!isSuperEliteEncounterActive()) return;
+    if (!['KeyW', 'KeyA', 'KeyD'].includes(event.code)) return;
+
+    superElitePressedKeys.add(event.code);
+    if (event.repeat) {
+        return;
+    }
+
+    event.preventDefault();
+    const timeSecs = typeof clock !== 'undefined' ? clock.getElapsedTime() : 0;
+    if (gameState !== 'FIGHT') {
+        return;
+    }
+    if (superEliteDodgeState && timeSecs < superEliteDodgeState.endsAt) {
+        updateSuperEliteDodgeHud(timeSecs);
+        return;
+    }
+
+    const input = getSuperEliteInputFromPressedKeys();
+    if (!input) {
+        return;
+    }
+
+    triggerSuperEliteDodge(input, timeSecs);
+    updateSuperEliteDodgeHud(timeSecs);
+}
+
+function handleSuperEliteDodgeKeyup(event) {
+    if (!['KeyW', 'KeyA', 'KeyD'].includes(event.code)) return;
+    superElitePressedKeys.delete(event.code);
+}
+
+function clearSuperElitePressedKeys() {
+    superElitePressedKeys.clear();
+}
+
+function getCreatureDodgeRoot(creature) {
+    return creature?.userData?.dodgeRoot || creature?.userData?.animationRoot || null;
+}
+
 function positionEliteCombatants() {
     const playerPosition = new THREE.Vector3(4.2, 0, 5.8);
-    const enemyPosition = new THREE.Vector3(-0.8, 0, -7.4);
+    const enemyPosition = isSuperEliteEncounterActive()
+        ? new THREE.Vector3(-1.8, 0, -11.4)
+        : new THREE.Vector3(-0.8, 0, -7.4);
 
     playerCreature.position.copy(playerPosition);
     playerCreature.rotation.y = Math.PI + 0.52;
+    superElitePlayerBasePosition.copy(playerPosition);
+    superElitePlayerBaseRotationY = playerCreature.rotation.y;
+    superElitePlayerBaseReady = true;
     playerCombatCircle.position.set(playerPosition.x, 0, playerPosition.z);
     playerCombatCircle.visible = true;
 
@@ -7675,8 +8472,13 @@ function positionEliteCombatants() {
     enemyCombatCircle.position.set(enemyPosition.x, 0, enemyPosition.z);
     enemyCombatCircle.visible = true;
 
-    camera.position.set(10.8, 7.6 + playerGeneration * 0.5, 18.6);
-    controls.target.set(0.5, 2.1 + playerGeneration * 0.34, -4.3);
+    if (isSuperEliteEncounterActive()) {
+        camera.position.set(13.2, 8.5 + playerGeneration * 0.52, 23.4);
+        controls.target.set(0.9, 2.3 + playerGeneration * 0.34, -2.6);
+    } else {
+        camera.position.set(10.8, 7.6 + playerGeneration * 0.5, 18.6);
+        controls.target.set(0.5, 2.1 + playerGeneration * 0.34, -4.3);
+    }
     applyEliteCameraControls();
     controls.update();
     eliteUiAnchorLocked = false;
@@ -7688,7 +8490,8 @@ function startEliteEncounterCombat() {
         return;
     }
 
-    setActiveEncounterScene(ELITE_SCENE_KEY);
+    const encounterSceneKey = normalizeEncounterSceneKey(activeEncounterScene || eliteEncounterState?.sceneKey) || ELITE_SCENE_KEY;
+    setActiveEncounterScene(encounterSceneKey);
     eliteVictoryAwaitingContinue = false;
 
     activeCreatures.forEach((creature) => scene.remove(creature));
@@ -7698,7 +8501,8 @@ function startEliteEncounterCombat() {
         enemyCreature = null;
     }
 
-    document.title = 'Slay the Spore - Elite Encounter';
+    const encounterConfig = getEncounterSceneConfig(encounterSceneKey);
+    document.title = encounterConfig.documentTitle;
     gameState = 'FIGHT';
     syncSoundtrackMode();
     document.getElementById('start-screen').style.display = 'none';
@@ -7711,10 +8515,14 @@ function startEliteEncounterCombat() {
     applyEliteEncounterEnvironment();
 
     playerCreature = buildPlayerCreature(playerGenome, playerGeneration);
+    if (encounterConfig.playerSizeMultiplier !== 1) {
+        playerCreature.scale.multiplyScalar(encounterConfig.playerSizeMultiplier);
+    }
     scene.add(playerCreature);
     activeCreatures.push(playerCreature);
 
-    eliteEncounterState = cloneEliteEncounterState(eliteEncounterState) || createEliteEncounterState();
+    eliteEncounterState = cloneEliteEncounterState(eliteEncounterState) || createEliteEncounterState(encounterSceneKey);
+    eliteEncounterState.sceneKey = encounterConfig.sceneKey;
     enemyGeneration = Math.max(1, Number(eliteEncounterState.enemyGeneration) || playerGeneration);
     enemyGenome = cloneGenome(eliteEncounterState.enemyGenome);
     if (!enemyGenome.length) {
@@ -7725,6 +8533,12 @@ function startEliteEncounterCombat() {
     enemyCreature = decodeGenome(enemyGenome, enemyGeneration);
     applyEliteShadowToCreature(enemyCreature);
     attachEliteSmoke(enemyCreature);
+    if (isSuperEliteEncounterActive()) {
+        attachSuperEliteEnergy(enemyCreature);
+    }
+    if (encounterConfig.sizeMultiplier !== 1) {
+        enemyCreature.scale.multiplyScalar(encounterConfig.sizeMultiplier);
+    }
     scene.add(enemyCreature);
     activeCreatures.push(enemyCreature);
 
@@ -7737,7 +8551,7 @@ function startEliteEncounterCombat() {
     playerBlock = 0;
     playerEnergy = 3;
 
-    enemyMaxHP = Math.max(1, Math.ceil(calcEnemyMaxHP(enemyGeneration) * Math.max(1, eliteEncounterState.hpMultiplier || ELITE_HP_MULTIPLIER)));
+    enemyMaxHP = Math.max(1, Math.ceil(calcEnemyMaxHP(enemyGeneration) * Math.max(1, eliteEncounterState.hpMultiplier || encounterConfig.hpMultiplier)));
     enemyHP = enemyMaxHP;
     enemyBlock = 0;
     enemyIntentDmg = 0;
@@ -7752,8 +8566,10 @@ function startEliteEncounterCombat() {
         ? `G${playerGeneration}`
         : `(Gen ${playerGeneration})`;
     document.getElementById('enemy-name').innerText = isCompactMobile()
-        ? `Elite G${enemyGeneration}`
-        : `Elite Spore (Gen ${enemyGeneration})`;
+        ? `${encounterConfig.enemyLabel} G${enemyGeneration}`
+        : `${encounterConfig.enemyLabel} Spore (Gen ${enemyGeneration})`;
+
+    resetSuperEliteEncounterState(clock.getElapsedTime());
 
     drawPile = [...runDeck];
     shuffle(drawPile);
@@ -8191,7 +9007,7 @@ function dealDamage(target, amount, options = {}) {
     let unblocked = amount;
     if (target === 'player') {
         const dodgeChance = getPlayerDodgeChance();
-        if (options.isEnemyAttack && dodgeChance > 0 && Math.random() < dodgeChance) {
+        if (options.isEnemyAttack && !options.bypassPassiveDodge && dodgeChance > 0 && Math.random() < dodgeChance) {
             showFloatingText('player', 'Dodged!', '#8ff0ff');
             updateCombatUI();
             return;
@@ -8335,6 +9151,7 @@ function updateCombatUI() {
     }
     updateMutationUI();
     updateRunCoinUI();
+    updateSuperEliteDodgeHud(typeof clock !== 'undefined' ? clock.getElapsedTime() : 0);
     updateCombatInteractionState();
 }
 
@@ -8438,6 +9255,9 @@ window.triggerEvolution = function() {
 ////////////////////////////////////////////////////////////////////////////////
 
 const clock = new THREE.Clock();
+window.addEventListener('keydown', handleSuperEliteDodgeKeydown);
+window.addEventListener('keyup', handleSuperEliteDodgeKeyup);
+window.addEventListener('blur', clearSuperElitePressedKeys);
 
 function animate() {
     requestAnimationFrame(animate);
@@ -8445,6 +9265,9 @@ function animate() {
     const timeSecs = clock.getElapsedTime();
     animateEnvironment(timeSecs);
     activeCreatures.forEach(c => c.userData.animations.forEach(anim => anim(timeSecs)));
+    updateSuperEliteDodgeAnimation(timeSecs);
+    updateSuperEliteWaveAttacks(timeSecs);
+    updateSuperEliteDodgeHud(timeSecs);
     
     if (gameState === 'START') {
         starters.forEach(c => c.rotation.y = timeSecs * 0.5);

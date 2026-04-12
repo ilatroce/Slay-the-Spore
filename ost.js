@@ -10,11 +10,17 @@
             'OST/Elite/Elit 2.mp3',
             'OST/Elite/Elit 3.mp3',
             'OST/Elite/Elit 4.mp3'
+        ],
+        'super-elite': [
+            'OST/Super Elite/SUPER ELITE - instrumental.mp3',
+            'OST/Super Elite/SUPER ELITE - Le_Miroir_de_Chair.mp3',
+            'OST/Super Elite/SUPER ELITE - Le_Miroir_de_Metal.mp3'
         ]
     };
     const failedTracksByMode = {
         normal: new Set(),
-        elite: new Set()
+        elite: new Set(),
+        'super-elite': new Set()
     };
     const audio = new Audio();
     const unlockEvents = ['pointerdown', 'keydown', 'touchstart'];
@@ -28,7 +34,9 @@
     audio.volume = 0.38;
 
     function normalizeMode(mode) {
-        return mode === 'elite' ? 'elite' : 'normal';
+        if (mode === 'super-elite') return 'super-elite';
+        if (mode === 'elite') return 'elite';
+        return 'normal';
     }
 
     function resolveInitialMode() {
@@ -38,7 +46,7 @@
         }
 
         const params = new URLSearchParams(window.location.search);
-        return params.get('scene') === 'elite' ? 'elite' : 'normal';
+        return normalizeMode(params.get('scene'));
     }
 
     function availableTracks(mode) {
